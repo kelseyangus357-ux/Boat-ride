@@ -18,7 +18,7 @@ body{font-family:'Segoe UI',sans-serif;background:#071728;color:#fff;min-height:
 .sub{font-size:13px;color:#4a7a9b;margin-bottom:24px}
 hr.div{border:none;border-top:1px solid #1a3a55;margin:18px 0}
 .btn{display:block;width:100%;padding:13px;border-radius:10px;border:none;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:10px;transition:opacity .15s}
-.btn:hover{opacity:.85}
+.btn:hover:not(:disabled){opacity:.85}
 .btn-green{background:#1a7a3a;color:#fff}
 .btn-blue{background:#1565c0;color:#fff}
 .btn-gray{background:#1a3a55;color:#7ecbe0}
@@ -38,7 +38,7 @@ hr.div{border:none;border-top:1px solid #1a3a55;margin:18px 0}
 .mode-btn .mlabel{font-weight:700;font-size:15px;color:#7ecbe0}
 .mode-btn .msub{font-size:12px;color:#4a7a9b;margin-top:6px}
 .token-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:6px}
-.tok-btn{padding:5px 2px;border-radius:7px;border:2px solid #1a3a55;background:#071728;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px;transition:border-color .1s}
+.tok-btn{padding:5px 2px;border-radius:7px;border:2px solid #1a3a55;background:#071728;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:2px}
 .tok-btn:hover{border-color:#7ecbe0}
 .tok-btn.sel{border-color:#FFD700;background:#0d2137}
 .tok-btn span{font-size:9px;color:#7ecbe0;font-weight:600}
@@ -140,7 +140,9 @@ hr.div{border:none;border-top:1px solid #1a3a55;margin:18px 0}
     <div style="font-size:52px;margin-bottom:8px">⛵</div>
     <h1>Boat Ride 2.0</h1>
     <p class="sub">Become the Supreme Boat Captain!</p>
-    <button class="btn btn-green" id="btnResume" style="opacity:0.5;cursor:default;margin-bottom:6px">▶ Resume Game<br/><span id="btnResumeSub" style="font-size:11px;font-weight:400">Sign in to resume</span></button>
+    <button class="btn btn-green" id="btnResume" disabled style="opacity:0.5;line-height:1.4">
+      ▶ Resume Game<br/><span id="btnResumeSub" style="font-size:11px;font-weight:400">Loading...</span>
+    </button>
     <hr class="div"/>
     <div class="mode-wrap">
       <div class="mode-btn" id="btnModeOnline"><div class="micon">🌐</div><div class="mlabel">Online Multiplayer</div><div class="msub">Play with friends</div></div>
@@ -167,13 +169,13 @@ hr.div{border:none;border-top:1px solid #1a3a55;margin:18px 0}
       <div class="htp-ch" style="border-left:4px solid #00695c"><div class="chi">🐟</div><div><h4 style="color:#00695c">3. Catch a Fish</h4><p>Collect <b>10 fish</b> (or 6 with Shortcut). Accumulates across visits.</p></div></div>
       <div class="htp-ch" style="border-left:4px solid #0d47a1"><div class="chi">🆘</div><div><h4 style="color:#0d47a1">4. Let's Rescue!</h4><p>Perform <b>2 rescues</b> (or 1 with Shortcut). One space gives a $20 tip!</p></div></div>
       <div style="font-weight:700;color:#1565c0;font-size:13px;margin:10px 0 5px">🎴 Shipwreck Cards</div>
-      <div class="htp-rule" style="background:#fff8f0;border-color:#f5a623">Buy <b>1 card/turn</b> for $10 before rolling. Play <b>1 card/turn</b>. Bought cards can't be played until next turn.<br/><br/><b>💰 Highway Robbery</b> — steal ALL money<br/><b>⚡ Shortcut</b> — reduce a challenge requirement<br/><b>🌀 Teleportation</b> — jump to any space<br/><b>❄️ Freeze Frame</b> — target skips next 2 turns<br/><b>🎲 Double Time</b> — 2 bonus rolls this turn<br/><b>🚀 Fast Track</b> — no exact roll needed to WIN</div>
+      <div class="htp-rule" style="background:#fff8f0;border-color:#f5a623">Buy <b>1 card/turn</b> for $10. Play <b>1 card/turn</b>. Cards bought this turn can't be played until next turn.<br/><br/><b>💰 Highway Robbery</b> — steal all money | <b>⚡ Shortcut</b> — reduce a challenge | <b>🌀 Teleportation</b> — jump anywhere | <b>❄️ Freeze Frame</b> — skip 2 turns | <b>🎲 Double Time</b> — 2 bonus rolls | <b>🚀 Fast Track</b> — no exact roll to WIN</div>
       <div style="font-weight:700;color:#c0392b;font-size:13px;margin:10px 0 5px">💸 Debt Rules</div>
-      <div class="htp-rule" style="background:#fff5f5;border-color:#e74c3c">Balance can go negative but you can't win in debt. 5% interest each turn in debt.<br/><b>Debt Relief:</b> Sacrifice a challenge to reset to $0.</div>
+      <div class="htp-rule" style="background:#fff5f5;border-color:#e74c3c">Balance can go negative but you can't win in debt. 5% interest each turn in debt. <b>Debt Relief:</b> Sacrifice a challenge to reset to $0.</div>
       <div style="font-weight:700;color:#1a7a3a;font-size:13px;margin:10px 0 5px">🤝 Trading</div>
-      <div class="htp-rule" style="background:#f0fff4;border-color:#1a7a3a">Propose trades before rolling: money, fish, rescues, stars, or cards. Recipients can Accept, Decline, or Counter-offer.</div>
+      <div class="htp-rule" style="background:#f0fff4;border-color:#1a7a3a">Propose trades before rolling: money, fish, rescues, stars, or cards. Accept, Decline, or Counter-offer.</div>
       <div style="font-weight:700;color:#1565c0;font-size:13px;margin:10px 0 5px">📧 Online Multiplayer &amp; Notifications</div>
-      <div class="htp-rule">When it's your turn, you'll get an <b>email notification</b> — but only if you're not active in the game tab. Emails work in any browser including incognito, as long as you're signed in. In incognito you'll need to sign in again each session.</div>
+      <div class="htp-rule">Email notifications fire when it's your turn — but only if you're not active in the tab. Works in incognito too, as long as you're signed in.</div>
     </div>
     <div class="htp-ft"><button class="btn btn-blue" style="max-width:280px;margin:0 auto" id="btnHTPClose">Got it — Let's Play! ⛵</button></div>
   </div>
@@ -184,7 +186,6 @@ hr.div{border:none;border-top:1px solid #1a3a55;margin:18px 0}
     <button class="btn-back" id="btnOnlineBack">← Back</button>
     <div style="font-size:36px;margin-bottom:8px">🌐</div>
     <h1>Online Multiplayer</h1>
-    <p class="sub">Set up your profile, then create or join a room</p>
     <div style="text-align:left;margin-bottom:10px"><div class="sl">YOUR NAME</div><input class="inp" id="onlineName" placeholder="Enter your name" value="Player 1"/></div>
     <div style="text-align:left;margin-bottom:10px"><div class="sl">CHOOSE YOUR TOKEN</div><div class="token-grid" id="onlineTokenGrid"></div></div>
     <hr class="div"/>
@@ -213,7 +214,6 @@ hr.div{border:none;border-top:1px solid #1a3a55;margin:18px 0}
     <button class="btn-back" id="btnAIBack">← Back</button>
     <div style="font-size:36px;margin-bottom:8px">🤖</div>
     <h1>AI Competitors</h1>
-    <p class="sub">Customize your game settings</p>
     <div class="sl" style="margin-bottom:6px">AI DIFFICULTY</div>
     <div class="diff-row" id="diffBtns">
       <div class="diff-btn sel" data-diff="easy"><div class="dl">🟢 Easy</div><div class="ds">Random</div></div>
@@ -252,7 +252,7 @@ hr.div{border:none;border-top:1px solid #1a3a55;margin:18px 0}
       <div id="ctrlbar">
         <button id="btnLeave" style="background:#e67e22;color:#fff">🏠 Leave</button>
         <button id="btnZO" style="background:#1a3a55;color:#fff;font-size:17px;width:30px;height:30px;padding:0;border-radius:7px">−</button>
-        <div id="zlbl" style="background:#1a3a55;color:#7ecbe0;padding:4px 8px;border-radius:6px;font-size:11px;font-weight:600;min-width:44px;text-align:center">120%</div>
+        <div id="zlbl" style="background:#1a3a55;color:#7ecbe0;padding:4px 8px;border-radius:6px;font-size:11px;font-weight:600;min-width:44px;text-align:center">200%</div>
         <button id="btnZI" style="background:#1a3a55;color:#fff;font-size:17px;width:30px;height:30px;padding:0;border-radius:7px">+</button>
         <button id="btnCtr" style="background:#1a3a55;color:#7ecbe0">📍 Center</button>
       </div>
@@ -296,11 +296,10 @@ hr.div{border:none;border-top:1px solid #1a3a55;margin:18px 0}
 <script>
 // ── Firebase ──────────────────────────────────────────────────────────────────
 var _auth=null,_db=null,_fs=null;
-var currentUser=null,isGuest=false,isOnlineMultiplayer=false;
-var firebaseReady=false;
+var currentUser=null, isGuest=false, isOnlineMultiplayer=false;
 
-window.addEventListener('load',function(){
-  try{
+window.addEventListener('load', function(){
+  try {
     firebase.initializeApp({
       apiKey:"AIzaSyB_fBqYhfr061UY2xSYrBxO9UW1T16B5Jc",
       authDomain:"boat-ride-629a8.firebaseapp.com",
@@ -310,33 +309,33 @@ window.addEventListener('load',function(){
       messagingSenderId:"529814761740",
       appId:"1:529814761740:web:04a5491c6e91a064cdd929"
     });
-    _auth=firebase.auth();
-    _db=firebase.database();
-    _fs=firebase.firestore();
-    firebaseReady=true;
-    var lel=document.getElementById('authLoading');
-    if(lel)lel.textContent='';
+    _auth = firebase.auth();
+    _db   = firebase.database();
+    _fs   = firebase.firestore();
+    document.getElementById('authLoading').textContent = '';
     _auth.onAuthStateChanged(function(user){
       if(user){
-        currentUser=user;isGuest=false;
+        currentUser = user;
+        isGuest = false;
         saveUserToDb(user);
-        document.getElementById('authErr').textContent='';
-        var bar=document.getElementById('userBar');
-        bar.style.display='flex';
-        bar.innerHTML='👤 <span style="flex:1">'+(user.displayName||user.email||'User')+'</span><span style="color:#4a7a9b">'+(user.email||'')+'</span>';
-        document.getElementById('topUser').textContent=user.email||'';
-        var dn=user.displayName||(user.email?user.email.split('@')[0]:'Player');
-        document.getElementById('onlineName').value=dn;
-        document.getElementById('aiName').value=dn;
+        var bar = document.getElementById('userBar');
+        bar.style.display = 'flex';
+        bar.innerHTML = '👤 <span style="flex:1">'+(user.displayName||user.email||'User')+'</span><span style="color:#4a7a9b">'+(user.email||'')+'</span>';
+        document.getElementById('topUser').textContent = user.email||'';
+        var dn = user.displayName||(user.email?user.email.split('@')[0]:'Player');
+        document.getElementById('onlineName').value = dn;
+        document.getElementById('aiName').value = dn;
+        if(document.getElementById('scAuth').classList.contains('on')) showScreen('scHome');
+        // Only check for saved games AFTER we know who the user is
         checkForSavedGame();
-        if(document.getElementById('scAuth').classList.contains('on'))showScreen('scHome');
-      }else{
-        currentUser=null;
+      } else {
+        currentUser = null;
+        checkForSavedGame();
       }
     });
-  }catch(e){
+  } catch(e) {
     console.error('Firebase init error:',e);
-    document.getElementById('authErr').textContent='Firebase error: '+e.message;
+    document.getElementById('authErr').textContent = 'Firebase error: '+e.message;
   }
 });
 
@@ -345,79 +344,131 @@ function dbGet(p){return _db?_db.ref(p).once('value').then(function(s){return s.
 function dbOn(p,cb){if(!_db)return function(){};var r=_db.ref(p);r.on('value',function(s){cb(s.val());});return function(){r.off();};}
 function dbUpdate(p,v){return _db?_db.ref(p).update(v):Promise.resolve();}
 
-function saveUserToDb(user){
-  if(!user||!_db)return;
-  dbUpdate('users/'+user.uid,{email:user.email||'',displayName:user.displayName||user.email||'Player',lastSeen:Date.now()});
+function saveUserToDb(u){
+  if(!u||!_db)return;
+  dbUpdate('users/'+u.uid,{email:u.email||'',displayName:u.displayName||u.email||'Player',lastSeen:Date.now()});
 }
 
 function sendTurnEmail(toEmail,toName,fromName,roomCode){
   if(!_fs||!toEmail)return;
   var url='https://kelseysboatride.netlify.app/';
-  _fs.collection('mail').add({
-    to:toEmail,
-    message:{
-      subject:'⛵ It\'s your turn in Boat Ride 2.0!',
-      html:'<div style="font-family:sans-serif;max-width:480px;margin:0 auto;background:#071728;color:#fff;border-radius:16px;padding:32px;text-align:center">'
-        +'<div style="font-size:48px;margin-bottom:8px">⛵</div>'
-        +'<h2 style="color:#7ecbe0;margin-bottom:4px">Boat Ride 2.0</h2>'
-        +'<p style="font-size:16px;margin-bottom:8px">Hi <b>'+toName+'</b>!</p>'
-        +'<p style="font-size:15px;color:#aaa;margin-bottom:24px"><b style="color:#fff">'+fromName+'</b> just finished their turn in room <b style="color:#FFD700">'+roomCode+'</b>.</p>'
-        +'<p style="font-size:18px;font-weight:bold;color:#4eff91;margin-bottom:24px">It\'s your turn — time to roll! 🎲</p>'
-        +'<a href="'+url+'" style="display:inline-block;background:#1565c0;color:#fff;text-decoration:none;padding:14px 32px;border-radius:10px;font-weight:700;font-size:16px;margin-bottom:24px">▶ Play Now</a>'
-        +'<p style="font-size:12px;color:#4a7a9b">Room code: <b style="color:#FFD700;letter-spacing:4px">'+roomCode+'</b></p></div>'
-    }
-  }).catch(function(e){console.warn('Mail error:',e);});
+  _fs.collection('mail').add({to:toEmail,message:{subject:'⛵ It\'s your turn in Boat Ride 2.0!',html:'<div style="font-family:sans-serif;max-width:480px;margin:0 auto;background:#071728;color:#fff;border-radius:16px;padding:32px;text-align:center"><div style="font-size:48px">⛵</div><h2 style="color:#7ecbe0">Boat Ride 2.0</h2><p>Hi <b>'+toName+'</b>! <b>'+fromName+'</b> just finished their turn in room <b style="color:#FFD700">'+roomCode+'</b>.</p><p style="color:#4eff91;font-size:18px;font-weight:bold">It\'s your turn! 🎲</p><a href="'+url+'" style="display:inline-block;background:#1565c0;color:#fff;text-decoration:none;padding:14px 32px;border-radius:10px;font-weight:700">▶ Play Now</a></div>'}}).catch(function(e){console.warn('Mail:',e);});
 }
 
 // ── Save system ────────────────────────────────────────────────────────────────
-var MAX_SAVES=3;
-function saveSlotKey(id){return'savedGames/'+currentUser.uid+'/'+id;}
+var MAX_SAVES = 3;
+function saveSlotKey(id){return 'savedGames/'+currentUser.uid+'/'+id;}
 
 function saveGame(s){
   if(!currentUser||!_db||isOnlineMultiplayer)return;
   var slotId=s._saveSlot||('slot_'+Date.now());
-  s._saveSlot=slotId;GS=s;
+  s._saveSlot=slotId; GS=s;
   var opps=s.players.filter(function(p,i){return i!==0&&p;});
-  var oppNames=opps.map(function(p){return(p.isAI?'🤖 ':'')+p.name;}).join(', ');
-  var hasAI=opps.some(function(p){return p.isAI;});
-  var meta={slotId:slotId,savedAt:Date.now(),gameType:hasAI?'vs AI':'Local Multiplayer',opponents:oppNames,currentTurn:s.players[s.curIdx]?s.players[s.curIdx].name:'?',completedCount:s.players[0]?(s.players[0].completedTasks||[]).length:0};
-  dbSet(saveSlotKey(slotId),{state:cleanForFB(s),meta:meta}).catch(function(e){console.warn('Save error:',e);});
+  var meta={slotId:slotId,savedAt:Date.now(),gameType:opps.some(function(p){return p.isAI;})?'vs AI':'Local Multiplayer',opponents:opps.map(function(p){return(p.isAI?'🤖 ':'')+p.name;}).join(', '),currentTurn:s.players[s.curIdx]?s.players[s.curIdx].name:'?',completedCount:s.players[0]?(s.players[0].completedTasks||[]).length:0};
+  dbSet(saveSlotKey(slotId),{state:cleanForFB(s),meta:meta}).catch(function(e){console.warn('Save:',e);});
 }
 
 function getAllSaves(){
   if(!currentUser||!_db)return Promise.resolve({});
-  return dbGet('savedGames/'+currentUser.uid).then(function(snap){return snap||{};}).catch(function(){return{};});
+  return dbGet('savedGames/'+currentUser.uid).then(function(s){return s||{};}).catch(function(){return{};});
 }
 
-function deleteSaveSlot(slotId){
+function deleteSaveSlot(id){
   if(!currentUser||!_db)return Promise.resolve();
-  return dbSet(saveSlotKey(slotId),null).catch(function(e){console.warn('Delete error:',e);});
+  return dbSet(saveSlotKey(id),null).catch(function(e){console.warn('Del:',e);});
 }
 
-function deleteSavedGame(){
-  if(!GS||!GS._saveSlot)return;
-  deleteSaveSlot(GS._saveSlot);
-}
+function deleteSavedGame(){if(!GS||!GS._saveSlot)return;deleteSaveSlot(GS._saveSlot);}
 
-function checkResumeVisibility(){
-  var btn=document.getElementById('btnResume');
-  var div=document.getElementById('resumeDivider');
-  if(btn&&div)div.style.display=btn.style.display==='none'?'none':'block';
-}
-
+// Resume button management
 function checkForSavedGame(){
-  if(!currentUser||!_db)return;
+  var btn=document.getElementById('btnResume');
+  var sub=document.getElementById('btnResumeSub');
+  if(!btn||!sub)return;
+
+  if(!currentUser){
+    btn.disabled=true; btn.style.opacity='0.5';
+    sub.textContent=isGuest?'Not available for guests':'Sign in to resume';
+    return;
+  }
+  if(!_db){
+    btn.disabled=true; btn.style.opacity='0.5';
+    sub.textContent='Connecting...';
+    return;
+  }
+  sub.textContent='Loading...';
   getAllSaves().then(function(saves){
     var slots=Object.values(saves).filter(function(s){return s&&s.meta;});
-    var btn=document.getElementById('btnResume');
     if(slots.length>0){
-      btn.textContent='▶ Resume Game'+(slots.length>1?' ('+slots.length+' saved)':'');
-      btn.style.display='block';
-    }else{
-      btn.style.display='none';
+      btn.disabled=false; btn.style.opacity='1';
+      sub.textContent=slots.length===1?'1 saved game':slots.length+' saved games';
+    } else {
+      btn.disabled=true; btn.style.opacity='0.5';
+      sub.textContent='No saved games';
     }
-    checkResumeVisibility();
-  }).catch(function(e){console.warn('checkForSavedGame error:',e);});
+  }).catch(function(){btn.disabled=true;btn.style.opacity='0.5';sub.textContent='Could not load';});
+}
+
+document.getElementById('btnResume').addEventListener('click', openResumePicker);
+
+function openResumePicker(){
+  if(!currentUser)return;
+  getAllSaves().then(function(saves){
+    var slots=Object.values(saves).filter(function(s){return s&&s.meta&&s.state;});
+    if(!slots.length){checkForSavedGame();return;}
+    if(slots.length===1){loadSaveSlot(slots[0]);return;}
+    slots.sort(function(a,b){return b.meta.savedAt-a.meta.savedAt;});
+    document.getElementById('phd').style.background='#1a3a55';
+    document.getElementById('phd').innerHTML='<div style="font-size:18px;font-weight:700;color:#fff">▶ Resume Which Game?</div>';
+    document.getElementById('pbd').innerHTML='<div style="font-size:13px;color:#555;margin-bottom:4px">Choose a saved game:</div>';
+    var ft=document.getElementById('pft'); ft.innerHTML='';
+    slots.forEach(function(slot){
+      var m=slot.meta, d=new Date(m.savedAt);
+      var ts=d.toLocaleDateString()+' '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+      var b=document.createElement('button');
+      b.style.cssText='display:block;width:100%;padding:10px 14px;border-radius:9px;border:2px solid #1a3a55;background:#071728;color:#fff;font-size:12px;cursor:pointer;margin-bottom:8px;text-align:left';
+      b.innerHTML='<div style="font-weight:700;color:#7ecbe0">'+(m.gameType==='vs AI'?'🤖':'👥')+' '+m.gameType+'</div><div>With: <b>'+(m.opponents||'nobody')+'</b></div><div style="color:#4eff91">Progress: '+m.completedCount+'/4</div><div style="color:#4a7a9b;font-size:10px">'+m.currentTurn+' • '+ts+'</div>';
+      b.onclick=function(){hideP();loadSaveSlot(slot);};
+      ft.appendChild(b);
+      var del=document.createElement('button');
+      del.textContent='🗑 Delete'; del.style.cssText='font-size:11px;padding:5px 12px;margin-bottom:10px;background:#c0392b;color:#fff;border:none;border-radius:6px;cursor:pointer;display:block';
+      del.onclick=function(){deleteSaveSlot(m.slotId).then(function(){hideP();checkForSavedGame();});};
+      ft.appendChild(del);
+    });
+    var cancel=document.createElement('button'); cancel.textContent='Cancel'; cancel.className='pn'; cancel.onclick=hideP;
+    ft.appendChild(cancel);
+    document.getElementById('po').classList.add('on');
+  });
+}
+
+function loadSaveSlot(slot){
+  isOnlineMultiplayer=false; myId=0; aiSpeed=slot.state.aiSpeed||'show';
+  showScreen(null); document.getElementById('game').classList.add('on');
+  document.getElementById('rpill').textContent='OFFLINE';
+  JC=buildJC(); GS=slot.state; drawBoard(); renderAll();
+  document.getElementById('tro').classList.remove('on');
+  setTimeout(function(){centerOn(GS.curIdx);},100);
+}
+
+function showSaveFullPopup(slots,action){
+  slots.sort(function(a,b){return b.meta.savedAt-a.meta.savedAt;});
+  document.getElementById('phd').style.background='#c0392b';
+  document.getElementById('phd').innerHTML='<div style="font-size:18px;font-weight:700;color:#fff">🗑 Save Slots Full</div>';
+  document.getElementById('pbd').innerHTML='<div style="font-size:13px;color:#333;margin-bottom:8px">You have <b>3 saved games</b>. Delete one to start a new game.</div>';
+  var ft=document.getElementById('pft'); ft.innerHTML='';
+  slots.forEach(function(slot){
+    var m=slot.meta, d=new Date(m.savedAt);
+    var row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;background:#f5f5f5;margin-bottom:6px;width:100%';
+    row.innerHTML='<div style="flex:1;font-size:11px"><div style="font-weight:700;color:#1565c0">'+(m.gameType==='vs AI'?'🤖':'👥')+' '+m.gameType+'</div><div>With: <b>'+(m.opponents||'nobody')+'</b></div><div style="color:#888;font-size:10px">'+d.toLocaleDateString()+'</div></div>';
+    var del=document.createElement('button'); del.textContent='🗑 Delete';
+    del.style.cssText='padding:6px 12px;border-radius:6px;border:none;background:#c0392b;color:#fff;font-weight:600;font-size:11px;cursor:pointer';
+    del.onclick=function(){deleteSaveSlot(m.slotId).then(function(){hideP();checkForSavedGame();if(action==='ai')document.getElementById('btnStartAI').click();else if(action==='online')document.getElementById('btnCreateRoom').click();});};
+    row.appendChild(del); ft.appendChild(row);
+  });
+  var cancel=document.createElement('button'); cancel.textContent='Cancel'; cancel.className='pn'; cancel.onclick=hideP;
+  ft.appendChild(cancel);
+  document.getElementById('po').classList.add('on');
 }
 
 // ── Constants ─────────────────────────────────────────────────────────────────
@@ -448,8 +499,7 @@ var TASKS={
   boat_school:{key:"boat_school",label:"Boat School",entryIdx:5,exitIdx:6,count:6,colGap:SW,color:"#5b2c8c",
     spaces:[{story:"You ace a test drive!",eff:function(p){return mg(p,{stars:p.stars+1});},desc:"+1 ⭐",reward:1},{story:"F on nav test.",eff:function(p){return mg(p,{stars:Math.max(0,p.stars-1)});},desc:"-1 ⭐",reward:-1},{story:"New friends at sailing camp!",eff:function(p){return mg(p,{stars:p.stars+1});},desc:"+1 ⭐",reward:1},{story:"Fell asleep in class.",eff:function(p){return mg(p,{stars:Math.max(0,p.stars-1)});},desc:"-1 ⭐",reward:-1},{story:"Learn to tow water skiers!",eff:function(p){return mg(p,{stars:p.stars+2});},desc:"+2 ⭐",reward:2},{story:"You pass your final exam!",eff:function(p){return mg(p,{stars:p.stars+1});},desc:"+1 ⭐",reward:1}],
     req:function(p){return p.stars>=(p.shortcut&&p.shortcut.stars?2:3);},done:"🎓 Graduated",prog:function(p){return"⭐ "+p.stars+"/"+(p.shortcut&&p.shortcut.stars?2:3)+" stars";}},
-  boat:{key:"boat",label:"The Boat Store",entryIdx:12,exitIdx:13,count:6,colGap:SW,color:"#b7600a",
-    spaces:[],req:function(p){return p.boat!==null;},done:null,prog:function(p){return(p.boat?BOAT_EMOJIS[p.boat.name]||"🛥️":"⛵")+" "+(p.boat?p.boat.name:"No boat yet");}},
+  boat:{key:"boat",label:"The Boat Store",entryIdx:12,exitIdx:13,count:6,colGap:SW,color:"#b7600a",spaces:[],req:function(p){return p.boat!==null;},done:null,prog:function(p){return(p.boat?BOAT_EMOJIS[p.boat.name]||"🛥️":"⛵")+" "+(p.boat?p.boat.name:"No boat yet");}},
   fish:{key:"fish",label:"Catch a Fish",entryIdx:19,exitIdx:20,count:8,colGap:SW,color:"#0e6655",
     spaces:[{story:"Great fishing spot!",eff:function(p){return mg(p,{fish:p.fish+3});},desc:"+3 🐟",reward:3},{story:"Bad stream.",eff:function(p){return p;},desc:"Empty.",reward:0},{story:"Sister teaches bait tricks!",eff:function(p){return mg(p,{fish:p.fish+6});},desc:"+6 🐟",reward:6},{story:"Just one nibble.",eff:function(p){return mg(p,{fish:p.fish+1});},desc:"+1 🐟",reward:1},{story:"Wake up at dawn, worth it!",eff:function(p){return mg(p,{fish:p.fish+4});},desc:"+4 🐟",reward:4},{story:"Sailor shares his spot.",eff:function(p){return mg(p,{fish:p.fish+2});},desc:"+2 🐟",reward:2},{story:"Jackpot! Fish are jumping.",eff:function(p){return mg(p,{fish:p.fish+5});},desc:"+5 🐟",reward:5},{story:"Your line snaps.",eff:function(p){return p;},desc:"Got away.",reward:0}],
     req:function(p){return p.fish>=(p.shortcut&&p.shortcut.fish?6:10);},done:"🐟 Expert Fisherman",prog:function(p){return"🐟 "+p.fish+"/"+(p.shortcut&&p.shortcut.fish?6:10)+" fish";}},
@@ -469,91 +519,103 @@ function buildJC(){var c={};var tkeys=Object.keys(TASKS);for(var ki=0;ki<tkeys.l
 function sKind(i){if(i===0)return"start";if(SWSP.indexOf(i)>=0)return"swim";if(SKSP.indexOf(i)>=0)return"sink";if(JMAP[i])return"entry_"+JMAP[i];return"normal";}
 function sColor(k){var m={start:"#1a7a3a",swim:"#1565c0",sink:"#b71c1c",entry_boat_school:"#6a1b9a",entry_boat:"#e65100",entry_fish:"#00695c",entry_rescue:"#0d47a1",entry_winner:"#f57f17",normal:"#c8a96e"};return m[k]||"#c8a96e";}
 
-// ── State ─────────────────────────────────────────────────────────────────────
-var GS=null,myId=0,rCode=null,rUnsub=null;
-var scale=2.0,JC={},aiSpeed="show",tradeOpen=false;
-var selRoomSize=2,selOnlineTok="captain",selAITok="captain",selDiff="easy",selCnt=1,selSpd="show";
+// ── Core state ────────────────────────────────────────────────────────────────
+var GS=null, myId=0, rCode=null, rUnsub=null;
+var scale=2.0, JC={}, aiSpeed="show", tradeOpen=false;
+var selRoomSize=2, selOnlineTok="captain", selAITok="captain", selDiff="easy", selCnt=1, selSpd="show";
 var pageIsVisible=true;
-var STEP_MS=320; // ms per space when animating movement
+var STEP_MS=320;
+var LAND_PAUSE_MS=1000; // extra pause when landing on final space
 
 document.addEventListener("visibilitychange",function(){
   pageIsVisible=!document.hidden;
-  if(rCode&&currentUser)dbSet("rooms/"+rCode+"/presence/"+myId,pageIsVisible);
+  if(rCode&&currentUser) dbSet("rooms/"+rCode+"/presence/"+myId,pageIsVisible);
 });
 
-function push(s){
-  if(isOnlineMultiplayer&&rCode){
-    var cur=s.players&&s.players[s.curIdx];
-    var isMine=cur&&cur.uid===(currentUser?currentUser.uid:null);
-    if(!isMine){GS=s;renderAll();return;}
-    dbSet("rooms/"+rCode,cleanForFB(s)).catch(function(e){console.error(e);});
-  }else{GS=s;saveGame(s);renderAll();}
+// ── MULTIPLAYER: only the active player writes to Firebase ────────────────────
+// All game logic functions ONLY run on the client whose turn it is.
+// Non-active clients just call renderAll() when Firebase updates.
+function isMyTurnNow(){
+  if(!isOnlineMultiplayer) return true;
+  if(!GS||!currentUser) return false;
+  var cur=GS.players&&GS.players[GS.curIdx];
+  return !!(cur && cur.uid && cur.uid===currentUser.uid);
 }
+
+// pushLocal: update GS and re-render without writing to Firebase
+function pushLocal(s){ GS=s; renderAll(); }
+
+// pushRemote: write state to Firebase (only call when isMyTurnNow())
+function pushRemote(s){
+  GS=s;
+  if(isOnlineMultiplayer && rCode){
+    dbSet("rooms/"+rCode, cleanForFB(s)).catch(function(e){console.error('FB write error:',e);});
+  }
+  renderAll();
+}
+
+// push: smart router — use remote if online and our turn, else local
+function push(s){
+  if(isOnlineMultiplayer){
+    pushLocal(s); // always update local view immediately
+    var cur=s.players&&s.players[s.curIdx];
+    if(cur && cur.uid && currentUser && cur.uid===currentUser.uid){
+      dbSet("rooms/"+rCode, cleanForFB(s)).catch(function(e){console.error('FB write:',e);});
+    }
+  } else {
+    GS=s; saveGame(s); renderAll();
+  }
+}
+
 function addL(s,m){if(!s.log)s.log=[];s.log=[m].concat(s.log).slice(0,60);}
 
 // ── Screens ───────────────────────────────────────────────────────────────────
 function showScreen(id){
   var all=document.querySelectorAll(".screen");
   for(var i=0;i<all.length;i++) all[i].classList.remove("on");
-  if(id){
-    var el=document.getElementById(id);
-    if(el) el.classList.add("on");
-  }
-  // Refresh resume button whenever home screen is shown
+  if(id){ var el=document.getElementById(id); if(el) el.classList.add("on"); }
   if(id==="scHome") checkForSavedGame();
 }
 
 // ── Auth ──────────────────────────────────────────────────────────────────────
 var authMode="signin";
-
 document.getElementById("btnAuthSubmit").addEventListener("click",function(){
   var email=document.getElementById("authEmail").value.trim();
   var pass=document.getElementById("authPass").value;
   var name=document.getElementById("authName").value.trim();
-  var errEl=document.getElementById("authErr");
-  errEl.textContent="";
+  var errEl=document.getElementById("authErr"); errEl.textContent="";
   if(!email||!pass){errEl.textContent="Email and password required.";return;}
-  if(!_auth){errEl.textContent="Still connecting — please wait a moment.";return;}
+  if(!_auth){errEl.textContent="Still connecting — please wait.";return;}
   if(authMode==="signup"){
     _auth.createUserWithEmailAndPassword(email,pass).then(function(cred){
       return cred.user.updateProfile({displayName:name||email.split("@")[0]}).then(function(){saveUserToDb(cred.user);});
     }).catch(function(e){errEl.textContent=e.message;});
-  }else{
+  } else {
     _auth.signInWithEmailAndPassword(email,pass).then(function(cred){saveUserToDb(cred.user);}).catch(function(e){errEl.textContent=e.message;});
   }
 });
-
 document.getElementById("btnAuthGuest").addEventListener("click",function(){
-  isGuest=true;currentUser=null;
+  isGuest=true; currentUser=null;
   document.getElementById("userBar").style.display="none";
   document.getElementById("topUser").textContent="Guest";
   showScreen("scHome");
 });
-
 document.getElementById("authToggleLink").addEventListener("click",function(){
   authMode=authMode==="signin"?"signup":"signin";
-  var isUp=authMode==="signup";
-  document.getElementById("btnAuthSubmit").textContent=isUp?"📝 Sign Up":"🚀 Sign In";
-  document.getElementById("authSubtitle").textContent=isUp?"Create your account":"Sign in to set sail!";
-  document.getElementById("authToggleLink").textContent=isUp?"Sign in instead":"Sign up instead";
-  document.getElementById("authName").style.display=isUp?"block":"none";
+  var up=authMode==="signup";
+  document.getElementById("btnAuthSubmit").textContent=up?"📝 Sign Up":"🚀 Sign In";
+  document.getElementById("authSubtitle").textContent=up?"Create your account":"Sign in to set sail!";
+  document.getElementById("authToggleLink").textContent=up?"Sign in instead":"Sign up instead";
+  document.getElementById("authName").style.display=up?"block":"none";
   document.getElementById("authErr").textContent="";
 });
-
-document.getElementById("btnSignOut").addEventListener("click",function(){
-  if(_auth)_auth.signOut();
-  isGuest=false;currentUser=null;
-  showScreen("scAuth");
-});
+document.getElementById("btnSignOut").addEventListener("click",function(){if(_auth)_auth.signOut();isGuest=false;currentUser=null;showScreen("scAuth");});
 
 // ── Token grids ───────────────────────────────────────────────────────────────
 function tokenSVG(key,color,halo){var h=halo?'<circle cx="0" cy="-14" r="18" fill="none" stroke="#FFD700" stroke-width="3" opacity="0.8"/>':'';var body=h;body+='<rect x="-8" y="-4" width="16" height="20" rx="4" fill="'+color+'"/><circle cx="0" cy="-12" r="8" fill="#FDDBB4"/><rect x="-9" y="-22" width="18" height="8" rx="2" fill="#1a2a4a"/><rect x="-9" y="-16" width="18" height="2" fill="#FFD700"/><circle cx="-3" cy="-13" r="1" fill="#555"/><circle cx="3" cy="-13" r="1" fill="#555"/>';if(key==="lifeguard")body+='<rect x="-7" y="-4" width="14" height="14" rx="3" fill="#e74c3c"/><rect x="-1" y="-1" width="2" height="8" fill="#fff"/><rect x="-4" y="2" width="8" height="2" fill="#fff"/>';else if(key==="sailor")body+='<polygon points="0,2 -8,-4 8,-4" fill="#1565c0"/>';else if(key==="pirate")body+='<ellipse cx="-3" cy="-13" rx="3" ry="2" fill="#1a1a1a"/><circle cx="-8" cy="-10" r="1.5" fill="#FFD700"/>';else body+='<rect x="-11" y="-4" width="5" height="3" rx="1" fill="#FFD700"/><rect x="6" y="-4" width="5" height="3" rx="1" fill="#FFD700"/>';body+='<rect x="-7" y="16" width="6" height="10" rx="2" fill="#1a2a4a"/><rect x="1" y="16" width="6" height="10" rx="2" fill="#1a2a4a"/>';return body;}
-
 function buildTokenGrid(cid,selKey,color,onSel){var el=document.getElementById(cid);if(!el)return;el.innerHTML="";for(var i=0;i<TOKEN_KEYS.length;i++){(function(key,lbl){var btn=document.createElement("div");btn.className="tok-btn"+(key===selKey?" sel":"");btn.innerHTML='<svg width="42" height="50" viewBox="-22 -30 44 58">'+tokenSVG(key,color,false)+'</svg><span>'+lbl+'</span>';btn.addEventListener("click",function(){var all=el.querySelectorAll(".tok-btn");for(var j=0;j<all.length;j++)all[j].classList.remove("sel");btn.classList.add("sel");onSel(key);});el.appendChild(btn);})(TOKEN_KEYS[i],TOKEN_LABELS[i]);}}
-
 buildTokenGrid("onlineTokenGrid",selOnlineTok,"#2471a3",function(k){selOnlineTok=k;});
 buildTokenGrid("aiTokenGrid",selAITok,"#c0392b",function(k){selAITok=k;});
-
 function setupBtns(cid,attr,fn){var btns=document.getElementById(cid).querySelectorAll("["+attr+"]");for(var i=0;i<btns.length;i++){btns[i].addEventListener("click",(function(b){return function(){var all=document.getElementById(cid).querySelectorAll("["+attr+"]");for(var j=0;j<all.length;j++)all[j].classList.remove("sel");b.classList.add("sel");fn(b.getAttribute(attr));}})(btns[i]));}}
 setupBtns("diffBtns","data-diff",function(v){selDiff=v;});
 setupBtns("countBtns","data-cnt",function(v){selCnt=parseInt(v);document.getElementById("aiOppNames").textContent="AI opponents: "+AI_NAMES.slice(0,selCnt).join(", ");});
@@ -563,57 +625,12 @@ setupBtns("roomSizeBtns","data-sz",function(v){selRoomSize=parseInt(v);});
 // ── Screen nav ────────────────────────────────────────────────────────────────
 document.getElementById("btnHowTo").addEventListener("click",function(){showScreen("scHTP");});
 document.getElementById("btnHTPClose").addEventListener("click",function(){showScreen("scHome");});
-document.getElementById("btnModeOnline").addEventListener("click",function(){if(!currentUser&&!isGuest){alert("Please sign in.");return;}if(isGuest){alert("Online Multiplayer requires a signed-in account.");return;}showScreen("scOnline");});
+document.getElementById("btnModeOnline").addEventListener("click",function(){if(!currentUser){alert("Please sign in for online play.");return;}showScreen("scOnline");});
 document.getElementById("btnModeAI").addEventListener("click",function(){showScreen("scAI");});
 document.getElementById("btnOnlineBack").addEventListener("click",function(){showScreen("scHome");});
 document.getElementById("btnAIBack").addEventListener("click",function(){showScreen("scHome");});
 
-// ── Resume ────────────────────────────────────────────────────────────────────
-function openResumePicker(){
-  if(!currentUser) return;
-  getAllSaves().then(function(saves){
-    var slots=Object.values(saves).filter(function(s){return s&&s.meta&&s.state;});
-    if(!slots.length){alert("No saved games found.");checkForSavedGame();return;}
-    if(slots.length===1){loadSaveSlot(slots[0]);return;}
-    slots.sort(function(a,b){return b.meta.savedAt-a.meta.savedAt;});
-    document.getElementById("phd").style.background="#1a3a55";
-    document.getElementById("phd").innerHTML='<div style="font-size:18px;font-weight:700;color:#fff">▶ Resume Which Game?</div>';
-    document.getElementById("pbd").innerHTML='<div style="font-size:13px;color:#555;margin-bottom:4px">Choose a saved game:</div>';
-    var ft=document.getElementById("pft");ft.innerHTML="";
-    slots.forEach(function(slot){
-      var m=slot.meta,d=new Date(m.savedAt);
-      var ts=d.toLocaleDateString()+" "+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-      var btn=document.createElement("button");
-      btn.style.cssText="display:block;width:100%;padding:10px 14px;border-radius:9px;border:2px solid #1a3a55;background:#071728;color:#fff;font-size:12px;cursor:pointer;margin-bottom:8px;text-align:left";
-      btn.innerHTML='<div style="font-weight:700;color:#7ecbe0;margin-bottom:3px">'+(m.gameType==="vs AI"?"🤖":"👥")+" "+m.gameType+'</div><div>With: <b>'+(m.opponents||"nobody")+'</b></div><div style="color:#4eff91">Progress: '+m.completedCount+'/4</div><div style="color:#4a7a9b;font-size:10px">'+m.currentTurn+' • '+ts+'</div>';
-      btn.onclick=function(){hideP();loadSaveSlot(slot);};
-      ft.appendChild(btn);
-      var del=document.createElement("button");
-      del.textContent="🗑 Delete";
-      del.style.cssText="font-size:11px;padding:5px 12px;margin-bottom:10px;background:#c0392b;color:#fff;border:none;border-radius:6px;cursor:pointer;display:block";
-      del.onclick=function(){deleteSaveSlot(m.slotId).then(function(){hideP();checkForSavedGame();});};
-      ft.appendChild(del);
-    });
-    var cancel=document.createElement("button");cancel.textContent="Cancel";cancel.className="pn";cancel.onclick=hideP;ft.appendChild(cancel);
-    document.getElementById("po").classList.add("on");
-  });
-}
-
-// Resume button — handler delegates to openResumePicker if enabled
-document.getElementById("btnResume").addEventListener("click", function(){
-  if(this.style.pointerEvents === 'none') return;
-  openResumePicker();
-});
-
-function loadSaveSlot(slot){
-  isOnlineMultiplayer=false;myId=0;aiSpeed=slot.state.aiSpeed||"show";
-  showScreen(null);document.getElementById("game").classList.add("on");
-  document.getElementById("rpill").textContent="OFFLINE";
-  JC=buildJC();GS=slot.state;drawBoard();renderAll();
-  document.getElementById("tro").classList.remove("on");
-}
-
-// ── AI Start ──────────────────────────────────────────────────────────────────
+// ── AI start ──────────────────────────────────────────────────────────────────
 document.getElementById("btnStartAI").addEventListener("click",function(){
   if(currentUser){
     getAllSaves().then(function(saves){
@@ -621,20 +638,19 @@ document.getElementById("btnStartAI").addEventListener("click",function(){
       if(slots.length>=MAX_SAVES){showSaveFullPopup(slots,"ai");return;}
       doStartAI();
     });
-  }else{doStartAI();}
+  } else { doStartAI(); }
 });
-
 function doStartAI(){
   var name=document.getElementById("aiName").value.trim()||"Player 1";
   var uid=currentUser?currentUser.uid:null;
   var players=[mkP(0,name,PC[0],false,null,selAITok,uid)];
-  for(var i=0;i<selCnt;i++)players.push(mkP(i+1,AI_NAMES[i],PC[i+1],true,selDiff,TOKEN_KEYS[(i+1)%TOKEN_KEYS.length],null));
+  for(var i=0;i<selCnt;i++) players.push(mkP(i+1,AI_NAMES[i],PC[i+1],true,selDiff,TOKEN_KEYS[(i+1)%TOKEN_KEYS.length],null));
   startGame(players,selSpd);
 }
 
-// ── Online Room ───────────────────────────────────────────────────────────────
+// ── Online room ───────────────────────────────────────────────────────────────
 document.getElementById("btnCreateRoom").addEventListener("click",function(){
-  if(!currentUser){alert("Sign in required for online play.");return;}
+  if(!currentUser){alert("Sign in required.");return;}
   getAllSaves().then(function(saves){
     var slots=Object.values(saves).filter(function(s){return s&&s.meta;});
     if(slots.length>=MAX_SAVES){showSaveFullPopup(slots,"online");return;}
@@ -645,8 +661,9 @@ document.getElementById("btnCreateRoom").addEventListener("click",function(){
 function doCreateRoom(){
   var name=document.getElementById("onlineName").value.trim()||currentUser.displayName||"Player 1";
   var code=String(Math.floor(1000+Math.random()*9000));
-  rCode=code;myId=0;isOnlineMultiplayer=true;
-  var players=[];for(var i=0;i<selRoomSize;i++)players.push(null);
+  rCode=code; myId=0; isOnlineMultiplayer=true;
+  var players=[];
+  for(var i=0;i<selRoomSize;i++) players.push(null);
   players[0]=mkP(0,name,PC[0],false,null,selOnlineTok,currentUser.uid);
   var s={players:players,curIdx:0,phase:"waiting",log:[],roomSize:selRoomSize,swimDeck:mkSwim(),sinkDeck:mkSink(),swDeck:mkDeck(SWDEFS),winner:null};
   dbSet("rooms/"+code,s).then(function(){
@@ -655,7 +672,7 @@ function doCreateRoom(){
     document.getElementById("btnForceStart").style.display="block";
     rUnsub=dbOn("rooms/"+code,function(v){
       if(!v)return;
-      var needed=v.roomSize||selRoomSize,players=v.players||{},filled=0;
+      var needed=v.roomSize||selRoomSize, players=v.players||{}, filled=0;
       for(var i=0;i<needed;i++){var p=players[i];if(p&&p.name)filled++;}
       updateSlots(players,needed);
       var badge=document.getElementById("cbadge");
@@ -683,12 +700,15 @@ document.getElementById("btnJoinRoom").addEventListener("click",function(){
   if(code.length!==4){setBadge("j","Enter 4-digit code","berr");return;}
   dbGet("rooms/"+code).then(function(v){
     if(!v){setBadge("j","Room not found","berr");return;}
-    var roomSize=v.roomSize||2,players=v.players||{},slot=-1;
+    var roomSize=v.roomSize||2, players=v.players||{}, slot=-1;
     for(var i=1;i<roomSize;i++){var p=players[i];if(!p||!p.name){slot=i;break;}}
     if(slot<0){setBadge("j","Room is full","berr");return;}
-    rCode=code;myId=slot;isOnlineMultiplayer=true;
+    rCode=code; myId=slot; isOnlineMultiplayer=true;
     var newP=mkP(slot,name,PC[slot],false,null,selOnlineTok,currentUser.uid);
-    dbSet("rooms/"+code+"/players/"+slot,newP).then(function(){setBadge("j","Joined! Loading...","bok");setTimeout(function(){enterGame(code);},1200);});
+    dbSet("rooms/"+code+"/players/"+slot,newP).then(function(){
+      setBadge("j","Joined! Loading...","bok");
+      setTimeout(function(){enterGame(code);},1200);
+    });
   }).catch(function(e){setBadge("j","Error: "+e.message,"berr");});
 });
 
@@ -700,59 +720,87 @@ function updateSlots(players,total){
   el.innerHTML=h;
 }
 
+// ── enterGame — the ONLY Firebase listener. It is READ-ONLY on non-active clients ──
 function enterGame(code){
   if(rUnsub){rUnsub();rUnsub=null;}
-  showScreen(null);document.getElementById("game").classList.add("on");
+  showScreen(null);
+  document.getElementById("game").classList.add("on");
   document.getElementById("rpill").textContent="ROOM "+code;
-  JC=buildJC();drawBoard();
-  if(currentUser)dbSet("rooms/"+code+"/presence/"+myId,true);
-  var lastCurIdx=null,lastLogLen=0;
+  JC=buildJC(); drawBoard();
+  if(currentUser) dbSet("rooms/"+code+"/presence/"+myId,true);
+
+  var lastCurIdx=null, lastLogLen=0, shownTransFor=-1;
+
   rUnsub=dbOn("rooms/"+code,function(v){
     if(!v)return;
-    if(currentUser&&v.players){for(var i=0;i<(v.roomSize||6);i++){var p=v.players[i];if(p&&p.uid&&p.uid===currentUser.uid){myId=i;break;}}}
-    GS=v;
-    var logArr=Array.isArray(v.log)?v.log:Object.values(v.log||{});
-    var logLen=logArr.length,logChanged=logLen!==lastLogLen;
-    lastLogLen=logLen;
-    var isMyTurn=v.players&&v.players[v.curIdx]&&v.players[v.curIdx].uid===(currentUser?currentUser.uid:null);
-    if(!isMyTurn&&logChanged&&document.getElementById("po").classList.contains("on"))hideP();
-    if(!isMyTurn&&logChanged&&logArr.length>0){
-      var latest=logArr[0];
-      if(latest&&latest.indexOf("rolls")===-1&&latest.indexOf("enters")===-1&&latest.indexOf("interest")===-1){
-        showP(v.players[v.curIdx]?v.players[v.curIdx].name+"'s Turn":"Game Update","info",latest,[],true);
+    // Sync myId from UID every update
+    if(currentUser&&v.players){
+      for(var i=0;i<(v.roomSize||6);i++){
+        var p=v.players[i];
+        if(p&&p.uid&&p.uid===currentUser.uid){myId=i;break;}
       }
     }
-    var turnChanged=lastCurIdx!==null&&lastCurIdx!==v.curIdx;
+
+    var prevCurIdx=lastCurIdx;
     lastCurIdx=v.curIdx;
+
+    var logArr=Array.isArray(v.log)?v.log:Object.values(v.log||{});
+    var logLen=logArr.length, logChanged=logLen!==lastLogLen;
+    lastLogLen=logLen;
+
+    var curPl=v.players&&v.players[v.curIdx];
+    var nowMyTurn=!!(curPl&&curPl.uid&&currentUser&&curPl.uid===currentUser.uid);
+
+    // Auto-dismiss spectator popup when state advances
+    if(!nowMyTurn&&logChanged&&document.getElementById("po").classList.contains("on")) hideP();
+
+    // Show spectator popup for interesting events
+    if(!nowMyTurn&&logChanged&&logArr.length>0){
+      var latest=logArr[0];
+      if(latest&&latest.indexOf("rolls")===-1&&latest.indexOf("enters")===-1&&latest.indexOf("interest")===-1&&latest.indexOf("buys")===-1){
+        showP(curPl?curPl.name+"'s Turn":"Game Update","info",latest,[],true);
+      }
+    }
+
+    // Update local GS for rendering — DO NOT run any game logic here
+    GS=v;
     renderAll();
-    if(turnChanged&&isMyTurn&&v.phase==="transition")showTrans();
-    if(v.pendingTrade&&v.pendingTrade.toIdx===myId&&!v.pendingTrade.responded)showTradeOffer(v.pendingTrade,v);
+
+    // Show transition screen exactly once per turn index for THIS client
+    if(nowMyTurn&&v.phase==="transition"&&shownTransFor!==v.curIdx){
+      shownTransFor=v.curIdx;
+      showTrans();
+    }
+
+    if(v.pendingTrade&&v.pendingTrade.toIdx===myId&&!v.pendingTrade.responded)
+      showTradeOffer(v.pendingTrade,v);
   });
 }
 
 function startGame(players,spd){
   isOnlineMultiplayer=false; myId=0; aiSpeed=spd||"show";
+  aiRunning=false; showTransActive=false;
   showScreen(null); document.getElementById("game").classList.add("on");
   document.getElementById("rpill").textContent="OFFLINE";
   JC=buildJC();
-  GS={players:players,curIdx:0,phase:"transition",log:[],
-    swimDeck:mkSwim(),sinkDeck:mkSink(),swDeck:mkDeck(SWDEFS),winner:null};
+  GS={players:players,curIdx:0,phase:"transition",log:[],swimDeck:mkSwim(),sinkDeck:mkSink(),swDeck:mkDeck(SWDEFS),winner:null};
   drawBoard(); renderAll();
-  setTimeout(function(){ centerOn(0); }, 100);
+  setTimeout(function(){centerOn(0);},100);
   showTrans();
 }
 
 function leaveGame(){
-  if(rCode&&currentUser)dbSet("rooms/"+rCode+"/presence/"+myId,false);
+  aiRunning=false; showTransActive=false;
+  if(rCode&&currentUser) dbSet("rooms/"+rCode+"/presence/"+myId,false);
   if(rUnsub){rUnsub();rUnsub=null;}
-  GS=null;isOnlineMultiplayer=false;tradeOpen=false;rCode=null;
+  GS=null; isOnlineMultiplayer=false; tradeOpen=false; rCode=null;
   document.getElementById("game").classList.remove("on");
   document.getElementById("wo").classList.remove("on");
   document.getElementById("tro").classList.remove("on");
   document.getElementById("createSection").style.display="none";
   document.getElementById("jbadge").style.display="none";
   document.getElementById("ji").value="";
-  hideP();showScreen("scHome");
+  hideP(); showScreen("scHome");
 }
 
 function notifyNextPlayer(s,prevIdx,nextIdx){
@@ -766,53 +814,22 @@ function notifyNextPlayer(s,prevIdx,nextIdx){
       if(!snap||!snap.email)return;
       sendTurnEmail(snap.email,nextPl.name,s.players[prevIdx]?s.players[prevIdx].name:"Someone",rCode);
     });
-  }).catch(function(e){console.warn("Notify error:",e);});
+  }).catch(function(e){console.warn("Notify:",e);});
 }
 
-function showSaveFullPopup(slots,pendingAction){
-  slots.sort(function(a,b){return b.meta.savedAt-a.meta.savedAt;});
-  document.getElementById("phd").style.background="#c0392b";
-  document.getElementById("phd").innerHTML='<div style="font-size:18px;font-weight:700;color:#fff">🗑 Save Slots Full</div>';
-  document.getElementById("pbd").innerHTML='<div style="font-size:13px;color:#333;margin-bottom:8px">You have <b>3 saved games</b>. Delete one to start a new game.</div>';
-  var ft=document.getElementById("pft");ft.innerHTML="";
-  slots.forEach(function(slot){
-    var m=slot.meta,d=new Date(m.savedAt);
-    var row=document.createElement("div");
-    row.style.cssText="display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:8px;background:#f5f5f5;margin-bottom:6px;width:100%";
-    row.innerHTML='<div style="flex:1;font-size:11px;text-align:left"><div style="font-weight:700;color:#1565c0">'+(m.gameType==="vs AI"?"🤖":"👥")+" "+m.gameType+'</div><div>With: <b>'+(m.opponents||"nobody")+'</b></div><div style="color:#888;font-size:10px">'+d.toLocaleDateString()+'</div></div>';
-    var del=document.createElement("button");
-    del.textContent="🗑 Delete";
-    del.style.cssText="padding:6px 12px;border-radius:6px;border:none;background:#c0392b;color:#fff;font-weight:600;font-size:11px;cursor:pointer";
-    del.onclick=function(){
-      deleteSaveSlot(m.slotId).then(function(){
-        hideP();checkForSavedGame();
-        if(pendingAction==="ai")document.getElementById("btnStartAI").click();
-        else if(pendingAction==="online")document.getElementById("btnCreateRoom").click();
-      });
-    };
-    row.appendChild(del);ft.appendChild(row);
-  });
-  var cancel=document.createElement("button");cancel.textContent="Cancel";cancel.className="pn";cancel.onclick=hideP;ft.appendChild(cancel);
-  document.getElementById("po").classList.add("on");
-}
-
-// Single reliable turn-ownership check used everywhere
-function isMine(s) {
-  if(!isOnlineMultiplayer) return true;
-  var cur = s && s.players && s.players[s.curIdx];
-  if(!cur || cur.isAI) return false;
-  if(!currentUser || !cur.uid) return false;
-  return cur.uid === currentUser.uid;
-}
+// ── Render ────────────────────────────────────────────────────────────────────
 function renderAll(){
   if(!GS)return;
-  var s=GS,cur=s.players[s.curIdx];if(!cur)return;
-  var isMyTurn=!isOnlineMultiplayer||(cur.uid&&currentUser&&cur.uid===currentUser.uid);
-  document.getElementById("tinfo").textContent=(cur.isAI?"🤖 ":"")+cur.name+"'s Turn"+(isMyTurn&&!cur.isAI?"":" ⏳");
+  var s=GS, cur=s.players[s.curIdx]; if(!cur)return;
+  var mine=isMyTurnNow();
+  document.getElementById("tinfo").textContent=(cur.isAI?"🤖 ":"")+cur.name+"'s Turn"+(mine&&!cur.isAI?"":" ⏳");
   document.getElementById("tinfo").style.color=cur.color;
-  renderPList(s);renderCur(s,cur);renderAct(s,cur);updateTok(s);
-  if(s.winner)showWin(s.winner);
-  if(!isOnlineMultiplayer&&s.phase==="transition"&&!document.getElementById("tro").classList.contains("on"))showTrans();
+  renderPList(s); renderCur(s,cur); renderAct(s,cur); updateTok(s);
+  if(s.winner) showWin(s.winner);
+  // Only trigger showTrans for local games, never during AI execution, never if already showing
+  if(!isOnlineMultiplayer && s.phase==="transition" && !showTransActive && !aiRunning){
+    showTrans();
+  }
   if(s.log){var arr=Array.isArray(s.log)?s.log:Object.values(s.log);var h="";for(var i=0;i<arr.length;i++)h+='<div style="margin-bottom:2px">'+arr[i]+'</div>';document.getElementById("glog").innerHTML=h;}
 }
 
@@ -828,8 +845,8 @@ function renderPList(s){
 function renderCur(s,cur){
   document.getElementById("ctn").textContent=(cur.isAI?"🤖 ":"")+cur.name;
   document.getElementById("ctn").style.color=cur.color;
-  var pd=posD(cur);document.getElementById("ctp").textContent=pd||"";document.getElementById("ctp").style.display=pd?"":"none";
-  var id=cur.money<0;document.getElementById("ctm").innerHTML="💰 $"+cur.money+(id?" ⚠️ IN DEBT":"");document.getElementById("ctm").style.color=id?"#ff6b6b":"#7dff9a";
+  var pd=posD(cur); document.getElementById("ctp").textContent=pd||""; document.getElementById("ctp").style.display=pd?"":"none";
+  var id=cur.money<0; document.getElementById("ctm").innerHTML="💰 $"+cur.money+(id?" ⚠️ IN DEBT":""); document.getElementById("ctm").style.color=id?"#ff6b6b":"#7dff9a";
   var tks=["boat_school","boat","fish","rescue"],h="";
   for(var i=0;i<tks.length;i++){var r=tLine(cur,tks[i]);h+='<div style="color:'+(r.g?"#4eff91":"#8aaccc")+'">'+r.t+'</div>';}
   document.getElementById("ctt").innerHTML=h;
@@ -838,8 +855,8 @@ function renderCur(s,cur){
 }
 
 function renderCards(s,cur){
-  var el=document.getElementById("cds");if(!cur.heldCards||!cur.heldCards.length){el.innerHTML="";return;}
-  var mine=isMine(s);
+  var el=document.getElementById("cds"); if(!cur.heldCards||!cur.heldCards.length){el.innerHTML="";return;}
+  var mine=isMyTurnNow();
   var h='<div class="sl">CARDS'+(cur.usedShipwreckThisTurn?" (1 played)":"")+"</div>";
   for(var i=0;i<cur.heldCards.length;i++){var c=cur.heldCards[i];
     if(c.type==="fasttrack"){h+='<div style="display:flex;align-items:center;gap:5px;padding:3px 7px;border-radius:5px;background:#0f3d1a;border:1.5px solid #2ecc71;color:#2ecc71;font-size:10px;margin-bottom:3px">'+c.icon+" "+c.label+'<span style="margin-left:auto;font-size:8px;background:#2ecc71;color:#0a1f0e;border-radius:3px;padding:1px 4px;font-weight:700">ACTIVE</span></div>';}
@@ -851,7 +868,7 @@ function renderCards(s,cur){
 
 function renderAct(s,cur){
   var el=document.getElementById("aa");
-  var mine=isMine(s);
+  var mine=isMyTurnNow();
   if(!mine){
     var pd=posD(cur)||("Space "+cur.pos);
     var tks=["boat_school","boat","fish","rescue"];
@@ -870,9 +887,291 @@ function renderAct(s,cur){
   if(tradeOpen)buildTradePanel(s,cur);
 }
 
+// ── Movement animation ────────────────────────────────────────────────────────
+function animateSteps(playerIdx,steps,onDone){
+  if(!steps||!steps.length){onDone();return;}
+  var i=0;
+  function next(){
+    if(i>=steps.length){onDone();return;}
+    var step=steps[i++];
+    var pl=GS.players[playerIdx]; if(!pl){onDone();return;}
+    if(step.type==="oval") GS.players[playerIdx]=mg(pl,{pos:step.pos,inTask:null,taskPos:-1});
+    else if(step.type==="task") GS.players[playerIdx]=mg(pl,{inTask:step.task,taskPos:step.taskPos});
+    else if(step.type==="win") GS.players[playerIdx]=mg(pl,{winPos:step.winPos});
+    updateTok(GS); centerOn(playerIdx);
+    setTimeout(next,STEP_MS);
+  }
+  next();
+}
+
+function centerOn(playerIdx){
+  if(!GS||!GS.players[playerIdx])return;
+  var xy=pXY(GS.players[playerIdx]);
+  var bs=document.getElementById("bs");
+  bs.scrollLeft=Math.max(0,xy.x*scale-bs.clientWidth/2);
+  bs.scrollTop=Math.max(0,xy.y*scale-bs.clientHeight/2);
+}
+function ctrOn(){centerOn(GS?GS.curIdx:0);}
+
+// ── Game logic — these ONLY run on the client whose turn it is ────────────────
+function posD(pl){if(pl.winPos>=0){var l=["Dock 1","Lose Turn","Back 1","⭐ WIN"];return"Winner's Dock: "+l[pl.winPos];}if(pl.inTask==="boat")return"🛥️ Boat Store: sp "+(pl.taskPos+1);if(pl.inTask)return(TASKS[pl.inTask]?TASKS[pl.inTask].label:pl.inTask)+": sp "+(pl.taskPos+1);return null;}
+function tLine(pl,tk){var done=(pl.completedTasks||[]).indexOf(tk)>=0;if(tk==="boat"){if(done)return{t:(pl.boat?BOAT_EMOJIS[pl.boat.name]||"🛥️":"🛥️")+" "+(pl.boat?pl.boat.name:"owned"),g:true};return{t:"⛵ No boat yet",g:false};}var t=TASKS[tk];if(!t)return{t:"",g:false};if(done)return{t:t.done||t.label,g:true};return{t:t.prog(pl),g:t.req(pl)};}
+
+function doRoll(){
+  if(!GS||!isMyTurnNow())return;
+  var s=dc(GS), pl=s.players[s.curIdx];
+  if((pl.doubleRollsLeft||0)>0) pl.doubleRollsLeft--;
+  var r=Math.ceil(Math.random()*6);
+  addL(s,pl.name+" 🎲 rolls "+r);
+  s.players[s.curIdx]=pl;
+  push(s);
+  processRoll(r,s);
+}
+
+function processRoll(r,s){
+  var pl=s.players[s.curIdx];
+  if(pl.frozen>0){
+    var nf=pl.frozen-1; s.players[s.curIdx]=mg(pl,{frozen:nf});
+    addL(s,pl.name+" ❄️ frozen "+(nf>0?nf+" left.":"free!"));
+    showP("❄️ Frozen!","info",pl.name+" is frozen!\n"+(nf>0?nf+" turn(s) left.":"Free next turn!"),[{l:"OK",c:"pn",fn:function(){advTurn(s);}}]);
+    push(s); return;
+  }
+  if(pl.skip>0){s.players[s.curIdx]=mg(pl,{skip:pl.skip-1});addL(s,pl.name+" skips.");advTurn(s);return;}
+  if(pl.winPos>=0){doWin(pl,s,r);return;}
+  if(pl.inTask==="boat"){doBoat(pl,s,r);return;}
+  if(pl.inTask){doTask(pl,s,r);return;}
+  doMove(pl,s,r);
+}
+
+function doMove(pl,s,r){
+  var path=[];for(var i=1;i<=r;i++) path.push((pl.pos+i)%36);
+  var fc=pl.completedTasks||[];
+  var jes=[{idx:TASKS.boat_school.entryIdx,key:"boat_school",need:fc.indexOf("boat_school")<0},{idx:TASKS.boat.entryIdx,key:"boat",need:fc.indexOf("boat")<0},{idx:TASKS.fish.entryIdx,key:"fish",need:fc.indexOf("fish")<0},{idx:TASKS.rescue.entryIdx,key:"rescue",need:fc.indexOf("rescue")<0},{idx:WIN_IDX,key:"winner",need:fc.length>=4}];
+  var ss=r,jh=null;
+  outer:for(var i=0;i<path.length;i++){for(var j=0;j<jes.length;j++){if(jes[j].need&&jes[j].idx===path[i]){ss=i+1;jh=jes[j];break outer;}}}
+  var extra=r-ss;
+  var steps=[];for(var i=0;i<ss;i++) steps.push({type:"oval",pos:path[i]});
+  var passed=false;for(var i=0;i<ss;i++) if(path[i]===0&&pl.pos!==0){passed=true;break;}
+  var finalPos=path[ss-1];
+  var u=mg(pl,{pos:finalPos});
+  if(passed){u=mg(u,{money:u.money+5});addL(s,"💰 Passed START! +$5");}
+  s.players[s.curIdx]=u; push(s);
+  animateSteps(s.curIdx,steps,function(){
+    GS.players[GS.curIdx]=u; updateTok(GS); centerOn(GS.curIdx);
+    if(jh){if(extra>0)enterJutX(u,s,jh.key,extra);else enterJut(u,s,jh.key);}
+    else landOn(u,s);
+  });
+}
+
+function landOn(pl,s){
+  var k=sKind(pl.pos);
+  if(k==="swim"){
+    var deck=(s.swimDeck||[]).slice();if(!deck.length)deck=mkSwim();
+    var card=deck[0];deck=deck.slice(1);s.swimDeck=deck;
+    var u=mg(pl,{});if(card.eff.money)u=mg(u,{money:u.money+card.eff.money});if(card.eff.skip)u=mg(u,{skip:(u.skip||0)+card.eff.skip});
+    var mv=card.eff.move||0; s.players[s.curIdx]=u; addL(s,"🏊 SWIM: "+card.text);
+    var sc2=dc(s);
+    showP("🏊 Swim Card!","swim",card.text,[{l:"Woohoo!",c:"pp",fn:function(){
+      if(mv!==0){
+        var steps=[];for(var i=1;i<=Math.abs(mv);i++) steps.push({type:"oval",pos:((u.pos+(mv>0?i:-i)+360)%36)});
+        animateSteps(sc2.curIdx,steps,function(){
+          var fp=((u.pos+mv+360)%36); var um=mg(u,{pos:fp}); sc2.players[sc2.curIdx]=um; push(sc2); landOn(um,sc2);
+        });
+      } else advTurn(sc2);
+    }}]); push(s); return;
+  }
+  if(k==="sink"){
+    var deck2=(s.sinkDeck||[]).slice();if(!deck2.length)deck2=mkSink();
+    var card2=deck2[0];deck2=deck2.slice(1);s.sinkDeck=deck2;
+    var u2=mg(pl,{});if(card2.eff.money)u2=mg(u2,{money:u2.money+card2.eff.money});if(card2.eff.skip)u2=mg(u2,{skip:(u2.skip||0)+card2.eff.skip});
+    var mv2=card2.eff.move||0; s.players[s.curIdx]=u2; addL(s,"🌊 SINK: "+card2.text);
+    var sc3=dc(s);
+    showP("🌊 Sink Card!","sink",card2.text,[{l:"Yikes!",c:"pn",fn:function(){
+      if(mv2!==0){
+        var steps2=[];for(var i=1;i<=Math.abs(mv2);i++) steps2.push({type:"oval",pos:((u2.pos+(mv2>0?i:-i)+360)%36)});
+        animateSteps(sc3.curIdx,steps2,function(){
+          var fp2=((u2.pos+mv2+360)%36); var um2=mg(u2,{pos:fp2}); sc3.players[sc3.curIdx]=um2; push(sc3); landOn(um2,sc3);
+        });
+      } else advTurn(sc3);
+    }}]); push(s); return;
+  }
+  advTurn(s);
+}
+
+function enterJut(pl,s,key){
+  if(key==="winner"){if(pl.money<0){showP("💸 Wallet Too Low!","debt","Need $0+ to enter!\n$"+pl.money,[{l:"Dang!",c:"pn",fn:function(){advTurn(s);}}]);return;}s.players[s.curIdx]=mg(pl,{winPos:-1});showP("🏆 Winner's Dock!","info","All 4 done! 🎉\nRoll to reach ⭐ WIN!",[{l:"Let's go!",c:"pp",fn:function(){advTurn(s);}}]);push(s);return;}
+  if(key==="boat"&&!pl.graduated){if(pl.isAI){if(Math.random()<0.3&&pl.money>-50){s.players[s.curIdx]=mg(pl,{money:pl.money-100,inTask:"boat",taskPos:-1});addL(s,"🤖 AI pays $100 bypass");push(s);advTurn(s);}else{addL(s,"🤖 AI skips Boat Store");push(s);advTurn(s);}return;}showP("🛥️ The Boat Store!","info","Need to graduate!\nPay $100 to bypass, or skip.\n$"+pl.money,[{l:"Pay $100",c:"pw",fn:function(){var s2=dc(GS);s2.players[s2.curIdx]=mg(s2.players[s2.curIdx],{money:s2.players[s2.curIdx].money-100,inTask:"boat",taskPos:-1});push(s2);advTurn(s2);}},{l:"Skip",c:"pn",fn:function(){advTurn(dc(GS));}}]);return;}
+  s.players[s.curIdx]=mg(pl,{inTask:key,taskPos:-1});addL(s,pl.name+" enters "+(TASKS[key]?TASKS[key].label:key)+"!");push(s);advTurn(s);
+}
+
+function enterJutX(pl,s,key,extra){
+  if(key==="winner"){if(pl.money<0){showP("💸 Wallet Too Low!","debt","Need $0+ to enter!",[{l:"Dang!",c:"pn",fn:function(){advTurn(s);}}]);return;}s.players[s.curIdx]=mg(pl,{winPos:-1});push(s);doWin(s.players[s.curIdx],s,extra);return;}
+  if(key==="boat"&&!pl.graduated){enterJut(pl,s,"boat");return;}
+  s.players[s.curIdx]=mg(pl,{inTask:key,taskPos:-1});addL(s,pl.name+" enters "+(TASKS[key]?TASKS[key].label:key)+"!");push(s);doTask(s.players[s.curIdx],s,extra);
+}
+
+function doTask(pl,s,r){
+  var t=TASKS[pl.inTask], np=pl.taskPos+r;
+  if(np>=t.count){
+    var stepsT=[];for(var i=pl.taskPos+1;i<t.count;i++) stepsT.push({type:"task",task:pl.inTask,taskPos:i});
+    animateSteps(s.curIdx,stepsT,function(){
+      var rem=r-(t.count-1-pl.taskPos)-1;
+      var u=mg(pl,{inTask:null,taskPos:-1,pos:t.exitIdx});
+      var comp=t.req(u)&&(u.completedTasks||[]).indexOf(t.key)<0;
+      if(comp){u=mg(u,{completedTasks:(u.completedTasks||[]).concat([t.key])});if(t.key==="boat_school")u=mg(u,{graduated:true});addL(s,"🎉 Completed "+t.label+"!");}
+      s.players[s.curIdx]=u; var sc4=dc(s),uc=dc(u);
+      showP(comp?"✅ Done!":"Exited "+t.label,comp?"success":"info",comp?(u.completedTasks.length+"/4 done! 🎊"):t.prog(u),[{l:comp?"Yes! 🎉":"Continue",c:"pp",fn:function(){
+        if(rem>0){
+          var exitSteps=[];for(var i=1;i<=rem;i++) exitSteps.push({type:"oval",pos:(t.exitIdx+i)%36});
+          animateSteps(sc4.curIdx,exitSteps,function(){var fp3=(t.exitIdx+rem)%36;var um3=mg(uc,{pos:fp3});sc4.players[sc4.curIdx]=um3;push(sc4);landOn(um3,sc4);});
+        } else advTurn(sc4);
+      }}]); push(s);
+    }); return;
+  }
+  var stepsT2=[];for(var i=pl.taskPos+1;i<=np;i++) stepsT2.push({type:"task",task:pl.inTask,taskPos:i});
+  animateSteps(s.curIdx,stepsT2,function(){
+    var u2=mg(pl,{taskPos:np}),space=t.spaces[np];if(space)u2=space.eff(u2);
+    s.players[s.curIdx]=u2;addL(s,pl.name+" sp"+(np+1)+": "+(space?space.desc:""));
+    var sc5=dc(s);showP(t.label,"info",space?(space.story+"\n\n"+space.desc):t.prog(u2),[{l:"Continue",c:"pp",fn:function(){advTurn(sc5);}}]);push(s);
+  });
+}
+
+function doBoat(pl,s,r){
+  var np=pl.taskPos+r;
+  if(np>=BOATS.length){s.players[s.curIdx]=mg(pl,{inTask:null,taskPos:-1,pos:TASKS.boat.exitIdx});push(s);advTurn(s);return;}
+  var stepsB=[];for(var i=pl.taskPos+1;i<=np;i++) stepsB.push({type:"task",task:"boat",taskPos:i});
+  animateSteps(s.curIdx,stepsB,function(){
+    var u=mg(pl,{taskPos:np}),boat=BOATS[np];
+    var sold=false;for(var i=0;i<s.players.length;i++)if(i!==s.curIdx&&s.players[i]&&s.players[i].boat&&s.players[i].boat.name===boat.name){sold=true;break;}
+    s.players[s.curIdx]=u;
+    if(sold){showP(boat.icon+" Sold","info","Already taken!",[{l:"Continue",c:"pp",fn:function(){advTurn(s);}}]);push(s);return;}
+    if(pl.isAI){if(pl.aiDiff==="easy"?Math.random()<0.5:true){var nc=(u.completedTasks||[]).concat(["boat"]);s.players[s.curIdx]=mg(u,{money:u.money-boat.price,boat:boat,inTask:null,taskPos:-1,pos:TASKS.boat.exitIdx,completedTasks:nc});addL(s,"🤖 AI buys "+boat.icon+" "+boat.name);push(s);advTurn(s);}else{push(s);advTurn(s);}return;}
+    showP(boat.icon+" "+boat.name+" — $"+boat.price,"info","Price: $"+boat.price+" | Balance: $"+u.money+(u.money<boat.price?"\n⚠️ Going into debt!":""),[{l:"Buy "+boat.icon+" $"+boat.price,c:"pp",fn:function(){var s2=dc(GS),pu=s2.players[s2.curIdx];var nc2=(pu.completedTasks||[]).filter(function(x){return x!=="boat";}).concat(["boat"]);s2.players[s2.curIdx]=mg(pu,{money:pu.money-boat.price,boat:boat,inTask:null,taskPos:-1,pos:TASKS.boat.exitIdx,completedTasks:nc2});addL(s2,pu.name+" buys "+boat.icon+" "+boat.name);push(s2);advTurn(s2);}},{l:"Pass",c:"pn",fn:function(){advTurn(dc(GS));}}]);push(s);
+  });
+}
+
+function doWin(pl,s,r){
+  var cp=pl.winPos<0?-1:pl.winPos,MAX=3,tg=cp+r;
+  if(!pl.fasttrack&&tg>MAX){showP("🎯 Overshot!","info","Need exactly "+(MAX-Math.max(cp,0))+" to reach ⭐ WIN.",[{l:"OK",c:"pn",fn:function(){advTurn(s);}}]);return;}
+  var nwp=Math.min(tg,MAX);
+  var stepsW=[];for(var i=cp+1;i<=nwp;i++) stepsW.push({type:"win",winPos:i});
+  animateSteps(s.curIdx,stepsW,function(){
+    var u=WDOCK[nwp].eff(mg(pl,{winPos:nwp}));
+    if(WDOCK[nwp].win){if(u.money<0){s.players[s.curIdx]=u;push(s);showP("💸 Still in Debt!","debt","Cannot win with $"+u.money,[{l:"Dang!",c:"pn",fn:function(){advTurn(s);}}]);return;}u=mg(u,{done:true});s.players[s.curIdx]=u;s.winner=u;push(s);showWin(u);return;}
+    var wl=["⚓ Dock 1","😴 Lose Turn","↩️ Back 1"];addL(s,pl.name+" Dock: "+wl[nwp]);s.players[s.curIdx]=u;var sc7=dc(s);showP("🏅 Winner's Dock","info",wl[nwp]+"!",[{l:"Continue",c:"pp",fn:function(){advTurn(sc7);}}]);push(s);
+  });
+}
+
+function advTurn(s){
+  var prevIdx=s.curIdx; tradeOpen=false;
+  var np=[];
+  for(var i=0;i<s.players.length;i++){var pl=s.players[i];if(!pl){np.push(pl);continue;}if(pl.done||pl.eliminated){np.push(pl);continue;}if(pl.money<=-1000){addL(s,pl.name+" eliminated! 💀");np.push(mg(pl,{eliminated:true,done:true}));}else np.push(pl);}
+  s.players=np;
+  var cur2=np[prevIdx];if(cur2&&cur2.money<0&&!cur2.done&&!cur2.eliminated){var interest=Math.floor(cur2.money*0.05);np[prevIdx]=mg(cur2,{money:cur2.money+interest});addL(s,cur2.name+" 💸 interest: "+(cur2.money+interest));}
+  var active=np.filter(function(p){return p&&!p.done;});
+  if(active.length<=1){var w=active[0]||np[0];var wi=np.indexOf(w);if(wi>=0)np[wi]=mg(w,{done:true});s.players=np;s.winner=w;push(s);showWin(w);return;}
+  var next=(s.curIdx+1)%np.length,its=0;
+  while((!np[next]||np[next].done)&&its<np.length){next=(next+1)%np.length;its++;}
+  np[next]=mg(np[next],{boughtCardThisTurn:false,usedShipwreckThisTurn:false,cardsBoughtThisTurn:[],pendingTrade:null});
+  s.players=np; s.curIdx=next; s.phase="transition"; s.pendingTrade=null;
+  // Write to Firebase — non-active clients receive this and show transition for THEIR turn only
+  if(isOnlineMultiplayer){
+    GS=s;
+    dbSet("rooms/"+rCode,cleanForFB(s)).catch(function(e){console.error(e);});
+    notifyNextPlayer(s,prevIdx,next);
+    renderAll();
+  } else {
+    GS=s; saveGame(s); renderAll(); showTrans();
+  }
+}
+
+var aiRunning=false; // guard against concurrent AI turns
+
+function runAI(){
+  if(!GS)return;
+  // Prevent concurrent AI calls
+  if(aiRunning){console.log("AI already running, skipping");return;}
+  var cur=GS.players[GS.curIdx];
+  if(!cur||!cur.isAI)return;
+  aiRunning=true;
+
+  var s=dc(GS),pl=s.players[s.curIdx];
+
+  // Buy a card if conditions met
+  if(!pl.boughtCardThisTurn&&pl.money>20&&(pl.heldCards||[]).length<3){
+    var deck=(s.swDeck||[]).slice();
+    if(!deck.length)deck=mkDeck(SWDEFS);
+    var card=deck[0],uid2=Math.random().toString(36).slice(2);
+    deck=deck.slice(1); s.swDeck=deck;
+    pl.heldCards=(pl.heldCards||[]).concat([mg(card,{uid:uid2})]);
+    pl.money-=10; pl.boughtCardThisTurn=true;
+    pl.cardsBoughtThisTurn=(pl.cardsBoughtThisTurn||[]).concat([uid2]);
+    if(card.type==="fasttrack")pl.fasttrack=true;
+    addL(s,"🤖 AI buys "+card.icon+" "+card.label);
+  }
+
+  s.players[s.curIdx]=pl;
+  var r=Math.ceil(Math.random()*6);
+  addL(s,"🤖 AI rolls "+r);
+  GS=s; renderAll();
+  processRoll(r,s);
+}
+
+// ── Cards ─────────────────────────────────────────────────────────────────────
+function buyCard(){
+  if(!GS||!isMyTurnNow())return; var s=dc(GS),pl=s.players[s.curIdx]; if(pl.boughtCardThisTurn)return;
+  var deck=(s.swDeck||[]).slice();if(!deck.length)deck=mkDeck(SWDEFS);var card=deck[0],uid2=Math.random().toString(36).slice(2);deck=deck.slice(1);s.swDeck=deck;
+  pl.heldCards=(pl.heldCards||[]).concat([mg(card,{uid:uid2})]);pl.money-=10;pl.boughtCardThisTurn=true;pl.cardsBoughtThisTurn=(pl.cardsBoughtThisTurn||[]).concat([uid2]);if(card.type==="fasttrack")pl.fasttrack=true;
+  s.players[s.curIdx]=pl; addL(s,pl.name+" 🃏 buys "+card.icon+" "+card.label); push(s);
+  showP(card.icon+" "+card.label,"info",card.desc+(card.type==="fasttrack"?"\n🚀 Already active!":"\n⏳ Play next turn."),[{l:"Got it!",c:"pp",fn:hideP}]);
+}
+function openCard(idx){
+  if(!GS||!isMyTurnNow())return; var pl=GS.players[GS.curIdx];
+  if(pl.usedShipwreckThisTurn){showP("One Per Turn","info","Only 1 card per turn.",[{l:"OK",c:"pn",fn:hideP}]);return;}
+  var card=pl.heldCards[idx]; if(!card)return;
+  if((pl.cardsBoughtThisTurn||[]).indexOf(card.uid)>=0){showP("⏳ Not Yet","info","Play this card next turn.",[{l:"OK",c:"pn",fn:hideP}]);return;}
+  if(card.type==="double"){execCard(card,idx);return;}
+  showP(card.icon+" "+card.label,"info",card.desc,[{l:"▶ Play Now",c:"pp",fn:function(){hideP();execCard(card,idx);}},{l:"Save",c:"pn",fn:hideP}]);
+}
+function execCard(card,idx){
+  var s=dc(GS),pl=s.players[s.curIdx]; pl.heldCards=pl.heldCards.filter(function(_,i){return i!==idx;}); pl.usedShipwreckThisTurn=true; s.players[s.curIdx]=pl;
+  if(card.type==="double"){pl.doubleRollsLeft=(pl.doubleRollsLeft||0)+2;s.players[s.curIdx]=pl;push(s);showP("🎲 Double Time!","info","2 bonus rolls!",[{l:"Roll!",c:"pp",fn:hideP}]);return;}
+  if(card.type==="fasttrack"){pl.fasttrack=true;s.players[s.curIdx]=pl;push(s);showP("🚀 Fast Track","info","No exact roll needed!",[{l:"Awesome!",c:"pp",fn:hideP}]);return;}
+  if(card.type==="shortcut"){push(s);showP("⚡ Shortcut","info","Reduce which challenge?",[{l:"🐟 Fish: 10→6",c:"pp",fn:function(){var s2=dc(GS);s2.players[s2.curIdx].shortcut.fish=true;push(s2);hideP();}},{l:"🆘 Rescues: 2→1",c:"pp",fn:function(){var s2=dc(GS);s2.players[s2.curIdx].shortcut.rescues=true;push(s2);hideP();}},{l:"⭐ Stars: 3→2",c:"pp",fn:function(){var s2=dc(GS);s2.players[s2.curIdx].shortcut.stars=true;push(s2);hideP();}}]);return;}
+  if(card.type==="teleport"){push(s);showP("🌀 Teleportation","info","Click any space on the board!",[{l:"Cancel",c:"pn",fn:hideP}]);setTimeout(function(){for(var i=1;i<36;i++){if(sKind(i)==="entry_winner")continue;(function(si){var el=document.getElementById("sp"+si);if(!el)return;el.style.cursor="pointer";var rect=el.querySelector("rect");if(rect){rect.setAttribute("stroke","#FFD700");rect.setAttribute("stroke-width","3");}el.addEventListener("click",function h(){el.removeEventListener("click",h);el.style.cursor="";if(rect){rect.setAttribute("stroke","#ffffffa0");rect.setAttribute("stroke-width","0.8");}hideP();var s2=dc(GS);s2.players[s2.curIdx]=mg(s2.players[s2.curIdx],{pos:si,inTask:null,taskPos:-1});addL(s2,s2.players[s2.curIdx].name+" 🌀 teleports to "+si);push(s2);advTurn(s2);});})(i);}},100);return;}
+  if(card.type==="freeze"){var others=s.players.filter(function(p,i){return i!==s.curIdx&&p&&!p.done;});push(s);showP("❄️ Freeze Frame","info","Choose a player to freeze:",others.map(function(op){return{l:(op.isAI?"🤖 ":"")+op.name,c:"pp",fn:(function(opid){return function(){var s2=dc(GS);for(var i=0;i<s2.players.length;i++)if(s2.players[i]&&s2.players[i].id===opid){s2.players[i]=mg(s2.players[i],{frozen:2});break;}addL(s2,s2.players[s2.curIdx].name+" ❄️ freezes "+op.name);push(s2);hideP();};})(op.id)};}));return;}
+  if(card.type==="robbery"){var others2=s.players.filter(function(p,i){return i!==s.curIdx&&p&&!p.done;});push(s);showP("💰 Highway Robbery","info","Steal ALL money from:",others2.map(function(op){return{l:(op.isAI?"🤖 ":"")+op.name+" ($"+op.money+")",c:"pp",fn:(function(opid){return function(){var s2=dc(GS),stolen=0;for(var i=0;i<s2.players.length;i++)if(s2.players[i]&&s2.players[i].id===opid){stolen=s2.players[i].money;s2.players[i]=mg(s2.players[i],{money:0});break;}s2.players[s2.curIdx]=mg(s2.players[s2.curIdx],{money:s2.players[s2.curIdx].money+stolen});addL(s2,s2.players[s2.curIdx].name+" 💰 robs $"+stolen);push(s2);hideP();};})(op.id)};}));return;}
+}
+
+function debtR(){
+  if(!GS)return; var pl=GS.players[GS.curIdx];
+  if(!pl.completedTasks||!pl.completedTasks.length){showP("💸 Debt Relief","debt","No completed challenges to sacrifice.",[{l:"Close",c:"pn",fn:hideP}]);return;}
+  var lbls={boat_school:"🎓 Boat School",boat:"🛥️ Boat",fish:"🐟 Fish",rescue:"🆘 Rescues"};
+  var btns=pl.completedTasks.map(function(tk){
+    return{l:lbls[tk]||tk,c:"pw",fn:(function(ttk){return function(){
+      var s=dc(GS),p2=mg(s.players[s.curIdx],{money:0,completedTasks:s.players[s.curIdx].completedTasks.filter(function(x){return x!==ttk;})});
+      if(ttk==="boat_school")p2=mg(p2,{graduated:false,stars:0});
+      if(ttk==="fish")p2=mg(p2,{fish:0});
+      if(ttk==="rescue")p2=mg(p2,{rescues:0});
+      if(ttk==="boat")p2=mg(p2,{boat:null});
+      s.players[s.curIdx]=p2;addL(s,p2.name+" 💸 debt relief");push(s);hideP();
+    };})(tk)};
+  });
+  btns.push({l:"Cancel",c:"pn",fn:hideP});
+  showP("💸 Debt Relief","debt","Sacrifice a challenge to reset to $0:",btns);
+}
+
+function inspP(i){
+  if(!GS)return; var pl=GS.players[i]; if(!pl)return;
+  var tks=["boat_school","boat","fish","rescue"],lines="💰 $"+pl.money+(pl.money<0?" ⚠️ IN DEBT":"")+"\n\n";
+  for(var j=0;j<tks.length;j++){var tk=tks[j],done=(pl.completedTasks||[]).indexOf(tk)>=0,t=TASKS[tk];if(!t)continue;var status=done?(tk==="boat"?(pl.boat?(BOAT_EMOJIS[pl.boat.name]||"🛥️")+" "+pl.boat.name:"owned"):t.done||"done"):t.prog(pl);lines+=(done?"✅ ":"⬜ ")+t.label+": "+status+"\n";}
+  if(pl.heldCards&&pl.heldCards.length)lines+="\n🃏 "+pl.heldCards.map(function(c){return c.icon+" "+c.label;}).join(", ");
+  if(pl.frozen>0)lines+="\n❄️ Frozen: "+pl.frozen+" turn(s)";
+  showP((pl.isAI?"🤖 ":"")+pl.name,"info",lines,[{l:"Close",c:"pn",fn:hideP}]);
+}
+
 // ── Trade ─────────────────────────────────────────────────────────────────────
 function toggleTradePanel(){tradeOpen=!tradeOpen;renderAct(GS,GS.players[GS.curIdx]);}
-
 function buildTradePanel(s,cur){
   var tp=document.getElementById("tradePanel");if(!tp)return;
   var others=[];for(var i=0;i<s.players.length;i++)if(i!==s.curIdx&&s.players[i]&&!s.players[i].done)others.push({pl:s.players[i],idx:i});
@@ -882,82 +1181,58 @@ function buildTradePanel(s,cur){
   h+='<select id="trTarget" style="width:100%;padding:4px;border-radius:5px;background:#071728;color:#fff;border:1px solid #1a3a55;font-size:11px;margin-bottom:8px">';
   for(var i=0;i<others.length;i++)h+='<option value="'+others[i].idx+'">'+(others[i].pl.isAI?"🤖 ":"")+others[i].pl.name+'</option>';
   h+='</select>';
+  var fields=[{id:"tgMoney",lbl:"💰 Money",note:"$"+cur.money},{id:"tgFish",lbl:"🐟 Fish",note:"have "+cur.fish},{id:"tgRescues",lbl:"🆘 Rescues",note:"have "+cur.rescues},{id:"tgStars",lbl:"⭐ Stars",note:"have "+cur.stars}];
   h+='<div style="font-size:10px;color:#4eff91;font-weight:700;margin-bottom:4px">YOU GIVE:</div>';
-  h+='<div style="display:flex;align-items:center;gap:5px;margin-bottom:4px"><label style="font-size:11px;color:#aaa;width:70px">💰 Money</label><input id="tgMoney" type="number" min="0" value="0" style="width:50px;padding:2px 5px;border-radius:4px;background:#071728;border:1px solid #1a3a55;color:#fff;font-size:11px"/><span style="font-size:9px;color:#555">$'+cur.money+'</span></div>';
-  h+='<div style="display:flex;align-items:center;gap:5px;margin-bottom:4px"><label style="font-size:11px;color:#aaa;width:70px">🐟 Fish</label><input id="tgFish" type="number" min="0" value="0" style="width:50px;padding:2px 5px;border-radius:4px;background:#071728;border:1px solid #1a3a55;color:#fff;font-size:11px"/><span style="font-size:9px;color:#555">have '+cur.fish+'</span></div>';
-  h+='<div style="display:flex;align-items:center;gap:5px;margin-bottom:4px"><label style="font-size:11px;color:#aaa;width:70px">🆘 Rescues</label><input id="tgRescues" type="number" min="0" value="0" style="width:50px;padding:2px 5px;border-radius:4px;background:#071728;border:1px solid #1a3a55;color:#fff;font-size:11px"/><span style="font-size:9px;color:#555">have '+cur.rescues+'</span></div>';
-  h+='<div style="display:flex;align-items:center;gap:5px;margin-bottom:4px"><label style="font-size:11px;color:#aaa;width:70px">⭐ Stars</label><input id="tgStars" type="number" min="0" value="0" style="width:50px;padding:2px 5px;border-radius:4px;background:#071728;border:1px solid #1a3a55;color:#fff;font-size:11px"/><span style="font-size:9px;color:#555">have '+cur.stars+'</span></div>';
+  for(var i=0;i<fields.length;i++)h+='<div style="display:flex;align-items:center;gap:5px;margin-bottom:4px"><label style="font-size:11px;color:#aaa;width:70px">'+fields[i].lbl+'</label><input id="'+fields[i].id+'" type="number" min="0" value="0" style="width:50px;padding:2px 5px;border-radius:4px;background:#071728;border:1px solid #1a3a55;color:#fff;font-size:11px"/><span style="font-size:9px;color:#555">'+fields[i].note+'</span></div>';
   h+='<div style="display:flex;align-items:center;gap:5px;margin-bottom:6px"><label style="font-size:11px;color:#aaa;width:70px">🃏 Card</label><select id="tgCard" style="flex:1;padding:2px 4px;border-radius:4px;background:#071728;border:1px solid #1a3a55;color:#fff;font-size:10px"><option value="">None</option>';
   if(cur.heldCards)for(var ci=0;ci<cur.heldCards.length;ci++){var c=cur.heldCards[ci];h+='<option value="'+ci+'">'+c.icon+' '+c.label+'</option>';}
   h+='</select></div>';
+  var wfields=[{id:"trMoney",lbl:"💰 Money"},{id:"trFish",lbl:"🐟 Fish"},{id:"trRescues",lbl:"🆘 Rescues"},{id:"trStars",lbl:"⭐ Stars"}];
   h+='<div style="font-size:10px;color:#ff9999;font-weight:700;margin-bottom:4px">YOU WANT:</div>';
-  h+='<div style="display:flex;align-items:center;gap:5px;margin-bottom:4px"><label style="font-size:11px;color:#aaa;width:70px">💰 Money</label><input id="trMoney" type="number" min="0" value="0" style="width:50px;padding:2px 5px;border-radius:4px;background:#071728;border:1px solid #1a3a55;color:#fff;font-size:11px"/></div>';
-  h+='<div style="display:flex;align-items:center;gap:5px;margin-bottom:4px"><label style="font-size:11px;color:#aaa;width:70px">🐟 Fish</label><input id="trFish" type="number" min="0" value="0" style="width:50px;padding:2px 5px;border-radius:4px;background:#071728;border:1px solid #1a3a55;color:#fff;font-size:11px"/></div>';
-  h+='<div style="display:flex;align-items:center;gap:5px;margin-bottom:4px"><label style="font-size:11px;color:#aaa;width:70px">🆘 Rescues</label><input id="trRescues" type="number" min="0" value="0" style="width:50px;padding:2px 5px;border-radius:4px;background:#071728;border:1px solid #1a3a55;color:#fff;font-size:11px"/></div>';
-  h+='<div style="display:flex;align-items:center;gap:5px;margin-bottom:8px"><label style="font-size:11px;color:#aaa;width:70px">⭐ Stars</label><input id="trStars" type="number" min="0" value="0" style="width:50px;padding:2px 5px;border-radius:4px;background:#071728;border:1px solid #1a3a55;color:#fff;font-size:11px"/></div>';
-  h+='<div style="display:flex;gap:6px"><button id="btnSendTrade" style="flex:1;padding:6px;border-radius:6px;border:none;background:#1a7a3a;color:#fff;font-weight:600;font-size:11px;cursor:pointer">📤 Send Offer</button><button id="btnCancelTrade" style="flex:1;padding:6px;border-radius:6px;border:none;background:#444;color:#fff;font-size:11px;cursor:pointer">✕ Cancel</button></div></div>';
+  for(var i=0;i<wfields.length;i++)h+='<div style="display:flex;align-items:center;gap:5px;margin-bottom:4px"><label style="font-size:11px;color:#aaa;width:70px">'+wfields[i].lbl+'</label><input id="'+wfields[i].id+'" type="number" min="0" value="0" style="width:50px;padding:2px 5px;border-radius:4px;background:#071728;border:1px solid #1a3a55;color:#fff;font-size:11px"/></div>';
+  h+='<div style="display:flex;gap:6px;margin-top:8px"><button id="btnSendTrade" style="flex:1;padding:6px;border-radius:6px;border:none;background:#1a7a3a;color:#fff;font-weight:600;font-size:11px;cursor:pointer">📤 Send</button><button id="btnCancelTrade" style="flex:1;padding:6px;border-radius:6px;border:none;background:#444;color:#fff;font-size:11px;cursor:pointer">✕ Cancel</button></div></div>';
   tp.innerHTML=h;
   document.getElementById("btnSendTrade").addEventListener("click",sendTrade);
   document.getElementById("btnCancelTrade").addEventListener("click",function(){tradeOpen=false;renderAct(GS,GS.players[GS.curIdx]);});
 }
-
 function sendTrade(){
-  if(!GS)return;
-  var s=dc(GS),cur=s.players[s.curIdx];
+  if(!GS)return; var s=dc(GS),cur=s.players[s.curIdx];
   var toIdx=parseInt(document.getElementById("trTarget").value);
   var cardEl=document.getElementById("tgCard");
   var cardIdx=cardEl&&cardEl.value!==""?parseInt(cardEl.value):-1;
-  var tp={fromIdx:s.curIdx,toIdx:toIdx,
-    give:{money:parseInt(document.getElementById("tgMoney").value)||0,fish:parseInt(document.getElementById("tgFish").value)||0,rescues:parseInt(document.getElementById("tgRescues").value)||0,stars:parseInt(document.getElementById("tgStars").value)||0,cardIdx:cardIdx},
-    want:{money:parseInt(document.getElementById("trMoney").value)||0,fish:parseInt(document.getElementById("trFish").value)||0,rescues:parseInt(document.getElementById("trRescues").value)||0,stars:parseInt(document.getElementById("trStars").value)||0},
-    responded:false};
+  var tp={fromIdx:s.curIdx,toIdx:toIdx,give:{money:parseInt(document.getElementById("tgMoney").value)||0,fish:parseInt(document.getElementById("tgFish").value)||0,rescues:parseInt(document.getElementById("tgRescues").value)||0,stars:parseInt(document.getElementById("tgStars").value)||0,cardIdx:cardIdx},want:{money:parseInt(document.getElementById("trMoney").value)||0,fish:parseInt(document.getElementById("trFish").value)||0,rescues:parseInt(document.getElementById("trRescues").value)||0,stars:parseInt(document.getElementById("trStars").value)||0},responded:false};
   tradeOpen=false;
-  if(s.players[toIdx]&&s.players[toIdx].isAI){
-    var net=(tp.give.money-tp.want.money)+(tp.give.fish-tp.want.fish)*2;
-    if(net>=0||Math.random()<0.35){executeTrade(tp,s);addL(s,"🤖 AI accepts trade!");}
-    else addL(s,"🤖 AI declines trade.");
-    push(s);
-  }else{s.pendingTrade=tp;addL(s,cur.name+" 🤝 proposes a trade!");push(s);showTradeOffer(tp,s);}
+  if(s.players[toIdx]&&s.players[toIdx].isAI){var net=(tp.give.money-tp.want.money)+(tp.give.fish-tp.want.fish)*2;if(net>=0||Math.random()<0.35){executeTrade(tp,s);addL(s,"🤖 AI accepts trade!");}else addL(s,"🤖 AI declines trade.");push(s);}
+  else{s.pendingTrade=tp;addL(s,cur.name+" 🤝 proposes a trade!");push(s);showTradeOffer(tp,s);}
 }
-
 function showTradeOffer(tp,s,isCounter){
   var from=s.players[tp.fromIdx],to=s.players[tp.toIdx];
   var g=tp.give,w=tp.want,gs=[],ws=[];
-  if(g.money>0)gs.push("$"+g.money);if(g.fish>0)gs.push(g.fish+" 🐟");if(g.rescues>0)gs.push(g.rescues+" 🆘");if(g.stars>0)gs.push(g.stars+" ⭐");
-  if(g.cardIdx>=0&&from.heldCards&&from.heldCards[g.cardIdx])gs.push(from.heldCards[g.cardIdx].label);
+  if(g.money>0)gs.push("$"+g.money);if(g.fish>0)gs.push(g.fish+" 🐟");if(g.rescues>0)gs.push(g.rescues+" 🆘");if(g.stars>0)gs.push(g.stars+" ⭐");if(g.cardIdx>=0&&from.heldCards&&from.heldCards[g.cardIdx])gs.push(from.heldCards[g.cardIdx].label);
   if(w.money>0)ws.push("$"+w.money);if(w.fish>0)ws.push(w.fish+" 🐟");if(w.rescues>0)ws.push(w.rescues+" 🆘");if(w.stars>0)ws.push(w.stars+" ⭐");
-  var body="Gives: "+(gs.join(", ")||"nothing")+"\nWants: "+(ws.join(", ")||"nothing")+"\n\n"+to.name+", do you accept?";
-  var bl=[
-    {l:"✅ Accept",c:"pp",fn:function(){var s2=dc(GS);executeTrade(tp,s2);s2.pendingTrade=null;addL(s2,to.name+" accepts! 🤝");push(s2);hideP();}},
-    {l:"❌ Decline",c:"pn",fn:function(){var s2=dc(GS);s2.pendingTrade=null;addL(s2,to.name+" declines.");push(s2);hideP();}}
-  ];
+  var body="Gives: "+(gs.join(", ")||"nothing")+"\nWants: "+(ws.join(", ")||"nothing")+"\n\n"+to.name+", accept?";
+  var isMineToRespond=!isOnlineMultiplayer||(to.uid&&currentUser&&to.uid===currentUser.uid);
+  var bl=[{l:"✅ Accept",c:"pp",fn:function(){var s2=dc(GS);executeTrade(tp,s2);s2.pendingTrade=null;addL(s2,to.name+" accepts! 🤝");push(s2);hideP();}},{l:"❌ Decline",c:"pn",fn:function(){var s2=dc(GS);s2.pendingTrade=null;addL(s2,to.name+" declines.");push(s2);hideP();}}];
   if(!isCounter)bl.push({l:"🔄 Counter",c:"pw",fn:function(){hideP();showCounterPanel(tp,s);}});
-  var isMine=to.uid&&currentUser&&to.uid===currentUser.uid;
-  showP((isCounter?"Counter from ":"Offer from ")+from.name,"info",body,bl,!isMine);
+  showP((isCounter?"Counter from ":"Offer from ")+from.name,"info",body,bl,!isMineToRespond);
 }
-
 function showCounterPanel(origTp,s){
   var from=s.players[origTp.fromIdx],to=s.players[origTp.toIdx];
   document.getElementById("phd").style.background="#1a5276";
-  document.getElementById("phd").innerHTML='<div style="font-size:18px;font-weight:700;color:#fff">🔄 Counter-Offer to '+from.name+'</div>';
+  document.getElementById("phd").innerHTML='<div style="font-size:18px;font-weight:700;color:#fff">🔄 Counter to '+from.name+'</div>';
   document.getElementById("pbd").innerHTML='<div style="font-size:12px;color:#1565c0;font-weight:700;margin-bottom:6px">YOU GIVE:</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px"><span style="font-size:11px">💰<input id="ctgM" type="number" min="0" value="0" style="width:45px;margin:0 3px;border-radius:4px;border:1px solid #ccc;padding:2px 4px"/></span><span style="font-size:11px">🐟<input id="ctgF" type="number" min="0" value="0" style="width:45px;margin:0 3px;border-radius:4px;border:1px solid #ccc;padding:2px 4px"/></span><span style="font-size:11px">🆘<input id="ctgR" type="number" min="0" value="0" style="width:45px;margin:0 3px;border-radius:4px;border:1px solid #ccc;padding:2px 4px"/></span><span style="font-size:11px">⭐<input id="ctgS" type="number" min="0" value="0" style="width:45px;margin:0 3px;border-radius:4px;border:1px solid #ccc;padding:2px 4px"/></span></div><div style="font-size:12px;color:#c0392b;font-weight:700;margin-bottom:6px">YOU WANT:</div><div style="display:flex;gap:8px;flex-wrap:wrap"><span style="font-size:11px">💰<input id="ctrM" type="number" min="0" value="0" style="width:45px;margin:0 3px;border-radius:4px;border:1px solid #ccc;padding:2px 4px"/></span><span style="font-size:11px">🐟<input id="ctrF" type="number" min="0" value="0" style="width:45px;margin:0 3px;border-radius:4px;border:1px solid #ccc;padding:2px 4px"/></span><span style="font-size:11px">🆘<input id="ctrR" type="number" min="0" value="0" style="width:45px;margin:0 3px;border-radius:4px;border:1px solid #ccc;padding:2px 4px"/></span><span style="font-size:11px">⭐<input id="ctrS" type="number" min="0" value="0" style="width:45px;margin:0 3px;border-radius:4px;border:1px solid #ccc;padding:2px 4px"/></span></div>';
-  var f=document.getElementById("pft");f.innerHTML="";
-  var sb=document.createElement("button");sb.textContent="📤 Send Counter";sb.className="pp";
+  var f=document.getElementById("pft"); f.innerHTML="";
+  var sb=document.createElement("button"); sb.textContent="📤 Send Counter"; sb.className="pp";
   sb.onclick=function(){
-    var ctp={fromIdx:origTp.toIdx,toIdx:origTp.fromIdx,
-      give:{money:parseInt(document.getElementById("ctgM").value)||0,fish:parseInt(document.getElementById("ctgF").value)||0,rescues:parseInt(document.getElementById("ctgR").value)||0,stars:parseInt(document.getElementById("ctgS").value)||0,cardIdx:-1},
-      want:{money:parseInt(document.getElementById("ctrM").value)||0,fish:parseInt(document.getElementById("ctrF").value)||0,rescues:parseInt(document.getElementById("ctrR").value)||0,stars:parseInt(document.getElementById("ctrS").value)||0},
-      responded:false};
-    var s2=dc(GS);s2.pendingTrade=ctp;addL(s2,to.name+" counters!");push(s2);hideP();
-    if(s2.players[ctp.toIdx]&&s2.players[ctp.toIdx].isAI){
-      setTimeout(function(){var s3=dc(GS);if(Math.random()<0.5){executeTrade(ctp,s3);addL(s3,"🤖 AI accepts counter!");}else addL(s3,"🤖 AI declines counter.");push(s3);},700);
-    }else showTradeOffer(ctp,s2,true);
+    var ctp={fromIdx:origTp.toIdx,toIdx:origTp.fromIdx,give:{money:parseInt(document.getElementById("ctgM").value)||0,fish:parseInt(document.getElementById("ctgF").value)||0,rescues:parseInt(document.getElementById("ctgR").value)||0,stars:parseInt(document.getElementById("ctgS").value)||0,cardIdx:-1},want:{money:parseInt(document.getElementById("ctrM").value)||0,fish:parseInt(document.getElementById("ctrF").value)||0,rescues:parseInt(document.getElementById("ctrR").value)||0,stars:parseInt(document.getElementById("ctrS").value)||0},responded:false};
+    var s2=dc(GS); s2.pendingTrade=ctp; addL(s2,to.name+" counters!"); push(s2); hideP();
+    if(s2.players[ctp.toIdx]&&s2.players[ctp.toIdx].isAI){setTimeout(function(){var s3=dc(GS);if(Math.random()<0.5){executeTrade(ctp,s3);addL(s3,"🤖 AI accepts counter!");}else addL(s3,"🤖 AI declines counter.");push(s3);},700);}
+    else showTradeOffer(ctp,s2,true);
   };
-  var cb=document.createElement("button");cb.textContent="Cancel";cb.className="pn";cb.onclick=hideP;
-  f.appendChild(sb);f.appendChild(cb);
+  var cb=document.createElement("button"); cb.textContent="Cancel"; cb.className="pn"; cb.onclick=hideP;
+  f.appendChild(sb); f.appendChild(cb);
   document.getElementById("po").classList.add("on");
 }
-
 function executeTrade(tp,s){
   var f=s.players[tp.fromIdx],t=s.players[tp.toIdx],g=tp.give,w=tp.want;
   if(g.cardIdx>=0&&f.heldCards&&f.heldCards[g.cardIdx]){var card=f.heldCards[g.cardIdx];t.heldCards=(t.heldCards||[]).concat([card]);f.heldCards=f.heldCards.filter(function(_,i){return i!==g.cardIdx;});}
@@ -965,7 +1240,7 @@ function executeTrade(tp,s){
   t=mg(t,{money:t.money+(g.money||0),fish:t.fish+(g.fish||0),rescues:t.rescues+(g.rescues||0),stars:t.stars+(g.stars||0)});
   t=mg(t,{money:t.money-(w.money||0),fish:Math.max(0,t.fish-(w.fish||0)),rescues:Math.max(0,t.rescues-(w.rescues||0)),stars:Math.max(0,t.stars-(w.stars||0))});
   f=mg(f,{money:f.money+(w.money||0),fish:f.fish+(w.fish||0),rescues:f.rescues+(w.rescues||0),stars:f.stars+(w.stars||0)});
-  s.players[tp.fromIdx]=f;s.players[tp.toIdx]=t;addL(s,"🤝 Trade: "+f.name+" ↔ "+t.name);
+  s.players[tp.fromIdx]=f; s.players[tp.toIdx]=t; addL(s,"🤝 Trade: "+f.name+" ↔ "+t.name);
 }
 
 // ── Board ─────────────────────────────────────────────────────────────────────
@@ -974,8 +1249,9 @@ function mkEl(tag,attrs){var e=document.createElementNS(NS,tag);for(var k in att
 function mkTxt(str,attrs){var e=mkEl("text",attrs);e.textContent=str;return e;}
 
 function drawBoard(){
-  var svg=document.getElementById("bsvg");svg.setAttribute("width",BW);svg.setAttribute("height",BH);svg.innerHTML="";
-  var defs=mkEl("defs",{});var st=document.createElementNS(NS,"style");st.textContent="@keyframes wa{0%{transform:translateX(0)}100%{transform:translateX(-140px)}}@keyframes wb{0%{transform:translateX(0)}100%{transform:translateX(140px)}}@keyframes wc{0%{transform:translateX(-70px)}100%{transform:translateX(70px)}}";defs.appendChild(st);var cl=mkEl("clipPath",{id:"bc"});cl.appendChild(mkEl("rect",{width:BW,height:BH}));defs.appendChild(cl);svg.appendChild(defs);
+  var svg=document.getElementById("bsvg"); svg.setAttribute("width",BW); svg.setAttribute("height",BH); svg.innerHTML="";
+  var defs=mkEl("defs",{}); var st=document.createElementNS(NS,"style"); st.textContent="@keyframes wa{0%{transform:translateX(0)}100%{transform:translateX(-140px)}}@keyframes wb{0%{transform:translateX(0)}100%{transform:translateX(140px)}}@keyframes wc{0%{transform:translateX(-70px)}100%{transform:translateX(70px)}}"; defs.appendChild(st);
+  var cl=mkEl("clipPath",{id:"bc"}); cl.appendChild(mkEl("rect",{width:BW,height:BH})); defs.appendChild(cl); svg.appendChild(defs);
   svg.appendChild(mkEl("rect",{width:BW,height:BH,fill:"#4a9ebb"}));
   var wst=["wa","wb","wc"];
   for(var row=0;row<18;row++){var g=mkEl("g",{style:"animation:"+wst[row%3]+" "+(2.5+row*0.3)+"s linear infinite","clip-path":"url(#bc)"});var wxs=[-280,-140,0,140,280,420,560,700,840,980,1120,1260,1400];for(var wi=0;wi<wxs.length;wi++){var wx=wxs[wi];g.appendChild(mkEl("path",{d:"M"+wx+" "+(55+row*52)+" Q"+(wx+17)+" "+(45+row*52)+" "+(wx+35)+" "+(55+row*52)+" Q"+(wx+52)+" "+(65+row*52)+" "+(wx+70)+" "+(55+row*52),stroke:"#7ecbe0","stroke-width":2,fill:"none",opacity:0.5}));}svg.appendChild(g);}
@@ -983,18 +1259,17 @@ function drawBoard(){
   svg.appendChild(mkEl("rect",{x:OL-SW/2,y:OT-SW/2,width:OR-OL+SW,height:OB-OT+SW,rx:16,fill:"#4a9ebb",opacity:0.9}));
   svg.appendChild(mkTxt("Boat Ride 2.0",{x:(OL+OR)/2,y:(OT+OB)/2-14,"text-anchor":"middle","font-size":26,"font-weight":900,fill:"#fff",stroke:"#1a3a55","stroke-width":4,"paint-order":"stroke",opacity:0.45}));
   svg.appendChild(mkTxt("Supreme Boat Captain Race",{x:(OL+OR)/2,y:(OT+OB)/2+20,"text-anchor":"middle","font-size":16,"font-weight":700,fill:"#fff",stroke:"#1a3a55","stroke-width":4,"paint-order":"stroke",opacity:0.45}));
-  drawJuts(svg);drawOval(svg);svg.appendChild(mkEl("g",{id:"tlayer"}));applyScale();
+  drawJuts(svg); drawOval(svg); svg.appendChild(mkEl("g",{id:"tlayer"})); applyScale();
 }
 
 function jLP(key){if(key==="boat_school"){var b=oPos(5);return{x:b.x,y:b.y-3*SW-SW-10};}if(key==="boat"){var b=oPos(12);return{x:b.x-2*SW,y:b.y-SW/2-SW-10};}if(key==="fish"){var b=oPos(19);return{x:b.x,y:b.y+4*SW+SW+10};}if(key==="rescue"){var b=oPos(26);return{x:b.x,y:b.y+SW/2+3*SW+10};}if(key==="winner"){var b=oPos(33);return{x:b.x+2*SW,y:b.y-SW-10};}return null;}
-
 function drawJuts(svg){
   var jcols={boat_school:"#a855f7",boat:"#fb923c",fish:"#34d399",rescue:"#60a5fa",winner:"#fbbf24"};
   var jlbls={boat_school:"🎓 Boat School",boat:"🛥️ Boat Store",fish:"🐟 Catch a Fish",rescue:"🆘 Rescue!"};
   var wjd=JC.winner;
   for(var i=0;i<wjd.pts.length-1;i++)svg.appendChild(mkEl("line",{x1:wjd.pts[i].x,y1:wjd.pts[i].y,x2:wjd.pts[i+1].x,y2:wjd.pts[i+1].y,stroke:"#c47d0e","stroke-width":SW+1,"stroke-opacity":0.15}));
   var wlbls=["Dock 1","Lose Turn","Back 1","⭐ WIN"];
-  for(var i=0;i<wjd.pts.length;i++){var pt=wjd.pts[i],g=mkEl("g",{});g.appendChild(mkEl("rect",{x:pt.x-SW/2,y:pt.y-SH/2,width:SW,height:SH,rx:6,fill:i===3?"#f5a623":"#c47d0e",stroke:"#ffffffa0","stroke-width":0.8}));var pp2=wlbls[i].split(" ");g.appendChild(mkTxt(pp2[0],{x:pt.x,y:pt.y-4,"text-anchor":"middle","dominant-baseline":"central","font-size":9,fill:"#fff","font-weight":"bold"}));if(pp2.length>1)g.appendChild(mkTxt(pp2.slice(1).join(" "),{x:pt.x,y:pt.y+8,"text-anchor":"middle","dominant-baseline":"central","font-size":9,fill:"#fff"}));svg.appendChild(g);}
+  for(var i=0;i<wjd.pts.length;i++){var pt=wjd.pts[i],gg=mkEl("g",{});gg.appendChild(mkEl("rect",{x:pt.x-SW/2,y:pt.y-SH/2,width:SW,height:SH,rx:6,fill:i===3?"#f5a623":"#c47d0e",stroke:"#ffffffa0","stroke-width":0.8}));var pp2=wlbls[i].split(" ");gg.appendChild(mkTxt(pp2[0],{x:pt.x,y:pt.y-4,"text-anchor":"middle","dominant-baseline":"central","font-size":9,fill:"#fff","font-weight":"bold"}));if(pp2.length>1)gg.appendChild(mkTxt(pp2.slice(1).join(" "),{x:pt.x,y:pt.y+8,"text-anchor":"middle","dominant-baseline":"central","font-size":9,fill:"#fff"}));svg.appendChild(gg);}
   var tkeys=Object.keys(TASKS);
   for(var ki=0;ki<tkeys.length;ki++){
     var key=tkeys[ki],t=TASKS[key],jd=JC[key];
@@ -1031,412 +1306,84 @@ function drawOval(svg){
 // ── Tokens ────────────────────────────────────────────────────────────────────
 function pXY(pl){if(pl.winPos>=0){var pts=JC.winner?JC.winner.pts:[];if(pts[pl.winPos])return pts[pl.winPos];}if(pl.inTask){var jd=JC[pl.inTask];if(jd){if(pl.taskPos>=0&&jd.pts[pl.taskPos])return jd.pts[pl.taskPos];return jd.ep||oPos(TASKS[pl.inTask].entryIdx);}}return oPos(pl.pos);}
 function updateTok(s){
-  var layer=document.getElementById("tlayer");if(!layer)return;layer.innerHTML="";
+  var layer=document.getElementById("tlayer"); if(!layer)return; layer.innerHTML="";
   var groups={};
   for(var i=0;i<s.players.length;i++){var pl=s.players[i];if(!pl||pl.eliminated)continue;var xy=pXY(pl),k=Math.round(xy.x)+","+Math.round(xy.y);if(!groups[k])groups[k]=[];groups[k].push({pl:pl,pi:i});}
   var gkeys=Object.keys(groups);
   for(var gi=0;gi<gkeys.length;gi++){var grp=groups[gkeys[gi]],pts2=gkeys[gi].split(",");var bx=parseFloat(pts2[0]),by=parseFloat(pts2[1]);
-    for(var oi=0;oi<grp.length;oi++){var pl=grp[oi].pl,pi=grp[oi].pi,act=pi===s.curIdx;var ox=grp.length>1?(oi-(grp.length-1)/2)*28:0,oy=grp.length>1?-oi*6:0;var g=mkEl("g",{transform:"translate("+(bx+ox)+","+(by+oy)+")"});g.innerHTML=tokenSVG(pl.tokenKey||"captain",pl.color,act);var ws2=pl.name.split(" ");for(var wi=0;wi<ws2.length;wi++)g.appendChild(mkTxt(ws2[wi],{x:0,y:30+wi*10,"text-anchor":"middle","dominant-baseline":"central","font-size":8,fill:"#fff","font-weight":"bold",stroke:"#000","stroke-width":0.6,"paint-order":"stroke"}));layer.appendChild(g);}
+    for(var oi=0;oi<grp.length;oi++){var pl=grp[oi].pl,pi=grp[oi].pi,act=pi===s.curIdx;var ox=grp.length>1?(oi-(grp.length-1)/2)*28:0,oy=grp.length>1?-oi*6:0;var gg=mkEl("g",{transform:"translate("+(bx+ox)+","+(by+oy)+")"});gg.innerHTML=tokenSVG(pl.tokenKey||"captain",pl.color,act);var ws2=pl.name.split(" ");for(var wi=0;wi<ws2.length;wi++)gg.appendChild(mkTxt(ws2[wi],{x:0,y:30+wi*10,"text-anchor":"middle","dominant-baseline":"central","font-size":8,fill:"#fff","font-weight":"bold",stroke:"#000","stroke-width":0.6,"paint-order":"stroke"}));layer.appendChild(gg);}
   }
-}
-
-// ── Movement animation ────────────────────────────────────────────────────────
-// Animate a player stepping through a list of board positions, calling onDone when finished.
-// Each step: update player pos, re-render tokens, center camera, pause STEP_MS.
-function animateSteps(playerIdx, steps, onDone) {
-  if(!steps || steps.length === 0){ onDone(); return; }
-  var i = 0;
-  function next(){
-    if(i >= steps.length){ onDone(); return; }
-    var step = steps[i++];
-    // Update the player's position in GS for this step
-    var pl = GS.players[playerIdx];
-    if(!pl){ onDone(); return; }
-    if(step.type === "oval"){
-      GS.players[playerIdx] = mg(pl, {pos: step.pos, inTask: null, taskPos: -1});
-    } else if(step.type === "task"){
-      GS.players[playerIdx] = mg(pl, {inTask: step.task, taskPos: step.taskPos});
-    } else if(step.type === "win"){
-      GS.players[playerIdx] = mg(pl, {winPos: step.winPos});
-    }
-    updateTok(GS);
-    centerOn(playerIdx);
-    setTimeout(next, STEP_MS);
-  }
-  next();
-}
-
-// Center the camera on a specific player
-function centerOn(playerIdx){
-  if(!GS || !GS.players[playerIdx]) return;
-  var pl = GS.players[playerIdx];
-  var xy = pXY(pl);
-  var bs = document.getElementById("bs");
-  var targetX = xy.x * scale - bs.clientWidth / 2;
-  var targetY = xy.y * scale - bs.clientHeight / 2;
-  bs.scrollLeft = Math.max(0, targetX);
-  bs.scrollTop  = Math.max(0, targetY);
-}
-function posD(pl){if(pl.winPos>=0){var l=["Dock 1","Lose Turn","Back 1","⭐ WIN"];return"Winner's Dock: "+l[pl.winPos];}if(pl.inTask==="boat")return"🛥️ Boat Store: sp "+(pl.taskPos+1);if(pl.inTask)return(TASKS[pl.inTask]?TASKS[pl.inTask].label:pl.inTask)+": sp "+(pl.taskPos+1);return null;}
-function tLine(pl,tk){var done=(pl.completedTasks||[]).indexOf(tk)>=0;if(tk==="boat"){if(done)return{t:(pl.boat?BOAT_EMOJIS[pl.boat.name]||"🛥️":"🛥️")+" "+(pl.boat?pl.boat.name:"owned"),g:true};return{t:"⛵ No boat yet",g:false};}var t=TASKS[tk];if(!t)return{t:"",g:false};if(done)return{t:t.done||t.label,g:true};return{t:t.prog(pl),g:t.req(pl)};}
-
-function doRoll(){if(!GS)return;var s=dc(GS),pl=s.players[s.curIdx];if((pl.doubleRollsLeft||0)>0)pl.doubleRollsLeft--;var r=Math.ceil(Math.random()*6);addL(s,pl.name+" 🎲 rolls "+r);s.players[s.curIdx]=pl;push(s);processRoll(r,s);}
-
-function processRoll(r,s){
-  var pl=s.players[s.curIdx];
-  if(pl.frozen>0){var nf=pl.frozen-1;s.players[s.curIdx]=mg(pl,{frozen:nf});addL(s,pl.name+" ❄️ frozen "+(nf>0?nf+" left.":"free!"));showP("❄️ Frozen!","info",pl.name+" is frozen!\n"+(nf>0?nf+" turn(s) left.":"Free next turn!"),[{l:"OK",c:"pn",fn:function(){advTurn(s);}}]);push(s);return;}
-  if(pl.skip>0){s.players[s.curIdx]=mg(pl,{skip:pl.skip-1});addL(s,pl.name+" skips.");advTurn(s);return;}
-  if(pl.winPos>=0){doWin(pl,s,r);return;}
-  if(pl.inTask==="boat"){doBoat(pl,s,r);return;}
-  if(pl.inTask){doTask(pl,s,r);return;}
-  doMove(pl,s,r);
-}
-
-function doMove(pl,s,r){
-  var path=[];
-  for(var i=1;i<=r;i++) path.push((pl.pos+i)%36);
-  var fc=pl.completedTasks||[];
-  var jes=[
-    {idx:TASKS.boat_school.entryIdx,key:"boat_school",need:fc.indexOf("boat_school")<0},
-    {idx:TASKS.boat.entryIdx,       key:"boat",       need:fc.indexOf("boat")<0},
-    {idx:TASKS.fish.entryIdx,       key:"fish",       need:fc.indexOf("fish")<0},
-    {idx:TASKS.rescue.entryIdx,     key:"rescue",     need:fc.indexOf("rescue")<0},
-    {idx:WIN_IDX,                   key:"winner",     need:fc.length>=4}
-  ];
-  // Find where the player stops (jut entry or end of path)
-  var ss=r, jh=null;
-  outer:for(var i=0;i<path.length;i++){
-    for(var j=0;j<jes.length;j++){
-      if(jes[j].need && jes[j].idx===path[i]){ss=i+1;jh=jes[j];break outer;}
-    }
-  }
-  // Build animation steps — one per oval space
-  var steps=[];
-  for(var i=0;i<ss;i++) steps.push({type:"oval", pos:path[i]});
-  // Check for passing start
-  var passed=false;
-  for(var i=0;i<ss;i++) if(path[i]===0 && pl.pos!==0){passed=true;break;}
-  var extra=r-ss;
-  // Store final state in s but animate first
-  var finalPos=path[ss-1];
-  var u=mg(pl,{pos:finalPos});
-  if(passed){u=mg(u,{money:u.money+5});addL(s,"💰 Passed START! +$5");}
-  s.players[s.curIdx]=u;
-  push(s);
-  animateSteps(s.curIdx, steps, function(){
-    // After animation, sync GS with final state
-    GS.players[GS.curIdx]=u;
-    updateTok(GS);
-    centerOn(GS.curIdx);
-    if(jh){
-      if(extra>0) enterJutX(u,s,jh.key,extra);
-      else         enterJut(u,s,jh.key);
-    } else {
-      landOn(u,s);
-    }
-  });
-}
-
-function landOn(pl,s){
-  if(isOnlineMultiplayer && !isMine(s)) return;
-  var k=sKind(pl.pos);
-  if(k==="swim"){var deck=(s.swimDeck||[]).slice();if(!deck.length)deck=mkSwim();var card=deck[0];deck=deck.slice(1);s.swimDeck=deck;var u=mg(pl,{});if(card.eff.money)u=mg(u,{money:u.money+card.eff.money});if(card.eff.skip)u=mg(u,{skip:(u.skip||0)+card.eff.skip});var mv=card.eff.move||0;s.players[s.curIdx]=u;addL(s,"🏊 SWIM: "+card.text);var sc2=dc(s);showP("🏊 Swim Card!","swim",card.text,[{l:"Woohoo!",c:"pp",fn:function(){if(mv!==0){var fp=((u.pos+mv+360)%36);var um=mg(u,{pos:fp});sc2.players[sc2.curIdx]=um;push(sc2);landOn(um,sc2);}else advTurn(sc2);}}]);push(s);return;}
-  if(k==="sink"){var deck2=(s.sinkDeck||[]).slice();if(!deck2.length)deck2=mkSink();var card2=deck2[0];deck2=deck2.slice(1);s.sinkDeck=deck2;var u2=mg(pl,{});if(card2.eff.money)u2=mg(u2,{money:u2.money+card2.eff.money});if(card2.eff.skip)u2=mg(u2,{skip:(u2.skip||0)+card2.eff.skip});var mv2=card2.eff.move||0;s.players[s.curIdx]=u2;addL(s,"🌊 SINK: "+card2.text);var sc3=dc(s);showP("🌊 Sink Card!","sink",card2.text,[{l:"Yikes!",c:"pn",fn:function(){if(mv2!==0){var fp2=((u2.pos+mv2+360)%36);var um2=mg(u2,{pos:fp2});sc3.players[sc3.curIdx]=um2;push(sc3);landOn(um2,sc3);}else advTurn(sc3);}}]);push(s);return;}
-  advTurn(s);
-}
-
-function enterJut(pl,s,key){
-  if(isOnlineMultiplayer && !isMine(s)) return;
-  if(key==="winner"){if(pl.money<0){showP("💸 Wallet Too Low!","debt","Need $0+ to enter!\n$"+pl.money,[{l:"Dang!",c:"pn",fn:function(){advTurn(s);}}]);return;}s.players[s.curIdx]=mg(pl,{winPos:-1});showP("🏆 Winner's Dock!","info","All 4 done! 🎉\nRoll to reach ⭐ WIN!",[{l:"Let's go!",c:"pp",fn:function(){advTurn(s);}}]);push(s);return;}
-  if(key==="boat"&&!pl.graduated){if(pl.isAI){if(Math.random()<0.3&&pl.money>-50){s.players[s.curIdx]=mg(pl,{money:pl.money-100,inTask:"boat",taskPos:-1});addL(s,"🤖 AI pays $100 bypass");push(s);advTurn(s);}else{addL(s,"🤖 AI skips Boat Store");push(s);advTurn(s);}return;}showP("🛥️ The Boat Store!","info","Need to graduate!\nPay $100 to bypass, or skip.\n$"+pl.money,[{l:"Pay $100",c:"pw",fn:function(){var s2=dc(GS);s2.players[s2.curIdx]=mg(s2.players[s2.curIdx],{money:s2.players[s2.curIdx].money-100,inTask:"boat",taskPos:-1});push(s2);advTurn(s2);}},{l:"Skip",c:"pn",fn:function(){advTurn(dc(GS));}}]);return;}
-  s.players[s.curIdx]=mg(pl,{inTask:key,taskPos:-1});addL(s,pl.name+" enters "+(TASKS[key]?TASKS[key].label:key)+"!");push(s);advTurn(s);
-}
-
-function enterJutX(pl,s,key,extra){
-  if(isOnlineMultiplayer && !isMine(s)) return;
-  if(key==="winner"){if(pl.money<0){showP("💸 Wallet Too Low!","debt","Need $0+ to enter!",[{l:"Dang!",c:"pn",fn:function(){advTurn(s);}}]);return;}s.players[s.curIdx]=mg(pl,{winPos:-1});push(s);doWin(s.players[s.curIdx],s,extra);return;}
-  if(key==="boat"&&!pl.graduated){enterJut(pl,s,"boat");return;}
-  s.players[s.curIdx]=mg(pl,{inTask:key,taskPos:-1});addL(s,pl.name+" enters "+(TASKS[key]?TASKS[key].label:key)+"!");push(s);doTask(s.players[s.curIdx],s,extra);
-}
-
-function doTask(pl,s,r){
-  var t=TASKS[pl.inTask], np=pl.taskPos+r;
-  // Build steps through task spaces one at a time
-  var steps=[];
-  for(var i=pl.taskPos+1; i<=Math.min(np, t.count-1); i++)
-    steps.push({type:"task", task:pl.inTask, taskPos:i});
-  if(np >= t.count){
-    // Will exit the jut — animate to last task space first
-    var lastSteps=[];
-    for(var i=pl.taskPos+1; i<t.count; i++)
-      lastSteps.push({type:"task", task:pl.inTask, taskPos:i});
-    animateSteps(s.curIdx, lastSteps, function(){
-      var rem=r-(t.count-1-pl.taskPos)-1;
-      var u=mg(pl,{inTask:null,taskPos:-1,pos:t.exitIdx});
-      var comp=t.req(u)&&(u.completedTasks||[]).indexOf(t.key)<0;
-      if(comp){
-        u=mg(u,{completedTasks:(u.completedTasks||[]).concat([t.key])});
-        if(t.key==="boat_school") u=mg(u,{graduated:true});
-        addL(s,"🎉 Completed "+t.label+"!");
-      }
-      s.players[s.curIdx]=u;
-      var sc4=dc(s), uc=dc(u);
-      // Show exit popup, then continue movement
-      showP(comp?"✅ Done!":"Exited "+t.label, comp?"success":"info",
-        comp?(u.completedTasks.length+"/4 done! 🎊"):t.prog(u),
-        [{l:comp?"Yes! 🎉":"Continue",c:"pp",fn:function(){
-          if(rem>0){
-            var exitSteps=[];
-            for(var i=1;i<=rem;i++) exitSteps.push({type:"oval",pos:(t.exitIdx+i)%36});
-            animateSteps(sc4.curIdx, exitSteps, function(){
-              var fp3=(t.exitIdx+rem)%36;
-              var um3=mg(uc,{pos:fp3});
-              sc4.players[sc4.curIdx]=um3;
-              push(sc4);
-              landOn(um3,sc4);
-            });
-          } else {
-            advTurn(sc4);
-          }
-        }}]
-      );
-      push(s);
-    });
-    return;
-  }
-  // Still inside jut — animate steps then apply space effect and show popup
-  animateSteps(s.curIdx, steps, function(){
-    var u2=mg(pl,{taskPos:np});
-    var space=t.spaces[np];
-    if(space) u2=space.eff(u2);
-    s.players[s.curIdx]=u2;
-    addL(s,pl.name+" sp"+(np+1)+": "+(space?space.desc:""));
-    var sc5=dc(s);
-    showP(t.label,"info",space?(space.story+"\n\n"+space.desc):t.prog(u2),
-      [{l:"Continue",c:"pp",fn:function(){advTurn(sc5);}}]);
-    push(s);
-  });
-}
-
-function doBoat(pl,s,r){
-  var np=pl.taskPos+r;
-  if(np>=BOATS.length){
-    s.players[s.curIdx]=mg(pl,{inTask:null,taskPos:-1,pos:TASKS.boat.exitIdx});
-    push(s); advTurn(s); return;
-  }
-  // Animate steps through the boat store
-  var steps=[];
-  for(var i=pl.taskPos+1; i<=np; i++)
-    steps.push({type:"task", task:"boat", taskPos:i});
-  animateSteps(s.curIdx, steps, function(){
-    var u=mg(pl,{taskPos:np}), boat=BOATS[np];
-    var sold=false;
-    for(var i=0;i<s.players.length;i++)
-      if(i!==s.curIdx&&s.players[i]&&s.players[i].boat&&s.players[i].boat.name===boat.name){sold=true;break;}
-    s.players[s.curIdx]=u;
-    if(sold){showP(boat.icon+" Sold","info","Already taken!",[{l:"Continue",c:"pp",fn:function(){advTurn(s);}}]);push(s);return;}
-    if(pl.isAI){
-      if(pl.aiDiff==="easy"?Math.random()<0.5:true){
-        var nc=(u.completedTasks||[]).concat(["boat"]);
-        s.players[s.curIdx]=mg(u,{money:u.money-boat.price,boat:boat,inTask:null,taskPos:-1,pos:TASKS.boat.exitIdx,completedTasks:nc});
-        addL(s,"🤖 AI buys "+boat.icon+" "+boat.name);push(s);advTurn(s);
-      }else{push(s);advTurn(s);}
-      return;
-    }
-    showP(boat.icon+" "+boat.name+" — $"+boat.price,"info",
-      "Price: $"+boat.price+" | Balance: $"+u.money+(u.money<boat.price?"\n⚠️ Going into debt!":""),
-      [{l:"Buy "+boat.icon+" $"+boat.price,c:"pp",fn:function(){
-        var s2=dc(GS),pu=s2.players[s2.curIdx];
-        var nc2=(pu.completedTasks||[]).filter(function(x){return x!=="boat";}).concat(["boat"]);
-        s2.players[s2.curIdx]=mg(pu,{money:pu.money-boat.price,boat:boat,inTask:null,taskPos:-1,pos:TASKS.boat.exitIdx,completedTasks:nc2});
-        addL(s2,pu.name+" buys "+boat.icon+" "+boat.name);push(s2);advTurn(s2);
-      }},
-      {l:"Pass",c:"pn",fn:function(){advTurn(dc(GS));}}]
-    );
-    push(s);
-  });
-}
-
-function doWin(pl,s,r){
-  var cp=pl.winPos<0?-1:pl.winPos, MAX=3, tg=cp+r;
-  if(!pl.fasttrack&&tg>MAX){
-    showP("🎯 Overshot!","info","Need exactly "+(MAX-Math.max(cp,0))+" to reach ⭐ WIN.",
-      [{l:"OK",c:"pn",fn:function(){advTurn(s);}}]);
-    return;
-  }
-  var nwp=Math.min(tg,MAX);
-  // Animate each dock step
-  var steps=[];
-  for(var i=cp+1; i<=nwp; i++) steps.push({type:"win", winPos:i});
-  animateSteps(s.curIdx, steps, function(){
-    var u=WDOCK[nwp].eff(mg(pl,{winPos:nwp}));
-    if(WDOCK[nwp].win){
-      if(u.money<0){
-        s.players[s.curIdx]=u; push(s);
-        showP("💸 Still in Debt!","debt","Cannot win with $"+u.money,
-          [{l:"Dang!",c:"pn",fn:function(){advTurn(s);}}]);
-        return;
-      }
-      u=mg(u,{done:true}); s.players[s.curIdx]=u; s.winner=u; push(s); showWin(u); return;
-    }
-    var wl=["⚓ Dock 1","😴 Lose Turn","↩️ Back 1"];
-    addL(s,pl.name+" Dock: "+wl[nwp]);
-    s.players[s.curIdx]=u;
-    var sc7=dc(s);
-    showP("🏅 Winner's Dock","info",wl[nwp]+"!",
-      [{l:"Continue",c:"pp",fn:function(){advTurn(sc7);}}]);
-    push(s);
-  });
-}
-
-function advTurn(s){
-  var prevIdx=s.curIdx;tradeOpen=false;
-  var np=[];for(var i=0;i<s.players.length;i++){var pl=s.players[i];if(!pl){np.push(pl);continue;}if(pl.done||pl.eliminated){np.push(pl);continue;}if(pl.money<=-1000){addL(s,pl.name+" eliminated! 💀");np.push(mg(pl,{eliminated:true,done:true}));}else np.push(pl);}
-  s.players=np;
-  var cur2=np[prevIdx];if(cur2&&cur2.money<0&&!cur2.done&&!cur2.eliminated){var interest=Math.floor(cur2.money*0.05);np[prevIdx]=mg(cur2,{money:cur2.money+interest});addL(s,cur2.name+" 💸 interest: "+(cur2.money+interest));}
-  var active=np.filter(function(p){return p&&!p.done;});
-  if(active.length<=1){var w=active[0]||np[0];var wi=np.indexOf(w);if(wi>=0)np[wi]=mg(w,{done:true});s.players=np;s.winner=w;push(s);showWin(w);return;}
-  var next=(s.curIdx+1)%np.length,its=0;while((!np[next]||np[next].done)&&its<np.length){next=(next+1)%np.length;its++;}
-  np[next]=mg(np[next],{boughtCardThisTurn:false,usedShipwreckThisTurn:false,cardsBoughtThisTurn:[],pendingTrade:null});
-  s.players=np; s.curIdx=next; s.phase="transition"; s.pendingTrade=null;
-  push(s);
-  if(!isOnlineMultiplayer) saveGame(s);
-  if(isOnlineMultiplayer) notifyNextPlayer(s,prevIdx,next);
-  else showTrans();
-}
-
-// ── AI ────────────────────────────────────────────────────────────────────────
-function runAI(){
-  if(!GS)return;var s=dc(GS),pl=s.players[s.curIdx];if(!pl||!pl.isAI)return;
-  if(!pl.boughtCardThisTurn&&pl.money>20&&pl.heldCards.length<3){var deck=(s.swDeck||[]).slice();if(!deck.length)deck=mkDeck(SWDEFS);var card=deck[0],uid2=Math.random().toString(36).slice(2);deck=deck.slice(1);s.swDeck=deck;pl.heldCards=(pl.heldCards||[]).concat([mg(card,{uid:uid2})]);pl.money-=10;pl.boughtCardThisTurn=true;pl.cardsBoughtThisTurn=(pl.cardsBoughtThisTurn||[]).concat([uid2]);if(card.type==="fasttrack")pl.fasttrack=true;addL(s,"🤖 AI buys "+card.icon+" "+card.label);}
-  s.players[s.curIdx]=pl;var r=Math.ceil(Math.random()*6);addL(s,"🤖 AI rolls "+r);push(s);processRoll(r,s);
-}
-
-// ── Cards ─────────────────────────────────────────────────────────────────────
-function buyCard(){
-  if(!GS)return;var s=dc(GS),pl=s.players[s.curIdx];if(pl.boughtCardThisTurn)return;
-  var deck=(s.swDeck||[]).slice();if(!deck.length)deck=mkDeck(SWDEFS);var card=deck[0],uid2=Math.random().toString(36).slice(2);deck=deck.slice(1);s.swDeck=deck;
-  pl.heldCards=(pl.heldCards||[]).concat([mg(card,{uid:uid2})]);pl.money-=10;pl.boughtCardThisTurn=true;pl.cardsBoughtThisTurn=(pl.cardsBoughtThisTurn||[]).concat([uid2]);if(card.type==="fasttrack")pl.fasttrack=true;
-  s.players[s.curIdx]=pl;addL(s,pl.name+" 🃏 buys "+card.icon+" "+card.label);push(s);
-  showP(card.icon+" "+card.label,"info",card.desc+(card.type==="fasttrack"?"\n🚀 Already active!":"\n⏳ Play next turn."),[{l:"Got it!",c:"pp",fn:hideP}]);
-}
-
-function openCard(idx){
-  if(!GS)return;var pl=GS.players[GS.curIdx];
-  if(pl.usedShipwreckThisTurn){showP("One Per Turn","info","Only 1 card per turn.",[{l:"OK",c:"pn",fn:hideP}]);return;}
-  var card=pl.heldCards[idx];if(!card)return;
-  if((pl.cardsBoughtThisTurn||[]).indexOf(card.uid)>=0){showP("⏳ Not Yet","info","Play this card next turn.",[{l:"OK",c:"pn",fn:hideP}]);return;}
-  if(card.type==="double"){execCard(card,idx);return;}
-  showP(card.icon+" "+card.label,"info",card.desc,[{l:"▶ Play Now",c:"pp",fn:function(){hideP();execCard(card,idx);}},{l:"Save",c:"pn",fn:hideP}]);
-}
-
-function execCard(card,idx){
-  var s=dc(GS),pl=s.players[s.curIdx];pl.heldCards=pl.heldCards.filter(function(_,i){return i!==idx;});pl.usedShipwreckThisTurn=true;s.players[s.curIdx]=pl;
-  if(card.type==="double"){pl.doubleRollsLeft=(pl.doubleRollsLeft||0)+2;s.players[s.curIdx]=pl;push(s);showP("🎲 Double Time!","info","2 bonus rolls this turn!",[{l:"Roll!",c:"pp",fn:hideP}]);return;}
-  if(card.type==="fasttrack"){pl.fasttrack=true;s.players[s.curIdx]=pl;push(s);showP("🚀 Fast Track","info","No exact roll needed to WIN!",[{l:"Awesome!",c:"pp",fn:hideP}]);return;}
-  if(card.type==="shortcut"){push(s);showP("⚡ Shortcut","info","Reduce which challenge?",[{l:"🐟 Fish: 10→6",c:"pp",fn:function(){var s2=dc(GS);s2.players[s2.curIdx].shortcut.fish=true;push(s2);hideP();}},{l:"🆘 Rescues: 2→1",c:"pp",fn:function(){var s2=dc(GS);s2.players[s2.curIdx].shortcut.rescues=true;push(s2);hideP();}},{l:"⭐ Stars: 3→2",c:"pp",fn:function(){var s2=dc(GS);s2.players[s2.curIdx].shortcut.stars=true;push(s2);hideP();}}]);return;}
-  if(card.type==="teleport"){push(s);showP("🌀 Teleportation","info","Click any space on the board!",[{l:"Cancel",c:"pn",fn:hideP}]);setTimeout(function(){for(var i=1;i<36;i++){if(sKind(i)==="entry_winner")continue;(function(si){var el=document.getElementById("sp"+si);if(!el)return;el.style.cursor="pointer";var rect=el.querySelector("rect");if(rect){rect.setAttribute("stroke","#FFD700");rect.setAttribute("stroke-width","3");}el.addEventListener("click",function h(){el.removeEventListener("click",h);el.style.cursor="";if(rect){rect.setAttribute("stroke","#ffffffa0");rect.setAttribute("stroke-width","0.8");}hideP();var s2=dc(GS);s2.players[s2.curIdx]=mg(s2.players[s2.curIdx],{pos:si,inTask:null,taskPos:-1});addL(s2,s2.players[s2.curIdx].name+" 🌀 teleports to "+si);push(s2);advTurn(s2);});})(i);}},100);return;}
-  if(card.type==="freeze"){var others=s.players.filter(function(p,i){return i!==s.curIdx&&p&&!p.done;});push(s);showP("❄️ Freeze Frame","info","Choose a player to freeze:",others.map(function(op){return{l:(op.isAI?"🤖 ":"")+op.name,c:"pp",fn:(function(opid){return function(){var s2=dc(GS);for(var i=0;i<s2.players.length;i++)if(s2.players[i]&&s2.players[i].id===opid){s2.players[i]=mg(s2.players[i],{frozen:2});break;}addL(s2,s2.players[s2.curIdx].name+" ❄️ freezes "+op.name);push(s2);hideP();};})(op.id)};}));return;}
-  if(card.type==="robbery"){var others2=s.players.filter(function(p,i){return i!==s.curIdx&&p&&!p.done;});push(s);showP("💰 Highway Robbery","info","Steal ALL money from:",others2.map(function(op){return{l:(op.isAI?"🤖 ":"")+op.name+" ($"+op.money+")",c:"pp",fn:(function(opid){return function(){var s2=dc(GS),stolen=0;for(var i=0;i<s2.players.length;i++)if(s2.players[i]&&s2.players[i].id===opid){stolen=s2.players[i].money;s2.players[i]=mg(s2.players[i],{money:0});break;}s2.players[s2.curIdx]=mg(s2.players[s2.curIdx],{money:s2.players[s2.curIdx].money+stolen});addL(s2,s2.players[s2.curIdx].name+" 💰 robs $"+stolen);push(s2);hideP();};})(op.id)};}));return;}
-}
-
-function debtR(){
-  if(!GS) return;
-  var pl = GS.players[GS.curIdx];
-  if(!pl.completedTasks || !pl.completedTasks.length){
-    showP("💸 Debt Relief","debt","No completed challenges to sacrifice.",[{l:"Close",c:"pn",fn:hideP}]);
-    return;
-  }
-  var lbls = {boat_school:"🎓 Boat School", boat:"🛥️ Boat", fish:"🐟 Fish", rescue:"🆘 Rescues"};
-  var btns = pl.completedTasks.map(function(tk){
-    return {l: lbls[tk]||tk, c:"pw", fn: (function(ttk){
-      return function(){
-        var s = dc(GS);
-        var p2 = mg(s.players[s.curIdx], {money:0, completedTasks: s.players[s.curIdx].completedTasks.filter(function(x){return x!==ttk;})});
-        if(ttk==="boat_school") p2 = mg(p2,{graduated:false, stars:0});
-        if(ttk==="fish")        p2 = mg(p2,{fish:0});
-        if(ttk==="rescue")      p2 = mg(p2,{rescues:0});
-        if(ttk==="boat")        p2 = mg(p2,{boat:null});
-        s.players[s.curIdx] = p2;
-        addL(s, p2.name+" 💸 debt relief");
-        push(s); hideP();
-      };
-    })(tk)};
-  });
-  btns.push({l:"Cancel", c:"pn", fn:hideP});
-  showP("💸 Debt Relief","debt","Sacrifice a challenge to reset to $0:", btns);
-}
-
-function inspP(i){
-  if(!GS) return;
-  var pl = GS.players[i]; if(!pl) return;
-  var tks = ["boat_school","boat","fish","rescue"];
-  var lines = "💰 $"+pl.money+(pl.money<0?" ⚠️ IN DEBT":"")+"\n\n";
-  for(var j=0; j<tks.length; j++){
-    var tk = tks[j];
-    var done = (pl.completedTasks||[]).indexOf(tk)>=0;
-    var t = TASKS[tk]; if(!t) continue;
-    var status;
-    if(done){
-      if(tk==="boat") status = (pl.boat ? (BOAT_EMOJIS[pl.boat.name]||"🛥️")+" "+pl.boat.name : "owned");
-      else status = t.done||"done";
-    } else {
-      status = t.prog(pl);
-    }
-    lines += (done?"✅ ":"⬜ ")+t.label+": "+status+"\n";
-  }
-  if(pl.heldCards && pl.heldCards.length)
-    lines += "\n🃏 "+pl.heldCards.map(function(c){return c.icon+" "+c.label;}).join(", ");
-  if(pl.frozen>0) lines += "\n❄️ Frozen: "+pl.frozen+" turn(s)";
-  showP((pl.isAI?"🤖 ":"")+pl.name, "info", lines, [{l:"Close",c:"pn",fn:hideP}]);
 }
 
 // ── Transition ────────────────────────────────────────────────────────────────
+var showTransActive=false;
 function showTrans(){
-  if(!GS) return; var cur=GS.players[GS.curIdx]; if(!cur) return;
+  if(!GS)return;
+  if(showTransActive)return; // prevent double-firing
+  var cur=GS.players[GS.curIdx]; if(!cur)return;
+  showTransActive=true;
   document.getElementById("trsub").textContent=cur.isAI?"🤖 AI TURN":"NEXT UP";
   document.getElementById("trdot").style.background=cur.color;
   document.getElementById("trdot").style.boxShadow="0 0 20px "+cur.color;
   document.getElementById("trname").textContent=cur.name+"'s Turn";
   document.getElementById("trstats").textContent="💰$"+cur.money+(cur.money<0?" ⚠️ IN DEBT":"")+" | "+(cur.completedTasks||[]).length+"/4";
-  var mine=isMine(GS);
+  var mine=isMyTurnNow();
   document.getElementById("trBtn").style.display=(cur.isAI||!mine)?"none":"block";
   document.getElementById("tro").classList.add("on");
   if(cur.isAI){
     var delay=aiSpeed==="fast"?300:1800;
     setTimeout(function(){
+      showTransActive=false;
       document.getElementById("tro").classList.remove("on");
-      var s=dc(GS); s.phase="preturn"; push(s);
-      setTimeout(runAI,aiSpeed==="fast"?100:400);
+      // Set phase to preturn so renderAll won't re-trigger showTrans
+      if(GS){GS.phase="preturn"; renderAll();}
+      setTimeout(function(){
+        // Safety check: is it still an AI turn?
+        if(GS&&GS.players[GS.curIdx]&&GS.players[GS.curIdx].isAI&&!aiRunning){
+          runAI();
+        }
+      }, aiSpeed==="fast"?100:400);
     },delay);
   }
 }
 function disTrans(){
+  showTransActive=false;
   document.getElementById("tro").classList.remove("on");
-  if(!GS) return;
+  if(!GS)return;
   if(GS.phase==="transition"){
     var s=dc(GS); s.phase="preturn";
     if(isOnlineMultiplayer){
-      if(isMine(s)){
-        GS=s;
-        dbSet("rooms/"+rCode, cleanForFB(s)).catch(function(e){console.error(e);});
-        renderAll();
-      }
-    } else {
-      GS=s; saveGame(s); renderAll();
-    }
+      if(isMyTurnNow()){GS=s;dbSet("rooms/"+rCode,cleanForFB(s)).catch(function(e){console.error(e);});renderAll();}
+    } else {GS=s;saveGame(s);renderAll();}
   }
-  // Center on current player when turn begins
-  setTimeout(function(){ centerOn(GS ? GS.curIdx : 0); }, 50);
+  setTimeout(function(){centerOn(GS?GS.curIdx:0);},50);
 }
 
 // ── Popup ─────────────────────────────────────────────────────────────────────
 var ACOLS={swim:"#1565c0",sink:"#b71c1c",debt:"#c0392b",info:"#1a3a55",success:"#1a7a3a"};
 function showP(title,accent,body,btns,isSpectator){
-  showPWithAIPause(title,accent,body,btns,isSpectator);
+  document.getElementById("phd").style.background=ACOLS[accent]||"#1a3a55";
+  document.getElementById("phd").innerHTML='<div style="font-size:18px;font-weight:700;color:#fff">'+title+'</div>';
+  document.getElementById("pbd").textContent=body;
+  var f=document.getElementById("pft"); f.innerHTML="";
+  if(isSpectator){
+    var note=document.createElement("div"); note.style.cssText="font-size:11px;color:#888;text-align:center;padding:4px 0";
+    note.textContent="⏳ Waiting for "+(GS&&GS.players&&GS.players[GS.curIdx]?GS.players[GS.curIdx].name:"other player")+"...";
+    f.appendChild(note);
+  } else {
+    // AI turn in watch mode: auto-dismiss after pause
+    var isAITurn=GS&&GS.players[GS.curIdx]&&GS.players[GS.curIdx].isAI;
+    if(isAITurn&&aiSpeed==="show"){
+      var note2=document.createElement("div"); note2.style.cssText="font-size:11px;color:#aaa;text-align:center;padding:4px 0"; note2.textContent="⏳ Auto-continuing..."; f.appendChild(note2);
+      document.getElementById("po").classList.add("on");
+      setTimeout(function(){hideP();if(btns&&btns.length&&btns[0].fn)btns[0].fn();},1400);
+      return;
+    }
+    for(var i=0;i<(btns||[]).length;i++){(function(b){var btn=document.createElement("button");btn.textContent=b.l;btn.className=b.c||"pn";btn.onclick=function(){hideP();if(b.fn)b.fn();};f.appendChild(btn);})(btns[i]);}
+  }
+  document.getElementById("po").classList.add("on");
 }
 function hideP(){document.getElementById("po").classList.remove("on");}
-
 function showWin(player){
   if(!isOnlineMultiplayer){deleteSavedGame();checkForSavedGame();}
   document.getElementById("wname").textContent=player.name;
@@ -1445,16 +1392,15 @@ function showWin(player){
 }
 
 // ── Zoom ──────────────────────────────────────────────────────────────────────
-var ZL=[0.4,0.55,0.7,0.85,1.0,1.2,1.5,1.8,2.2];
-function zoomIn(){var idx=ZL.indexOf(scale);if(idx<0)idx=5;scale=ZL[Math.min(idx+1,ZL.length-1)];applyScale();}
-function zoomOut(){var idx=ZL.indexOf(scale);if(idx<0)idx=5;scale=ZL[Math.max(idx-1,0)];applyScale();}
+var ZL=[0.4,0.55,0.7,0.85,1.0,1.2,1.5,1.8,2.0,2.2];
+function zoomIn(){var idx=ZL.indexOf(scale);if(idx<0)idx=8;scale=ZL[Math.min(idx+1,ZL.length-1)];applyScale();}
+function zoomOut(){var idx=ZL.indexOf(scale);if(idx<0)idx=8;scale=ZL[Math.max(idx-1,0)];applyScale();}
 function applyScale(){
   var w=document.getElementById("bwrap"),bs=document.getElementById("bs");
-  w.style.transform="scale("+scale+")";w.style.width=BW+"px";w.style.height=BH+"px";
-  w.style.minWidth=Math.ceil(BW*scale)+"px";w.style.minHeight=Math.ceil(BH*scale)+"px";
+  w.style.transform="scale("+scale+")"; w.style.width=BW+"px"; w.style.height=BH+"px";
+  w.style.minWidth=Math.ceil(BW*scale)+"px"; w.style.minHeight=Math.ceil(BH*scale)+"px";
   document.getElementById("zlbl").textContent=Math.round(scale*100)+"%";
 }
-function ctrOn(){ centerOn(GS ? GS.curIdx : 0); }
 
 // ── Controls ──────────────────────────────────────────────────────────────────
 document.getElementById("btnLeave").addEventListener("click",leaveGame);

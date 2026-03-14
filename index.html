@@ -134,6 +134,7 @@ hr.div{border:none;border-top:1px solid #1a3a55;margin:18px 0}
     <div style="font-size:48px;margin-bottom:8px">⛵</div>
     <h1>Boat Ride 2.0</h1>
     <p class="sub" id="authSubtitle">Sign in to set sail!</p>
+    <div style="font-size:11px;color:#4a7a9b;margin-bottom:8px" id="authLoading">⏳ Connecting to server...</div>
     <div class="auth-err" id="authErr"></div>
     <input class="inp" id="authEmail" type="email" placeholder="Email address"/>
     <input class="inp" id="authPass" type="password" placeholder="Password"/>
@@ -380,6 +381,8 @@ window.addEventListener('load', function() {
     _fs   = firebase.firestore();
     firebaseReady = true;
     console.log("Firebase ready");
+    var loadingEl = document.getElementById("authLoading");
+    if(loadingEl) loadingEl.textContent = "";
 
     _auth.onAuthStateChanged(function(user) {
       if(user) {
@@ -442,7 +445,7 @@ function saveUserToDb(user) {
   });
 }
 
-function saveGame(s) {
+function saveSlotKey(slotId) { return "savedGames/" + currentUser.uid + "/" + slotId; }
   if(!currentUser || !_db || isOnlineMultiplayer) return;
   dbSet("savedGames/" + currentUser.uid, {
     state: cleanForFB(s),
@@ -728,59 +731,47 @@ function addL(s,m){if(!s.log)s.log=[];s.log=[m].concat(s.log).slice(0,60);}
 // SCREEN NAV
 // ─────────────────────────────────────────────────────────────────────────────
 function showScreen(id){var all=document.querySelectorAll(".screen");for(var i=0;i<all.length;i++)all[i].classList.remove("on");if(id){var el=document.getElementById(id);if(el)el.classList.add("on");}}
-document.getElementById("btnResume").addEventListener("click", async function(){
+document.getElementById("btnResume").addEventListener("click", function(){
   if(!currentUser) return;
-  var saves = await getAllSaves();
-  var slots = Object.values(saves).filter(function(s){ return s && s.meta && s.state; });
-  if(!slots.length){ alert("No saved games found."); checkForSavedGame(); return; }
-
-  if(slots.length === 1) {
-    loadSaveSlot(slots[0]);
-    return;
-  }
-
-  // Multiple saves — show picker
-  slots.sort(function(a,b){ return b.meta.savedAt - a.meta.savedAt; });
-  var body = document.getElementById("pbd");
-  var ft = document.getElementById("pft");
-  document.getElementById("phd").style.background = "#1a3a55";
-  document.getElementById("phd").innerHTML = '<div style="font-size:18px;font-weight:700;color:#fff">▶ Resume Which Game?</div>';
-  body.innerHTML = '<div style="font-size:13px;color:#555;margin-bottom:4px">Choose a saved game to continue:</div>';
-  ft.innerHTML = "";
-  slots.forEach(function(slot) {
-    var m = slot.meta;
-    var d = new Date(m.savedAt);
-    var timeStr = d.toLocaleDateString() + " " + d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-    var btn = document.createElement("button");
-    btn.style.cssText = "display:block;width:100%;padding:10px 14px;border-radius:9px;border:2px solid #1a3a55;background:#071728;color:#fff;font-size:12px;cursor:pointer;margin-bottom:8px;text-align:left;transition:border-color .1s";
-    btn.innerHTML = '<div style="font-weight:700;color:#7ecbe0;margin-bottom:3px">' + (m.gameType==="vs AI"?"🤖":"👥") + " " + m.gameType + '</div>'
-      + '<div style="color:#fff;margin-bottom:2px">Playing with: <b>' + (m.opponents||"nobody") + '</b></div>'
-      + '<div style="color:#4eff91;margin-bottom:2px">Your progress: ' + m.completedCount + '/4 challenges</div>'
-      + '<div style="color:#4a7a9b;font-size:10px">Last turn: ' + m.currentTurn + ' • Saved: ' + timeStr + '</div>';
-    btn.onmouseover = function(){ btn.style.borderColor="#7ecbe0"; };
-    btn.onmouseout  = function(){ btn.style.borderColor="#1a3a55"; };
-    btn.onclick = function(){ hideP(); loadSaveSlot(slot); };
-    ft.appendChild(btn);
-
-    // Delete button per slot
-    var del = document.createElement("button");
-    del.textContent = "🗑 Delete this save";
-    del.className = "pn";
-    del.style.cssText = "font-size:11px;padding:5px 12px;margin-bottom:12px;background:#c0392b;color:#fff;border:none;border-radius:6px;cursor:pointer";
-    del.onclick = async function(){
-      await deleteSaveSlot(m.slotId);
-      hideP();
-      checkForSavedGame();
-    };
-    ft.appendChild(del);
+  getAllSaves().then(function(saves) {
+    var slots = Object.values(saves).filter(function(s){ return s && s.meta && s.state; });
+    if(!slots.length){ alert("No saved games found."); checkForSavedGame(); return; }
+    if(slots.length === 1){ loadSaveSlot(slots[0]); return; }
+    slots.sort(function(a,b){ return b.meta.savedAt - a.meta.savedAt; });
+    var body = document.getElementById("pbd");
+    var ft = document.getElementById("pft");
+    document.getElementById("phd").style.background = "#1a3a55";
+    document.getElementById("phd").innerHTML = '<div style="font-size:18px;font-weight:700;color:#fff">▶ Resume Which Game?</div>';
+    body.innerHTML = '<div style="font-size:13px;color:#555;margin-bottom:4px">Choose a saved game to continue:</div>';
+    ft.innerHTML = "";
+    slots.forEach(function(slot) {
+      var m = slot.meta;
+      var d = new Date(m.savedAt);
+      var timeStr = d.toLocaleDateString() + " " + d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+      var btn = document.createElement("button");
+      btn.style.cssText = "display:block;width:100%;padding:10px 14px;border-radius:9px;border:2px solid #1a3a55;background:#071728;color:#fff;font-size:12px;cursor:pointer;margin-bottom:8px;text-align:left;transition:border-color .1s";
+      btn.innerHTML = '<div style="font-weight:700;color:#7ecbe0;margin-bottom:3px">'+(m.gameType==="vs AI"?"🤖":"👥")+" "+m.gameType+'</div>'
+        +'<div style="color:#fff;margin-bottom:2px">Playing with: <b>'+(m.opponents||"nobody")+'</b></div>'
+        +'<div style="color:#4eff91;margin-bottom:2px">Your progress: '+m.completedCount+'/4 challenges</div>'
+        +'<div style="color:#4a7a9b;font-size:10px">Last turn: '+m.currentTurn+' • Saved: '+timeStr+'</div>';
+      btn.onmouseover=function(){btn.style.borderColor="#7ecbe0";};
+      btn.onmouseout=function(){btn.style.borderColor="#1a3a55";};
+      btn.onclick=function(){hideP();loadSaveSlot(slot);};
+      ft.appendChild(btn);
+      var del=document.createElement("button");
+      del.textContent="🗑 Delete this save";
+      del.className="pn";
+      del.style.cssText="font-size:11px;padding:5px 12px;margin-bottom:12px;background:#c0392b;color:#fff;border:none;border-radius:6px;cursor:pointer";
+      del.onclick=function(){
+        deleteSaveSlot(m.slotId).then(function(){ hideP(); checkForSavedGame(); });
+      };
+      ft.appendChild(del);
+    });
+    var cancel=document.createElement("button");
+    cancel.textContent="Cancel";cancel.className="pn";cancel.onclick=hideP;
+    ft.appendChild(cancel);
+    document.getElementById("po").classList.add("on");
   });
-
-  var cancel = document.createElement("button");
-  cancel.textContent = "Cancel";
-  cancel.className = "pn";
-  cancel.onclick = hideP;
-  ft.appendChild(cancel);
-  document.getElementById("po").classList.add("on");
 });
 
 function loadSaveSlot(slot) {
@@ -825,13 +816,16 @@ setupBtns("roomSizeBtns","data-sz",function(v){selRoomSize=parseInt(v);});
 // ─────────────────────────────────────────────────────────────────────────────
 // ONLINE ROOM
 // ─────────────────────────────────────────────────────────────────────────────
-document.getElementById("btnCreateRoom").addEventListener("click", async function(){
+document.getElementById("btnCreateRoom").addEventListener("click", function(){
   if(!currentUser){ alert("Sign in required for online play."); return; }
-  if(currentUser) {
-    var saves = await getAllSaves();
+  getAllSaves().then(function(saves) {
     var slots = Object.values(saves).filter(function(s){ return s && s.meta; });
-    if(slots.length >= MAX_SAVES) { showSaveFullPopup(slots, "online"); return; }
-  }
+    if(slots.length >= MAX_SAVES){ showSaveFullPopup(slots, "online"); return; }
+    createRoom();
+  });
+});
+
+function createRoom(){
   var name = document.getElementById("onlineName").value.trim() || currentUser.displayName || "Player 1";
   var code = String(Math.floor(1000+Math.random()*9000));
   rCode = code; myId = 0; isOnlineMultiplayer = true;
@@ -982,18 +976,25 @@ function enterGame(code){
 // ─────────────────────────────────────────────────────────────────────────────
 // START AI / LOCAL GAME
 // ─────────────────────────────────────────────────────────────────────────────
-document.getElementById("btnStartAI").addEventListener("click", async function(){
+document.getElementById("btnStartAI").addEventListener("click", function(){
   if(currentUser) {
-    var saves = await getAllSaves();
-    var slots = Object.values(saves).filter(function(s){ return s && s.meta; });
-    if(slots.length >= MAX_SAVES) { showSaveFullPopup(slots, "ai"); return; }
+    getAllSaves().then(function(saves) {
+      var slots = Object.values(saves).filter(function(s){ return s && s.meta; });
+      if(slots.length >= MAX_SAVES){ showSaveFullPopup(slots, "ai"); return; }
+      startAIGame();
+    });
+  } else {
+    startAIGame();
   }
+});
+
+function startAIGame(){
   var name=document.getElementById("aiName").value.trim()||"Player 1";
-  var uid = currentUser ? currentUser.uid : null;
+  var uid=currentUser?currentUser.uid:null;
   var players=[mkP(0,name,PC[0],false,null,selAITok,uid)];
   for(var i=0;i<selCnt;i++)players.push(mkP(i+1,AI_NAMES[i],PC[i+1],true,selDiff,TOKEN_KEYS[(i+1)%TOKEN_KEYS.length],null));
   startGame(players,selSpd);
-});
+}
 
 function startGame(players,spd){
   isOnlineMultiplayer=false; myId=0; aiSpeed=spd||"show";
@@ -1022,23 +1023,19 @@ function leaveGame(){
 // ─────────────────────────────────────────────────────────────────────────────
 // NOTIFY NEXT PLAYER (online only)
 // ─────────────────────────────────────────────────────────────────────────────
-async function notifyNextPlayer(s, prevPlayerIdx, nextPlayerIdx) {
+function notifyNextPlayer(s, prevPlayerIdx, nextPlayerIdx) {
   if(!isOnlineMultiplayer) return;
   var nextPl = s.players[nextPlayerIdx];
   if(!nextPl || nextPl.isAI || !nextPl.uid) return;
-  if(nextPl.uid === (currentUser?currentUser.uid:null)) return;
-  try {
-    // Check if next player's tab is currently active (present in game)
-    var presenceSnap = await dbGet("rooms/"+rCode+"/presence/"+nextPlayerIdx);
-    if(presenceSnap === true){
-      console.log("Next player is active — skipping email.");
-      return;
-    }
-    var snap = await dbGet("users/"+nextPl.uid);
-    if(!snap || !snap.email) return;
-    var prevPl = s.players[prevPlayerIdx];
-    sendTurnEmail(snap.email, nextPl.name, prevPl?prevPl.name:"Someone", rCode||"?");
-  } catch(e){ console.warn("Notify error:", e); }
+  if(nextPl.uid === (currentUser ? currentUser.uid : null)) return;
+  dbGet("rooms/"+rCode+"/presence/"+nextPlayerIdx).then(function(presenceSnap) {
+    if(presenceSnap === true) { console.log("Next player is active — skipping email."); return; }
+    return dbGet("users/"+nextPl.uid).then(function(snap) {
+      if(!snap || !snap.email) return;
+      var prevPl = s.players[prevPlayerIdx];
+      sendTurnEmail(snap.email, nextPl.name, prevPl ? prevPl.name : "Someone", rCode||"?");
+    });
+  }).catch(function(e){ console.warn("Notify error:", e); });
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

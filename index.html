@@ -731,44 +731,39 @@ function addL(s,m){if(!s.log)s.log=[];s.log=[m].concat(s.log).slice(0,60);}
 // SCREEN NAV
 // ─────────────────────────────────────────────────────────────────────────────
 function showScreen(id){var all=document.querySelectorAll(".screen");for(var i=0;i<all.length;i++)all[i].classList.remove("on");if(id){var el=document.getElementById(id);if(el)el.classList.add("on");}}
-document.getElementById("btnResume").addEventListener("click", function(){
-  if(!currentUser) return;
-  getAllSaves().then(function(saves) {
+document.getElementById("btnResume").addEventListener("click", function(){  if(!currentUser) return;
+  getAllSaves().then(function(saves){
     var slots = Object.values(saves).filter(function(s){ return s && s.meta && s.state; });
     if(!slots.length){ alert("No saved games found."); checkForSavedGame(); return; }
     if(slots.length === 1){ loadSaveSlot(slots[0]); return; }
     slots.sort(function(a,b){ return b.meta.savedAt - a.meta.savedAt; });
-    var body = document.getElementById("pbd");
     var ft = document.getElementById("pft");
     document.getElementById("phd").style.background = "#1a3a55";
     document.getElementById("phd").innerHTML = '<div style="font-size:18px;font-weight:700;color:#fff">▶ Resume Which Game?</div>';
-    body.innerHTML = '<div style="font-size:13px;color:#555;margin-bottom:4px">Choose a saved game to continue:</div>';
+    document.getElementById("pbd").innerHTML = '<div style="font-size:13px;color:#555;margin-bottom:4px">Choose a saved game to continue:</div>';
     ft.innerHTML = "";
-    slots.forEach(function(slot) {
+    slots.forEach(function(slot){
       var m = slot.meta;
       var d = new Date(m.savedAt);
-      var timeStr = d.toLocaleDateString() + " " + d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+      var timeStr = d.toLocaleDateString()+" "+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
       var btn = document.createElement("button");
-      btn.style.cssText = "display:block;width:100%;padding:10px 14px;border-radius:9px;border:2px solid #1a3a55;background:#071728;color:#fff;font-size:12px;cursor:pointer;margin-bottom:8px;text-align:left;transition:border-color .1s";
+      btn.style.cssText = "display:block;width:100%;padding:10px 14px;border-radius:9px;border:2px solid #1a3a55;background:#071728;color:#fff;font-size:12px;cursor:pointer;margin-bottom:8px;text-align:left";
       btn.innerHTML = '<div style="font-weight:700;color:#7ecbe0;margin-bottom:3px">'+(m.gameType==="vs AI"?"🤖":"👥")+" "+m.gameType+'</div>'
-        +'<div style="color:#fff;margin-bottom:2px">Playing with: <b>'+(m.opponents||"nobody")+'</b></div>'
-        +'<div style="color:#4eff91;margin-bottom:2px">Your progress: '+m.completedCount+'/4 challenges</div>'
+        +'<div style="color:#fff;margin-bottom:2px">With: <b>'+(m.opponents||"nobody")+'</b></div>'
+        +'<div style="color:#4eff91;margin-bottom:2px">Progress: '+m.completedCount+'/4 challenges</div>'
         +'<div style="color:#4a7a9b;font-size:10px">Last turn: '+m.currentTurn+' • Saved: '+timeStr+'</div>';
       btn.onmouseover=function(){btn.style.borderColor="#7ecbe0";};
       btn.onmouseout=function(){btn.style.borderColor="#1a3a55";};
       btn.onclick=function(){hideP();loadSaveSlot(slot);};
       ft.appendChild(btn);
-      var del=document.createElement("button");
+      var del = document.createElement("button");
       del.textContent="🗑 Delete this save";
-      del.className="pn";
       del.style.cssText="font-size:11px;padding:5px 12px;margin-bottom:12px;background:#c0392b;color:#fff;border:none;border-radius:6px;cursor:pointer";
-      del.onclick=function(){
-        deleteSaveSlot(m.slotId).then(function(){ hideP(); checkForSavedGame(); });
-      };
+      del.onclick=function(){ deleteSaveSlot(m.slotId).then(function(){ hideP(); checkForSavedGame(); }); };
       ft.appendChild(del);
     });
-    var cancel=document.createElement("button");
-    cancel.textContent="Cancel";cancel.className="pn";cancel.onclick=hideP;
+    var cancel = document.createElement("button");
+    cancel.textContent="Cancel"; cancel.className="pn"; cancel.onclick=hideP;
     ft.appendChild(cancel);
     document.getElementById("po").classList.add("on");
   });
@@ -865,7 +860,6 @@ document.getElementById("btnForceStart").addEventListener("click", function(){
   if(!rCode) return;
   dbGet("rooms/"+rCode).then(function(v){
     if(!v) return;
-    // Fill empty slots with AI
     var players = v.players.slice();
     for(var i=1;i<players.length;i++){
       if(!players[i]) players[i]=mkP(i,AI_NAMES[i-1],PC[i],true,selDiff,TOKEN_KEYS[i%TOKEN_KEYS.length],null);
@@ -1484,8 +1478,7 @@ function amIActivePlayer(){
   return cur.uid === (currentUser ? currentUser.uid : null);
 }
 function hideP(){document.getElementById("po").classList.remove("on");}
-function showSaveFullPopup(slots, pendingAction) {
-  slots.sort(function(a,b){ return b.meta.savedAt - a.meta.savedAt; });
+function showSaveFullPopup(slots, pendingAction) {  slots.sort(function(a,b){ return b.meta.savedAt - a.meta.savedAt; });
   document.getElementById("phd").style.background = "#c0392b";
   document.getElementById("phd").innerHTML = '<div style="font-size:18px;font-weight:700;color:#fff">🗑 Save Slots Full</div>';
   document.getElementById("pbd").innerHTML = '<div style="font-size:13px;color:#333;margin-bottom:8px">You already have <b>3 saved games</b>. Delete or finish one before starting a new game.</div>';

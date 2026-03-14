@@ -362,31 +362,50 @@ hr.div{border:none;border-top:1px solid #1a3a55;margin:18px 0}
 // FIREBASE INIT
 // ─────────────────────────────────────────────────────────────────────────────
 var _fb, _auth, _db, _fs;
-try {
-  _fb = firebase.initializeApp({
-    apiKey: "AIzaSyB_fBqYhfr061UY2xSYrBxO9UW1T16B5Jc",
-    authDomain: "boat-ride-629a8.firebaseapp.com",
-    databaseURL: "https://boat-ride-629a8-default-rtdb.firebaseio.com",
-    projectId: "boat-ride-629a8",
-    storageBucket: "boat-ride-629a8.firebasestorage.app",
-    messagingSenderId: "529814761740",
-    appId: "1:529814761740:web:04a5491c6e91a064cdd929"
-  });
-  _auth = firebase.auth();
-  _db   = firebase.database();
-  _fs   = firebase.firestore();
-} catch(e) {
-  console.warn("Firebase init error:", e.message);
-}
+var firebaseReady = false;
 
-// DB helpers
-function dbSet(path, val) { return _db ? _db.ref(path).set(val) : Promise.resolve(); }
-function dbGet(path)      { return _db ? _db.ref(path).once("value").then(function(s){return s.val();}) : Promise.resolve(null); }
-function dbOn(path, cb)   { if(!_db) return function(){}; var r=_db.ref(path); r.on("value",function(s){cb(s.val());}); return function(){r.off();}; }
-function dbUpdate(path, val) { return _db ? _db.ref(path).update(val) : Promise.resolve(); }
+window.addEventListener('load', function() {
+  try {
+    _fb = firebase.initializeApp({
+      apiKey: "AIzaSyB_fBqYhfr061UY2xSYrBxO9UW1T16B5Jc",
+      authDomain: "boat-ride-629a8.firebaseapp.com",
+      databaseURL: "https://boat-ride-629a8-default-rtdb.firebaseio.com",
+      projectId: "boat-ride-629a8",
+      storageBucket: "boat-ride-629a8.firebasestorage.app",
+      messagingSenderId: "529814761740",
+      appId: "1:529814761740:web:04a5491c6e91a064cdd929"
+    });
+    _auth = firebase.auth();
+    _db   = firebase.database();
+    _fs   = firebase.firestore();
+    firebaseReady = true;
+    console.log("Firebase ready");
 
-// Firestore mail trigger (for email notifications)
-function sendTurnEmail(toEmail, toName, fromName, roomCode) {
+    _auth.onAuthStateChanged(function(user) {
+      if(user) {
+        currentUser = user;
+        isGuest = false;
+        saveUserToDb(user);
+        document.getElementById("authErr").textContent = "";
+        var bar = document.getElementById("userBar");
+        bar.style.display = "flex";
+        bar.innerHTML = '👤 <span style="flex:1">' + (user.displayName||user.email||"User") + '</span><span style="color:#4a7a9b">' + (user.email||"") + '</span>';
+        document.getElementById("topUser").textContent = user.email || "";
+        var dname = user.displayName || user.email.split("@")[0];
+        document.getElementById("onlineName").value = dname;
+        document.getElementById("aiName").value = dname;
+        checkForSavedGame();
+        if(document.getElementById("scAuth").classList.contains("on")) showScreen("scHome");
+      } else {
+        currentUser = null;
+      }
+    });
+
+  } catch(e) {
+    console.error("Firebase init error:", e);
+    document.getElementById("authErr").textContent = "Firebase error: " + e.message;
+  }
+});
   if(!_fs || !toEmail) return;
   var gameUrl = "https://kelseysboatride.netlify.app/";
   _fs.collection("mail").add({
@@ -504,21 +523,22 @@ function doAuth(){
   var email = document.getElementById("authEmail").value.trim();
   var pass  = document.getElementById("authPass").value;
   var name  = document.getElementById("authName").value.trim();
-  document.getElementById("authErr").textContent = "";
-  if(!email || !pass){ document.getElementById("authErr").textContent = "Email and password required."; return; }
-  if(!_auth){ document.getElementById("authErr").textContent = "Firebase Auth unavailable."; return; }
+  var errEl = document.getElementById("authErr");
+  errEl.textContent = "";
+  if(!email || !pass){ errEl.textContent = "Email and password required."; return; }
+  if(!_auth){ errEl.textContent = "Firebase not ready yet — please wait a moment and try again."; return; }
   if(authMode === "signup"){
-    _auth.createUserWithEmailAndPassword(email, pass).then(function(cred){
-      return cred.user.updateProfile({displayName: name||email.split("@")[0]}).then(function(){
-        saveUserToDb(cred.user);
-        showScreen("scHome");
-      });
-    }).catch(function(e){ document.getElementById("authErr").textContent = e.message; });
+    _auth.createUserWithEmailAndPassword(email, pass)
+      .then(function(cred){
+        return cred.user.updateProfile({displayName: name||email.split("@")[0]}).then(function(){
+          saveUserToDb(cred.user);
+        });
+      })
+      .catch(function(e){ errEl.textContent = e.message; });
   } else {
-    _auth.signInWithEmailAndPassword(email, pass).then(function(cred){
-      saveUserToDb(cred.user);
-      showScreen("scHome");
-    }).catch(function(e){ document.getElementById("authErr").textContent = e.message; });
+    _auth.signInWithEmailAndPassword(email, pass)
+      .then(function(cred){ saveUserToDb(cred.user); })
+      .catch(function(e){ errEl.textContent = e.message; });
   }
 }
 

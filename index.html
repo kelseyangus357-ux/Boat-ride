@@ -670,9 +670,15 @@ document.getElementById("btnCreateRoom").addEventListener("click", function(){
     document.getElementById("btnForceStart").style.display = "block";
     rUnsub = dbOn("rooms/"+code, function(v){
       if(!v) return;
-      updateSlots(v.players, v.roomSize||selRoomSize);
-      var filled = v.players.filter(function(p){return p!==null;}).length;
-      var needed = v.roomSize||selRoomSize;
+      var needed = v.roomSize || selRoomSize;
+      var players = v.players || {};
+      // Count filled slots — works whether Firebase returns array or object
+      var filled = 0;
+      for(var i=0; i<needed; i++){
+        var p = Array.isArray(players) ? players[i] : players[i];
+        if(p && p.name) filled++;
+      }
+      updateSlots(players, needed);
       var badge = document.getElementById("cbadge");
       if(filled >= needed && v.phase==="waiting"){
         badge.className="badge bok"; badge.textContent="All players joined! Starting...";
@@ -705,13 +711,19 @@ document.getElementById("btnJoinRoom").addEventListener("click", function(){
   if(code.length!==4){ setBadge("j","Enter 4-digit code","berr"); return; }
   dbGet("rooms/"+code).then(function(v){
     if(!v){ setBadge("j","Room not found","berr"); return; }
-    var players = v.players;
+    var roomSize = v.roomSize || 2;
+    // Firebase may return players as an object with numeric keys, or a sparse array
+    var players = v.players || {};
+    // Find first empty slot (index 1+) — check each slot up to roomSize-1
     var slot = -1;
-    for(var i=1;i<players.length;i++){ if(!players[i]){slot=i;break;} }
-    if(slot<0){ setBadge("j","Room is full","berr"); return; }
+    for(var i=1; i<roomSize; i++){
+      var p = Array.isArray(players) ? players[i] : players[i];
+      if(!p || p === null){ slot = i; break; }
+    }
+    if(slot < 0){ setBadge("j","Room is full","berr"); return; }
     rCode=code; myId=slot; isOnlineMultiplayer=true;
-    var p = mkP(slot, name, PC[slot], false, null, selOnlineTok, currentUser.uid);
-    dbSet("rooms/"+code+"/players/"+slot, p).then(function(){
+    var newP = mkP(slot, name, PC[slot], false, null, selOnlineTok, currentUser.uid);
+    dbSet("rooms/"+code+"/players/"+slot, newP).then(function(){
       setBadge("j","Joined! Loading...","bok");
       setTimeout(function(){ enterGame(code); }, 1200);
     });
@@ -720,9 +732,16 @@ document.getElementById("btnJoinRoom").addEventListener("click", function(){
 
 function setBadge(w,msg,cls){var el=document.getElementById(w==="j"?"jbadge":"cbadge");el.style.display="inline-block";el.className="badge "+cls;el.textContent=msg;}
 function updateSlots(players, total){
-  var el=document.getElementById("lslots");if(!el||!players)return;
+  var el=document.getElementById("lslots");if(!el)return;
   var h="";
-  for(var i=0;i<total;i++){var pl=players[i];h+='<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:7px;background:#071728;margin-bottom:5px;border:1px solid #1a3a55"><div style="width:10px;height:10px;border-radius:50%;background:'+PC[i]+'"></div><div style="font-size:12px;font-weight:600">'+(pl?pl.name:"Waiting...")+' (Slot '+(i+1)+')</div><div style="font-size:10px;color:#4a7a9b;margin-left:auto">'+(pl?"✅":"...")+'</div></div>';}
+  for(var i=0;i<total;i++){
+    // Firebase may return a sparse object or array — safely access each slot
+    var pl = players ? (Array.isArray(players) ? players[i] : players[i]) : null;
+    h+='<div style="display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:7px;background:#071728;margin-bottom:5px;border:1px solid #1a3a55">'
+      +'<div style="width:10px;height:10px;border-radius:50%;background:'+PC[i]+'"></div>'
+      +'<div style="font-size:12px;font-weight:600">'+(pl&&pl.name?pl.name:"Waiting...")+' (Slot '+(i+1)+')</div>'
+      +'<div style="font-size:10px;color:#4a7a9b;margin-left:auto">'+(pl&&pl.name?"✅":"⏳")+'</div></div>';
+  }
   el.innerHTML=h;
 }
 

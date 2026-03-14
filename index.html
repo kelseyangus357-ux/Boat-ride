@@ -7,7 +7,6 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 <script>
-  // Initialize Firebase immediately after compat scripts load
   var firebaseApp = firebase.initializeApp({
     apiKey:"AIzaSyB_fBqYhfr061UY2xSYrBxO9UW1T16B5Jc",
     authDomain:"boat-ride-629a8.firebaseapp.com",
@@ -29,56 +28,118 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Segoe UI',sans-serif;background:#071728;color:#fff;min-height:100vh}
-#lobby{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px}
-.card{background:#0b1e30;border-radius:20px;padding:36px 44px;max-width:460px;width:100%;text-align:center}
-.card h1{font-size:26px;font-weight:900;color:#7ecbe0;margin-bottom:4px}
-.sub{font-size:13px;color:#4a7a9b;margin-bottom:28px}
-hr.div{border:none;border-top:1px solid #1a3a55;margin:20px 0}
-.btn{display:block;width:100%;padding:13px;border-radius:10px;border:none;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:10px}
+
+/* ── Screens ── */
+.screen{display:none;min-height:100vh;align-items:center;justify-content:center;padding:24px;flex-direction:column}
+.screen.on{display:flex}
+
+/* ── Cards ── */
+.card{background:#0b1e30;border-radius:20px;padding:32px 40px;max-width:520px;width:100%;box-shadow:0 12px 48px rgba(0,0,0,.5)}
+.card h1{font-size:26px;font-weight:900;color:#7ecbe0;margin-bottom:4px;text-align:center}
+.card h2{font-size:20px;font-weight:800;color:#7ecbe0;margin-bottom:16px;text-align:center}
+.sub{font-size:13px;color:#4a7a9b;margin-bottom:24px;text-align:center}
+hr.div{border:none;border-top:1px solid #1a3a55;margin:18px 0}
+.btn{display:block;width:100%;padding:13px;border-radius:10px;border:none;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:10px;transition:opacity .15s}
+.btn:hover{opacity:.88}
+.btn:last-child{margin-bottom:0}
 .btn-green{background:#1a7a3a;color:#fff}
 .btn-blue{background:#1565c0;color:#fff}
 .btn-gray{background:#1a3a55;color:#7ecbe0}
-.inp{width:100%;padding:11px 14px;border-radius:9px;border:2px solid #1a3a55;background:#071728;color:#fff;font-size:20px;text-align:center;letter-spacing:6px;font-weight:700;outline:none;margin-bottom:10px}
+.btn-purple{background:#6a1b9a;color:#fff}
+.btn-back{background:none;border:none;color:#7ecbe0;cursor:pointer;font-size:13px;margin-bottom:16px;text-align:left;padding:0}
+.inp{width:100%;padding:11px 14px;border-radius:9px;border:2px solid #1a3a55;background:#071728;color:#fff;font-size:16px;outline:none;margin-bottom:10px}
 .inp:focus{border-color:#1565c0}
-.room-code{font-size:48px;font-weight:900;letter-spacing:10px;color:#FFD700;margin:12px 0}
+.inp-code{font-size:22px;text-align:center;letter-spacing:6px;font-weight:700}
+.room-code{font-size:48px;font-weight:900;letter-spacing:10px;color:#FFD700;margin:12px 0;text-align:center}
 .badge{display:inline-block;padding:5px 14px;border-radius:16px;font-size:12px;font-weight:600;margin-top:8px}
 .bwait{background:#1a3a55;color:#7ecbe0}
 .bok{background:#1a7a3a;color:#7dff9a}
 .berr{background:#3a0a0a;color:#ff9999}
+
+/* ── How to play ── */
+.htp-goal{background:#e8f4e8;border-radius:10px;padding:12px 16px;margin-bottom:14px;border-left:4px solid #1a7a3a}
+.htp-goal h3{color:#1a7a3a;font-size:14px;margin-bottom:4px}
+.htp-goal p{font-size:13px;color:#333;line-height:1.6}
+.htp-challenge{display:flex;gap:10px;margin-bottom:10px;padding:10px;border-radius:8px;background:#f8f8f8;border-left:4px solid #ccc}
+.htp-challenge .icon{font-size:22px;flex-shrink:0}
+.htp-challenge h4{font-size:13px;font-weight:700;margin-bottom:2px}
+.htp-challenge p{font-size:12px;color:#555;line-height:1.5}
+.htp-rule{font-size:12px;color:#555;line-height:1.6;border-radius:8px;padding:10px 12px;margin-bottom:10px;border:1px solid #ddd}
+
+/* ── Mode select ── */
+.mode-btns{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-bottom:16px}
+.mode-btn{padding:24px 28px;border-radius:14px;border:2px solid #1a3a55;background:#071728;cursor:pointer;width:180px;text-align:center;transition:border-color .15s}
+.mode-btn:hover{border-color:#7ecbe0}
+.mode-btn .micon{font-size:36px;margin-bottom:8px}
+.mode-btn .mlabel{font-weight:700;font-size:15px;color:#7ecbe0}
+.mode-btn .msub{font-size:12px;color:#4a7a9b;margin-top:6px}
+
+/* ── Token picker ── */
+.token-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-top:8px}
+.token-btn{padding:6px 2px;border-radius:8px;border:2.5px solid #1a3a55;background:#071728;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;transition:border-color .15s}
+.token-btn:hover{border-color:#7ecbe0}
+.token-btn.sel{border-color:#FFD700;background:#0d2137}
+.token-btn span{font-size:9px;color:#7ecbe0;font-weight:600}
+
+/* ── Difficulty / count ── */
+.diff-btns{display:flex;gap:8px;justify-content:center;margin-bottom:14px;flex-wrap:wrap}
+.diff-btn{padding:10px 14px;border-radius:10px;border:2px solid #1a3a55;background:#071728;cursor:pointer;min-width:90px;text-align:center}
+.diff-btn.sel{border-color:#d68910;background:#1a1000}
+.diff-btn .dlabel{font-weight:700;font-size:13px;color:#fff}
+.diff-btn .dsub{font-size:11px;color:#4a7a9b;margin-top:2px}
+.count-btns{display:flex;gap:8px;justify-content:center;margin-bottom:14px}
+.count-btn{padding:8px 18px;border-radius:8px;border:2px solid #1a3a55;background:#071728;color:#fff;font-weight:600;cursor:pointer;font-size:15px}
+.count-btn.sel{border-color:#6a1b9a;background:#1a0030}
+.speed-btns{display:flex;gap:10px;margin-bottom:14px}
+.speed-btn{flex:1;padding:10px 8px;border-radius:8px;border:2px solid #1a3a55;background:#071728;cursor:pointer;text-align:center}
+.speed-btn.sel{border-color:#6a1b9a;background:#1a0030}
+.speed-btn .sicon{font-size:18px;margin-bottom:4px}
+.speed-btn .slabel{font-weight:700;font-size:12px;color:#a855f7}
+.speed-btn .ssub{font-size:10px;color:#4a7a9b;margin-top:2px}
+
+/* ── Game ── */
 #game{display:none;flex-direction:column;height:100vh}
 #game.on{display:flex}
 #topbar{background:#0b1e30;border-bottom:2px solid #1a3a55;padding:6px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0}
 .pill{background:#1a3a55;color:#7ecbe0;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:2px}
-.ti{font-size:13px;font-weight:700;flex:1;text-align:center}
 #main{display:flex;flex:1;overflow:hidden}
 #boardcol{flex:1;display:flex;flex-direction:column;overflow:hidden}
-#bs{flex:1;overflow:auto}
+#bs{flex:1;overflow:auto;position:relative}
 #ctrlbar{height:44px;flex-shrink:0;background:rgba(7,23,40,.97);border-top:1px solid #1a3a55;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 16px}
 #ctrlbar button{padding:5px 11px;border-radius:7px;border:none;font-size:11px;font-weight:600;cursor:pointer}
-#rp{width:280px;background:#0b1e30;border-left:2px solid #1a3a55;display:flex;flex-direction:column;overflow:hidden}
+#rp{width:290px;background:#0b1e30;border-left:2px solid #1a3a55;display:flex;flex-direction:column;overflow:hidden}
 .ph{padding:8px 12px;border-bottom:1px solid #1a3a55;text-align:center;flex-shrink:0}
 #rs{flex:1;overflow-y:auto;padding:10px 12px}
 .sl{font-size:10px;color:#7ecbe0;letter-spacing:1px;margin-bottom:5px;margin-top:8px}
 .pr{display:flex;align-items:center;gap:7px;padding:4px 7px;border-radius:7px;margin-bottom:4px;cursor:pointer}
 .pr.act{background:#1a3a55}
-.ab{display:block;width:100%;padding:9px;border-radius:7px;border:none;color:#fff;font-weight:600;font-size:13px;cursor:pointer;margin-bottom:5px}
+.ab{display:block;width:100%;padding:9px;border-radius:7px;border:none;color:#fff;font-weight:600;font-size:12px;cursor:pointer;margin-bottom:5px;text-align:left}
 .ab:disabled{opacity:.4;cursor:default}
 .cb2{display:block;width:100%;padding:3px 7px;border-radius:5px;background:#1a3a55;border:1px solid #2a5a7a;color:#fff;font-size:10px;cursor:pointer;text-align:left;margin-bottom:3px}
 .cb2:disabled{background:#111;border-color:#333;color:#555;cursor:default}
+
+/* ── Trade panel ── */
+#trade-panel{background:#0d2137;border-radius:10px;padding:10px;margin-top:6px;border:1px solid #1a3a55}
+.trade-row{display:flex;align-items:center;gap:6px;margin-bottom:6px;font-size:12px}
+.trade-row label{width:70px;color:#7ecbe0;font-size:11px}
+.trade-row input{width:52px;padding:3px 6px;border-radius:5px;border:1px solid #1a3a55;background:#071728;color:#fff;font-size:12px}
+.trade-section-label{font-size:10px;color:#f5a623;font-weight:700;margin:8px 0 4px}
+
+/* ── Popups ── */
 #po{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);align-items:center;justify-content:center;z-index:200}
 #po.on{display:flex}
-#pb{background:#fff;border-radius:16px;max-width:460px;width:92%;overflow:hidden}
-#phd{padding:14px 20px}
-#pbd{padding:18px 24px 6px;font-size:14px;color:#333;line-height:1.7;white-space:pre-line;text-align:left}
-#pft{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;padding:14px 20px 18px}
+#pb{background:#fff;border-radius:16px;max-width:480px;width:92%;overflow:hidden;max-height:90vh;display:flex;flex-direction:column}
+#phd{padding:14px 20px;flex-shrink:0}
+#pbd{padding:16px 24px 6px;font-size:14px;color:#333;line-height:1.7;white-space:pre-line;text-align:left;overflow-y:auto}
+#pft{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;padding:12px 20px 16px;flex-shrink:0}
 #pft button{padding:9px 20px;border-radius:8px;border:none;cursor:pointer;font-weight:600;font-size:13px}
-.pp{background:#1565c0;color:#fff}
-.pw{background:#e67e22;color:#fff}
-.pn{background:#e0e0e0;color:#333}
+.pp{background:#1565c0;color:#fff}.pw{background:#e67e22;color:#fff}.pn{background:#e0e0e0;color:#333}.pd{background:#c0392b;color:#fff}
+
 #wo{display:none;position:fixed;inset:0;background:linear-gradient(160deg,#1565c0,#071728);align-items:center;justify-content:center;flex-direction:column;z-index:300}
 #wo.on{display:flex}
 #tro{display:none;position:fixed;inset:0;background:linear-gradient(160deg,#0d3b6e,#071728);align-items:center;justify-content:center;flex-direction:column;z-index:250}
 #tro.on{display:flex}
+
 ::-webkit-scrollbar{width:6px;height:6px}
 ::-webkit-scrollbar-track{background:#071728}
 ::-webkit-scrollbar-thumb{background:#1a3a55;border-radius:3px}
@@ -90,50 +151,176 @@ hr.div{border:none;border-top:1px solid #1a3a55;margin:20px 0}
 </head>
 <body>
 
-<div id="lobby">
+<!-- ═══════════ SCREEN: HOME ═══════════ -->
+<div class="screen on" id="scHome">
   <div class="card">
+    <div style="text-align:center;font-size:52px;margin-bottom:8px">⛵</div>
     <h1>Boat Ride 2.0</h1>
-    <p class="sub">Online Multiplayer</p>
-    <button class="btn btn-green" id="btnCreate">Create Room</button>
-    <div id="cs" style="display:none;margin-top:12px">
-      <p style="font-size:13px;color:#7ecbe0;margin-bottom:4px">Share this code:</p>
+    <p class="sub">Become the Supreme Boat Captain!</p>
+    <div class="mode-btns">
+      <div class="mode-btn" id="btnModeOnline">
+        <div class="micon">🌐</div>
+        <div class="mlabel">Online Multiplayer</div>
+        <div class="msub">Play with friends</div>
+      </div>
+      <div class="mode-btn" id="btnModeAI">
+        <div class="micon">🤖</div>
+        <div class="mlabel">vs AI</div>
+        <div class="msub">Play against computer</div>
+      </div>
+    </div>
+    <hr class="div"/>
+    <button class="btn btn-gray" id="btnHowTo">📖 How to Play</button>
+  </div>
+</div>
+
+<!-- ═══════════ SCREEN: HOW TO PLAY ═══════════ -->
+<div class="screen" id="scHTP" style="background:#fff;align-items:stretch;padding:0">
+  <div style="max-width:560px;width:100%;margin:0 auto;padding:20px">
+    <div style="background:linear-gradient(135deg,#1565c0,#0d3b6e);padding:24px 28px;text-align:center;border-radius:0 0 0 0">
+      <div style="font-size:40px;margin-bottom:6px">⛵</div>
+      <div style="font-size:24px;font-weight:900;color:#fff">How to Play</div>
+    </div>
+    <div style="padding:20px 28px;overflow-y:auto">
+      <div class="htp-goal">
+        <h3>🏆 Goal: Become the Supreme Boat Captain!</h3>
+        <p>Complete all <b>4 challenges</b>, then race to the <b>Winner's Dock</b> and land on <b>⭐ WIN</b> with a positive balance!</p>
+      </div>
+      <div class="htp-challenge" style="border-color:#6a1b9a">
+        <div class="icon">🎓</div>
+        <div><h4 style="color:#6a1b9a">Boat School</h4><p>Earn 3 ⭐ stars (or 2 with a shortcut card). You must complete this before buying a boat. Visit every lap until graduated.</p></div>
+      </div>
+      <div class="htp-challenge" style="border-color:#e65100">
+        <div class="icon">🛥️</div>
+        <div><h4 style="color:#e65100">The Boat Store</h4><p>Buy a boat 🚣🛶⛵🚢! Must be graduated first, or pay 💰$100 to bypass. Each boat has a unique price and icon.</p></div>
+      </div>
+      <div class="htp-challenge" style="border-color:#00695c">
+        <div class="icon">🐟</div>
+        <div><h4 style="color:#00695c">Catch a Fish</h4><p>Collect 10 🐟 fish (or 6 with a shortcut). Land on fishing spaces and work your way through the jut to catch fish.</p></div>
+      </div>
+      <div class="htp-challenge" style="border-color:#0d47a1">
+        <div class="icon">🆘</div>
+        <div><h4 style="color:#0d47a1">Let's Rescue!</h4><p>Perform 2 🆘 rescues (or 1 with a shortcut). Visit the rescue jut and save swimmers in need!</p></div>
+      </div>
+      <div style="font-weight:700;color:#1565c0;font-size:14px;margin:12px 0 6px">🃏 Shipwreck Cards</div>
+      <div class="htp-rule" style="background:#fff8f0;border-color:#f5a623">
+        Buy 1 card per turn for 💰$10. Play 1 card per turn. Cards bought this turn can't be played until next turn.<br/><br/>
+        <b>💰 Highway Robbery</b> — steal ALL money from a player<br/>
+        <b>⚡ Shortcut</b> — reduce a challenge requirement<br/>
+        <b>🌀 Teleportation</b> — jump to any space<br/>
+        <b>❄️ Freeze Frame</b> — freeze a player for 2 turns<br/>
+        <b>🎲 Double Time</b> — get 2 bonus rolls<br/>
+        <b>🚀 Fast Track</b> — no exact roll needed to WIN
+      </div>
+      <div style="font-weight:700;color:#c0392b;font-size:14px;margin:12px 0 6px">💸 Debt Rules</div>
+      <div class="htp-rule" style="background:#fff5f5;border-color:#e74c3c">
+        Your balance can go negative. You <b>cannot win or enter the Winner's Dock</b> with a negative balance.<br/>
+        5% interest is charged each turn while in debt.<br/>
+        <b>Debt Relief:</b> Sacrifice a completed challenge to reset balance to 💰$0.
+      </div>
+      <div style="font-weight:700;color:#1a7a3a;font-size:14px;margin:12px 0 6px">🤝 Trading</div>
+      <div class="htp-rule" style="background:#f0fff4;border-color:#1a7a3a">
+        Before rolling, you can propose a trade with another player. Offer money 💰, fish 🐟, rescues 🆘, or shipwreck cards 🃏. The other player can accept, decline, or make a counter-offer.
+      </div>
+      <div style="font-weight:700;color:#1565c0;font-size:14px;margin:12px 0 6px">🏆 Winner's Dock</div>
+      <div class="htp-rule" style="background:#f0f6ff;border-color:#1565c0">
+        Once all 4 challenges are complete, you enter the Winner's Dock. Roll the <b>exact</b> number to reach the ⭐ WIN space (unless you have Fast Track). Watch out — you can lose turns or go backwards!
+      </div>
+    </div>
+    <div style="padding:16px 28px;border-top:1px solid #eee;text-align:center;background:#fff">
+      <button class="btn btn-blue" style="max-width:300px;margin:0 auto" id="btnHTPClose">Got it — Let's Play! ⛵</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ SCREEN: ONLINE SETUP ═══════════ -->
+<div class="screen" id="scOnline">
+  <div class="card" style="max-width:480px">
+    <button class="btn-back" id="btnOnlineBack">← Back</button>
+    <div style="text-align:center;font-size:36px;margin-bottom:8px">🌐</div>
+    <h2>Online Multiplayer</h2>
+    <div style="margin-bottom:14px">
+      <div style="font-size:12px;color:#7ecbe0;margin-bottom:6px">YOUR NAME</div>
+      <input class="inp" id="onlineName" placeholder="Enter your name" value="Player 1"/>
+    </div>
+    <div style="margin-bottom:14px">
+      <div style="font-size:12px;color:#7ecbe0;margin-bottom:6px">CHOOSE YOUR TOKEN</div>
+      <div class="token-grid" id="onlineTokenGrid"></div>
+    </div>
+    <hr class="div"/>
+    <button class="btn btn-green" id="btnCreateRoom">🎲 Create Room</button>
+    <div id="createSection" style="display:none;margin-top:12px;text-align:center">
+      <p style="font-size:13px;color:#7ecbe0;margin-bottom:4px">Share this code with a friend:</p>
       <div class="room-code" id="ccode">----</div>
       <div id="lslots"></div>
       <span class="badge bwait" id="cbadge">Waiting for opponent...</span>
     </div>
     <hr class="div"/>
-    <input class="inp" id="ji" maxlength="4" placeholder="CODE"/>
-    <button class="btn btn-blue" id="btnJoin">Join Room</button>
+    <div style="font-size:12px;color:#7ecbe0;margin-bottom:8px;text-align:center">Or join a friend's room:</div>
+    <input class="inp inp-code" id="ji" maxlength="4" placeholder="CODE"/>
+    <button class="btn btn-blue" id="btnJoinRoom">🚀 Join Room</button>
     <span class="badge" id="jbadge" style="display:none"></span>
-    <hr class="div"/>
-    <button class="btn btn-gray" id="btnSolo">vs AI (offline)</button>
   </div>
 </div>
 
+<!-- ═══════════ SCREEN: AI SETUP ═══════════ -->
+<div class="screen" id="scAI">
+  <div class="card" style="max-width:520px;max-height:95vh;overflow-y:auto">
+    <button class="btn-back" id="btnAIBack">← Back</button>
+    <div style="text-align:center;font-size:36px;margin-bottom:8px">🤖</div>
+    <h2>AI Competitors</h2>
+    <div style="font-size:12px;color:#7ecbe0;margin-bottom:8px;text-align:center">AI DIFFICULTY</div>
+    <div class="diff-btns" id="diffBtns">
+      <div class="diff-btn sel" data-diff="easy"><div class="dlabel">🟢 Easy</div><div class="dsub">Random</div></div>
+      <div class="diff-btn" data-diff="medium"><div class="dlabel">🟡 Medium</div><div class="dsub">Greedy</div></div>
+      <div class="diff-btn" data-diff="hard"><div class="dlabel">🔴 Hard</div><div class="dsub">Minimax</div></div>
+    </div>
+    <div style="font-size:12px;color:#7ecbe0;margin-bottom:8px;text-align:center">NUMBER OF AI OPPONENTS</div>
+    <div class="count-btns" id="countBtns">
+      <div class="count-btn sel" data-count="1">1</div>
+      <div class="count-btn" data-count="2">2</div>
+      <div class="count-btn" data-count="3">3</div>
+    </div>
+    <div style="background:#1a0a30;border-radius:10px;padding:12px 14px;margin-bottom:14px;border:1px solid #6a1b9a">
+      <div style="font-size:12px;color:#a855f7;font-weight:700;margin-bottom:8px">🤖 AI TURN SPEED</div>
+      <div class="speed-btns" id="speedBtns">
+        <div class="speed-btn sel" data-speed="show"><div class="sicon">🎭</div><div class="slabel">Watch AI Play</div><div class="ssub">See every move & popup</div></div>
+        <div class="speed-btn" data-speed="fast"><div class="sicon">⚡</div><div class="slabel">Fast Forward</div><div class="ssub">Skip AI popups & animations</div></div>
+      </div>
+    </div>
+    <div style="font-size:12px;color:#7ecbe0;margin-bottom:6px">YOUR NAME</div>
+    <input class="inp" id="aiName" placeholder="Enter your name" value="Player 1"/>
+    <div style="font-size:12px;color:#7ecbe0;margin-bottom:6px">CHOOSE YOUR TOKEN</div>
+    <div class="token-grid" id="aiTokenGrid"></div>
+    <div style="font-size:11px;color:#4a7a9b;margin-top:10px;margin-bottom:14px;text-align:center" id="aiOpponentNames"></div>
+    <button class="btn btn-purple" id="btnStartAI" style="margin-top:8px">Set Sail! 🚢</button>
+  </div>
+</div>
+
+<!-- ═══════════ GAME ═══════════ -->
 <div id="game">
   <div id="topbar">
-    <div class="pill" id="rpill">ROOM ----</div>
-    <div class="ti" id="tinfo">Loading...</div>
+    <div class="pill" id="rpill">OFFLINE</div>
+    <div style="font-size:13px;font-weight:700;flex:1;text-align:center" id="tinfo">Loading...</div>
   </div>
   <div id="main">
     <div id="boardcol">
       <div id="bs">
-        <div id="bwrap" style="transform-origin:top left">
+        <div id="bwrap" style="transform-origin:top left;display:inline-block">
           <svg id="bsvg" xmlns="http://www.w3.org/2000/svg"></svg>
         </div>
       </div>
       <div id="ctrlbar">
-        <button id="btnLeave" style="background:#e67e22;color:#fff">Leave</button>
-        <button id="btnPause" style="background:#1a3a55;color:#7ecbe0">Pause</button>
-        <button id="btnZO" style="background:#1a3a55;color:#fff;font-size:17px;width:30px;height:30px;padding:0;border-radius:7px">-</button>
-        <div id="zlbl" style="background:#1a3a55;color:#7ecbe0;padding:4px 8px;border-radius:6px;font-size:11px;font-weight:600;min-width:42px;text-align:center">120%</div>
+        <button id="btnLeave" style="background:#e67e22;color:#fff">🏠 Leave</button>
+        <button id="btnZO" style="background:#1a3a55;color:#fff;font-size:17px;width:30px;height:30px;padding:0;border-radius:7px">−</button>
+        <div id="zlbl" style="background:#1a3a55;color:#7ecbe0;padding:4px 8px;border-radius:6px;font-size:11px;font-weight:600;min-width:44px;text-align:center">120%</div>
         <button id="btnZI" style="background:#1a3a55;color:#fff;font-size:17px;width:30px;height:30px;padding:0;border-radius:7px">+</button>
-        <button id="btnCtr" style="background:#1a3a55;color:#7ecbe0">Center</button>
+        <button id="btnCtr" style="background:#1a3a55;color:#7ecbe0">📍 Center</button>
       </div>
     </div>
     <div id="rp">
       <div class="ph">
-        <div style="font-size:13px;font-weight:900;color:#7ecbe0">Boat Ride 2.0</div>
+        <div style="font-size:13px;font-weight:900;color:#7ecbe0">⛵ Boat Ride 2.0</div>
         <div style="font-size:9px;color:#4a7a9b">Supreme Boat Captain Race</div>
       </div>
       <div id="rs">
@@ -141,10 +328,10 @@ hr.div{border:none;border-top:1px solid #1a3a55;margin:20px 0}
         <div id="plist"></div>
         <hr style="border:none;border-top:1px solid #1a3a55;margin:8px 0"/>
         <div class="sl">CURRENT TURN</div>
-        <div id="ctn" style="font-size:14px;font-weight:700;margin-bottom:2px"></div>
+        <div id="ctn" style="font-size:14px;font-weight:700;margin-bottom:4px"></div>
         <div id="ctp" style="font-size:10px;color:#f5a623;margin-bottom:3px"></div>
-        <div id="ctm" style="font-size:12px;font-weight:600;margin-bottom:2px"></div>
-        <div id="ctt" style="font-size:11px;margin-bottom:6px"></div>
+        <div id="ctm" style="font-size:12px;font-weight:600;margin-bottom:4px"></div>
+        <div id="ctt" style="font-size:11px;margin-bottom:6px;line-height:1.8"></div>
         <div id="ctb" style="font-size:10px;color:#FFD700;font-weight:700;margin-bottom:4px"></div>
         <div id="cds"></div>
         <hr style="border:none;border-top:1px solid #1a3a55;margin:6px 0"/>
@@ -158,865 +345,1230 @@ hr.div{border:none;border-top:1px solid #1a3a55;margin:20px 0}
   </div>
 </div>
 
+<!-- Popups -->
 <div id="po"><div id="pb"><div id="phd"></div><div id="pbd"></div><div id="pft"></div></div></div>
-
 <div id="wo">
-  <div style="font-size:56px;margin-bottom:16px;animation:pulse 1.4s infinite" id="wemoji">WIN</div>
+  <div style="font-size:56px;margin-bottom:16px;animation:pulse 1.4s infinite">🏆</div>
   <div style="font-size:36px;font-weight:900;color:#FFD700;margin-bottom:8px">Supreme Boat Captain!</div>
   <div style="font-size:28px;font-weight:800;margin-bottom:32px" id="wname"></div>
-  <button class="btn btn-blue" style="width:200px" id="btnWL">Play Again</button>
+  <button class="btn btn-blue" style="width:200px" id="btnWL">🏠 Play Again</button>
 </div>
-
 <div id="tro">
   <div style="font-size:16px;color:#7ecbe0;margin-bottom:8px" id="trsub">NEXT UP</div>
   <div style="width:22px;height:22px;border-radius:50%;margin-bottom:10px" id="trdot"></div>
   <div style="font-size:30px;font-weight:900;color:#fff;margin-bottom:6px;text-align:center" id="trname"></div>
   <div style="font-size:14px;color:#7ecbe0;margin-bottom:28px" id="trstats"></div>
-  <button id="trBtn" class="btn btn-blue" style="width:200px;font-size:16px">Lets go!</button>
+  <button id="trBtn" class="btn btn-blue" style="width:200px;font-size:16px">Let's go! ⛵</button>
 </div>
 
 <script>
-// All game code lives inside boot(), called once Firebase loads
+window.addEventListener("DOMContentLoaded", function(){ boot(dbSet,dbGet,dbOn); });
+
 function boot(dbSet, dbGet, dbOn) {
 
-  // ── Constants ──────────────────────────────────────────────────────────────
-  var PC = ["#c0392b","#2471a3","#1e8449","#d68910","#6c3483","#117a65"];
-  var BW=1300, BH=980, OL=140, OR=1160, OT=130, OB=850, SW=52, SH=52;
-  var WIN_IDX = 33;
+// ── Token definitions ────────────────────────────────────────────────────────
+var TOKEN_DEFS = [
+  {key:"captain",   label:"Captain"},
+  {key:"lifeguard", label:"Lifeguard"},
+  {key:"sailor",    label:"Sailor"},
+  {key:"surfer",    label:"Surfer"},
+  {key:"fisherman", label:"Fisherman"},
+  {key:"diver",     label:"Diver"},
+  {key:"pirate",    label:"Pirate"},
+  {key:"beachcomber",label:"Beachcomber"},
+  {key:"biologist", label:"Biologist"},
+  {key:"coastguard",label:"Coast Guard"}
+];
 
-  var BOATS = [
-    {name:"Dinghy",price:15},{name:"Kayak",price:20},{name:"Skiff",price:25},
-    {name:"Cruiser",price:40},{name:"Catamaran",price:50},{name:"Yacht",price:60}
-  ];
-  var SWSP = [3,9,16,28];
-  var SKSP = [6,23,30];
-
-  var TASKS = {
-    boat_school: {
-      key:"boat_school",label:"Boat School",entryIdx:5,exitIdx:6,count:6,colGap:SW,color:"#5b2c8c",
-      spaces:[
-        {story:"You ace a test drive!",         eff:function(p){return mg(p,{stars:p.stars+1});},                  desc:"+1 star",reward:1},
-        {story:"F on nav test.",                eff:function(p){return mg(p,{stars:Math.max(0,p.stars-1)});},      desc:"-1 star",reward:-1},
-        {story:"New friends at sailing camp!",  eff:function(p){return mg(p,{stars:p.stars+1});},                  desc:"+1 star",reward:1},
-        {story:"Fell asleep in class.",         eff:function(p){return mg(p,{stars:Math.max(0,p.stars-1)});},      desc:"-1 star",reward:-1},
-        {story:"You learn to tow water skiers!",eff:function(p){return mg(p,{stars:p.stars+2});},                  desc:"+2 stars",reward:2},
-        {story:"You pass your final exam!",     eff:function(p){return mg(p,{stars:p.stars+1});},                  desc:"+1 star",reward:1}
-      ],
-      req:function(p){return p.stars>=(p.shortcut&&p.shortcut.stars?2:3);},
-      done:"Graduated",
-      prog:function(p){return "Stars: "+p.stars+"/"+(p.shortcut&&p.shortcut.stars?2:3);}
-    },
-    boat: {
-      key:"boat",label:"The Boat Store",entryIdx:12,exitIdx:13,count:6,colGap:SW,color:"#b7600a",
-      spaces:[],req:function(p){return p.boat!==null;},done:null,prog:function(){return "No boat yet";}
-    },
-    fish: {
-      key:"fish",label:"Catch a Fish",entryIdx:19,exitIdx:20,count:8,colGap:SW,color:"#0e6655",
-      spaces:[
-        {story:"Great fishing spot!",          eff:function(p){return mg(p,{fish:p.fish+3});},desc:"+3 fish",reward:3},
-        {story:"Bad stream.",                  eff:function(p){return p;},                    desc:"Empty.",reward:0},
-        {story:"Sister teaches bait tricks!",  eff:function(p){return mg(p,{fish:p.fish+6});},desc:"+6 fish",reward:6},
-        {story:"Just one nibble.",             eff:function(p){return mg(p,{fish:p.fish+1});},desc:"+1 fish",reward:1},
-        {story:"Wake up at dawn, worth it!",   eff:function(p){return mg(p,{fish:p.fish+4});},desc:"+4 fish",reward:4},
-        {story:"Sailor shares his spot.",      eff:function(p){return mg(p,{fish:p.fish+2});},desc:"+2 fish",reward:2},
-        {story:"Jackpot! Fish are jumping.",   eff:function(p){return mg(p,{fish:p.fish+5});},desc:"+5 fish",reward:5},
-        {story:"Your line snaps.",             eff:function(p){return p;},                    desc:"Got away.",reward:0}
-      ],
-      req:function(p){return p.fish>=(p.shortcut&&p.shortcut.fish?6:10);},
-      done:"Expert Fisherman",
-      prog:function(p){return "Fish: "+p.fish+"/"+(p.shortcut&&p.shortcut.fish?6:10);}
-    },
-    rescue: {
-      key:"rescue",label:"Lets Rescue!",entryIdx:26,exitIdx:27,count:6,colGap:SW,color:"#1a5276",
-      spaces:[
-        {story:"You perform CPR!",             eff:function(p){return mg(p,{rescues:p.rescues+1});},                  desc:"+1",reward:1},
-        {story:"Swimmer got away.",            eff:function(p){return p;},                                            desc:"None.",reward:0},
-        {story:"Rescue someone who tips you!", eff:function(p){return mg(p,{rescues:p.rescues+1,money:p.money+20});}, desc:"+1+$20",reward:1},
-        {story:"Rescued person fell back in!", eff:function(p){return mg(p,{rescues:Math.max(0,p.rescues-1)});},      desc:"-1",reward:-1},
-        {story:"Save two from rip current!",   eff:function(p){return mg(p,{rescues:p.rescues+2});},                  desc:"+2",reward:2},
-        {story:"Conditions too rough.",        eff:function(p){return p;},                                            desc:"None.",reward:0}
-      ],
-      req:function(p){return p.rescues>=(p.shortcut&&p.shortcut.rescues?1:2);},
-      done:"Life Saver",
-      prog:function(p){return "Rescues: "+p.rescues+"/"+(p.shortcut&&p.shortcut.rescues?1:2);}
-    }
+function tokenSVG(key, color, halo) {
+  var h = halo ? '<circle cx="0" cy="-14" r="18" fill="none" stroke="#FFD700" stroke-width="3" opacity="0.8"/><circle cx="0" cy="-14" r="22" fill="none" stroke="#FFD700" stroke-width="1.5" opacity="0.4"/>' : '';
+  var bodies = {
+    captain:
+      h+'<rect x="-8" y="-4" width="16" height="20" rx="4" fill="'+color+'"/>'+
+      '<polygon points="0,0 -8,-4 -4,6" fill="#1a2a4a" opacity="0.7"/>'+
+      '<polygon points="0,0 8,-4 4,6" fill="#1a2a4a" opacity="0.7"/>'+
+      '<rect x="-11" y="-4" width="6" height="3" rx="1" fill="#FFD700"/>'+
+      '<rect x="5" y="-4" width="6" height="3" rx="1" fill="#FFD700"/>'+
+      '<circle cx="0" cy="-12" r="8" fill="#FDDBB4"/>'+
+      '<rect x="-9" y="-22" width="18" height="8" rx="2" fill="#1a2a4a"/>'+
+      '<rect x="-9" y="-16" width="18" height="2" fill="#FFD700"/>'+
+      '<circle cx="-3" cy="-13" r="1" fill="#555"/><circle cx="3" cy="-13" r="1" fill="#555"/>'+
+      '<rect x="-7" y="16" width="6" height="10" rx="2" fill="#1a2a4a"/>'+
+      '<rect x="1" y="16" width="6" height="10" rx="2" fill="#1a2a4a"/>',
+    lifeguard:
+      h+'<rect x="-7" y="-4" width="14" height="16" rx="3" fill="#e74c3c"/>'+
+      '<rect x="-1" y="-1" width="2" height="8" fill="#fff"/>'+
+      '<rect x="-4" y="2" width="8" height="2" fill="#fff"/>'+
+      '<circle cx="0" cy="-12" r="8" fill="#FDDBB4"/>'+
+      '<rect x="-8" y="-14" width="6" height="3" rx="1" fill="#1a1a1a"/>'+
+      '<rect x="2" y="-14" width="6" height="3" rx="1" fill="#1a1a1a"/>'+
+      '<rect x="-9" y="-20" width="18" height="5" rx="2" fill="#e74c3c"/>'+
+      '<circle cx="10" cy="0" r="5" fill="none" stroke="#e74c3c" stroke-width="2"/>'+
+      '<circle cx="10" cy="0" r="5" fill="none" stroke="#fff" stroke-width="2" stroke-dasharray="4 4"/>'+
+      '<rect x="-6" y="12" width="5" height="10" rx="2" fill="#FDDBB4"/>'+
+      '<rect x="1" y="12" width="5" height="10" rx="2" fill="#FDDBB4"/>',
+    sailor:
+      h+'<rect x="-8" y="-4" width="16" height="18" rx="3" fill="#fff"/>'+
+      '<rect x="-8" y="-1" width="16" height="2" fill="#1565c0" opacity="0.6"/>'+
+      '<rect x="-8" y="3" width="16" height="2" fill="#1565c0" opacity="0.6"/>'+
+      '<rect x="-8" y="7" width="16" height="2" fill="#1565c0" opacity="0.6"/>'+
+      '<polygon points="0,2 -8,-4 8,-4" fill="#1565c0"/>'+
+      '<circle cx="0" cy="-12" r="8" fill="#FDDBB4"/>'+
+      '<ellipse cx="0" cy="-20" rx="10" ry="2" fill="#fff"/>'+
+      '<rect x="-6" y="-26" width="12" height="7" rx="2" fill="#fff"/>'+
+      '<rect x="-6" y="-21" width="12" height="2" fill="#1565c0"/>'+
+      '<polygon points="0,-4 -4,2 4,2" fill="#e74c3c"/>'+
+      '<rect x="-7" y="14" width="6" height="10" rx="2" fill="#1565c0"/>'+
+      '<rect x="1" y="14" width="6" height="10" rx="2" fill="#1565c0"/>',
+    surfer:
+      h+'<rect x="-8" y="2" width="16" height="14" rx="3" fill="'+color+'"/>'+
+      '<rect x="-7" y="-4" width="14" height="8" rx="2" fill="#fff"/>'+
+      '<circle cx="0" cy="-12" r="8" fill="#e8b89a"/>'+
+      '<path d="M-8,-16 Q-6,-24 0,-22 Q6,-24 8,-16" fill="#f0c040"/>'+
+      '<rect x="-7" y="-14" width="5" height="3" rx="1" fill="#1a1a1a"/>'+
+      '<rect x="2" y="-14" width="5" height="3" rx="1" fill="#1a1a1a"/>'+
+      '<ellipse cx="14" cy="4" rx="4" ry="12" fill="#FF6B35" transform="rotate(-15 14 4)"/>'+
+      '<rect x="-6" y="16" width="5" height="9" rx="2" fill="#e8b89a"/>'+
+      '<rect x="1" y="16" width="5" height="9" rx="2" fill="#e8b89a"/>',
+    fisherman:
+      h+'<rect x="-8" y="-2" width="16" height="20" rx="3" fill="#5b8dd9"/>'+
+      '<rect x="-8" y="-4" width="5" height="16" rx="2" fill="#f0c040" opacity="0.7"/>'+
+      '<rect x="3" y="-4" width="5" height="16" rx="2" fill="#f0c040" opacity="0.7"/>'+
+      '<circle cx="0" cy="-12" r="8" fill="#FDDBB4"/>'+
+      '<ellipse cx="0" cy="-19" rx="10" ry="2.5" fill="#f0c040"/>'+
+      '<rect x="-7" y="-26" width="14" height="8" rx="2" fill="#f0c040"/>'+
+      '<line x1="8" y1="-6" x2="16" y2="-18" stroke="#8B4513" stroke-width="1.5"/>'+
+      '<line x1="16" y1="-18" x2="18" y2="0" stroke="#7ecbe0" stroke-width="0.8"/>'+
+      '<circle cx="18" cy="1" r="1.5" fill="#e74c3c"/>'+
+      '<rect x="-7" y="18" width="6" height="8" rx="2" fill="#2c3e50"/>'+
+      '<rect x="1" y="18" width="6" height="8" rx="2" fill="#2c3e50"/>',
+    diver:
+      h+'<rect x="-8" y="-4" width="16" height="20" rx="4" fill="#1a2a4a"/>'+
+      '<rect x="-8" y="2" width="16" height="2" fill="'+color+'" opacity="0.8"/>'+
+      '<rect x="-8" y="8" width="16" height="2" fill="'+color+'" opacity="0.8"/>'+
+      '<rect x="5" y="-4" width="5" height="14" rx="2" fill="#95a5a6"/>'+
+      '<circle cx="0" cy="-12" r="8" fill="#1a2a4a"/>'+
+      '<rect x="-7" y="-16" width="14" height="8" rx="3" fill="#7ecbe0" opacity="0.8"/>'+
+      '<rect x="-6" y="-15" width="12" height="6" rx="2" fill="#b8e8f8" opacity="0.5"/>'+
+      '<path d="M7,-10 Q12,-10 12,-18 Q12,-22 9,-22" stroke="#e74c3c" stroke-width="2" fill="none"/>'+
+      '<ellipse cx="-6" cy="22" rx="7" ry="3" fill="#27ae60" transform="rotate(-10 -6 22)"/>'+
+      '<ellipse cx="6" cy="22" rx="7" ry="3" fill="#27ae60" transform="rotate(10 6 22)"/>',
+    pirate:
+      h+'<rect x="-8" y="-4" width="16" height="20" rx="3" fill="#8B1A1A"/>'+
+      '<rect x="-8" y="-4" width="3" height="20" fill="#FFD700" opacity="0.5"/>'+
+      '<rect x="5" y="-4" width="3" height="20" fill="#FFD700" opacity="0.5"/>'+
+      '<circle cx="0" cy="-12" r="8" fill="#FDDBB4"/>'+
+      '<rect x="-10" y="-22" width="20" height="4" rx="1" fill="#1a1a1a"/>'+
+      '<rect x="-7" y="-28" width="14" height="8" rx="2" fill="#1a1a1a"/>'+
+      '<ellipse cx="-3" cy="-13" rx="3" ry="2" fill="#1a1a1a"/>'+
+      '<circle cx="3" cy="-13" r="1" fill="#555"/>'+
+      '<circle cx="-8" cy="-10" r="1.5" fill="#FFD700"/>'+
+      '<line x1="10" y1="2" x2="16" y2="16" stroke="#aaa" stroke-width="2"/>'+
+      '<rect x="-7" y="16" width="6" height="10" rx="2" fill="#2c1810"/>'+
+      '<rect x="1" y="16" width="6" height="10" rx="2" fill="#2c1810"/>',
+    beachcomber:
+      h+'<rect x="-8" y="2" width="16" height="14" rx="3" fill="'+color+'"/>'+
+      '<rect x="-8" y="-6" width="16" height="10" rx="3" fill="#e8d870"/>'+
+      '<circle cx="0" cy="-14" r="8" fill="#e8c49a"/>'+
+      '<ellipse cx="0" cy="-21" rx="13" ry="3" fill="#d4a844"/>'+
+      '<rect x="-7" y="-28" width="14" height="8" rx="4" fill="#d4a844"/>'+
+      '<circle cx="-3" cy="-15" r="1" fill="#555"/><circle cx="3" cy="-15" r="1" fill="#555"/>'+
+      '<rect x="-7" y="16" width="5" height="9" rx="2" fill="#e8c49a"/>'+
+      '<rect x="2" y="16" width="5" height="9" rx="2" fill="#e8c49a"/>'+
+      '<rect x="-8" y="23" width="7" height="2" rx="1" fill="#8B6914"/>'+
+      '<rect x="1" y="23" width="7" height="2" rx="1" fill="#8B6914"/>',
+    biologist:
+      h+'<rect x="-8" y="-4" width="16" height="20" rx="3" fill="#fff"/>'+
+      '<rect x="-4" y="-4" width="8" height="20" fill="'+color+'"/>'+
+      '<circle cx="0" cy="-12" r="8" fill="#FDDBB4"/>'+
+      '<rect x="-8" y="-15" width="6" height="4" rx="2" fill="none" stroke="#555" stroke-width="1"/>'+
+      '<rect x="2" y="-15" width="6" height="4" rx="2" fill="none" stroke="#555" stroke-width="1"/>'+
+      '<line x1="-2" y1="-13" x2="2" y2="-13" stroke="#555" stroke-width="0.8"/>'+
+      '<path d="M-8,-16 Q0,-24 8,-16" fill="#8B4513"/>'+
+      '<circle cx="0" cy="-22" r="3" fill="#8B4513"/>'+
+      '<rect x="9" y="-4" width="8" height="10" rx="1" fill="#8B6914"/>'+
+      '<rect x="10" y="-3" width="6" height="8" rx="1" fill="#fff"/>'+
+      '<rect x="-7" y="16" width="6" height="10" rx="2" fill="#fff"/>'+
+      '<rect x="1" y="16" width="6" height="10" rx="2" fill="#fff"/>',
+    coastguard:
+      h+'<rect x="-8" y="-4" width="16" height="20" rx="3" fill="#e67e22"/>'+
+      '<rect x="-8" y="4" width="16" height="2" fill="#fff" opacity="0.8"/>'+
+      '<rect x="-8" y="10" width="16" height="2" fill="#fff" opacity="0.8"/>'+
+      '<rect x="-4" y="-2" width="8" height="5" rx="1" fill="#1565c0"/>'+
+      '<circle cx="0" cy="-12" r="8" fill="#FDDBB4"/>'+
+      '<path d="M-8,-12 Q-8,-26 0,-28 Q8,-26 8,-12" fill="#e67e22"/>'+
+      '<rect x="-8" y="-15" width="16" height="3" fill="#e67e22"/>'+
+      '<rect x="-10" y="-13" width="20" height="2" rx="1" fill="#d35400"/>'+
+      '<rect x="9" y="-2" width="5" height="8" rx="1" fill="#2c3e50"/>'+
+      '<line x1="11" y1="-2" x2="11" y2="-8" stroke="#555" stroke-width="1"/>'+
+      '<rect x="-7" y="16" width="6" height="10" rx="2" fill="#e67e22"/>'+
+      '<rect x="1" y="16" width="6" height="10" rx="2" fill="#e67e22"/>'
   };
+  return bodies[key] || bodies.captain;
+}
 
-  var JMAP = {5:"boat_school",12:"boat",19:"fish",26:"rescue",33:"winner"};
-  var WDOCK = [
-    {label:"Dock 1",   eff:function(p){return p;}},
-    {label:"Lose Turn",eff:function(p){return mg(p,{skip:(p.skip||0)+1});}},
-    {label:"Back 1",   eff:function(p){return mg(p,{winPos:Math.max(0,(p.winPos||0)-1)});}},
-    {label:"WIN",      eff:function(p){return p;},win:true}
-  ];
-  var SCARDS = [
-    {id:"s1",text:"Fair winds! Move +3.",eff:{move:3}},{id:"s2",text:"Wallet found! +$20.",eff:{money:20}},
-    {id:"s3",text:"Smooth sailing! Move +2.",eff:{move:2}},{id:"s4",text:"Sponsorship! +$25.",eff:{money:25}},
-    {id:"s5",text:"Crew tip! +$15.",eff:{money:15}},{id:"s6",text:"Current! Move +4.",eff:{move:4}},
-    {id:"s7",text:"Weather bonus! +$12.",eff:{money:12}},{id:"s8",text:"Sailor tips you! +$8.",eff:{money:8}},
-    {id:"s9",text:"Harbor festival! +$18.",eff:{money:18}},{id:"s10",text:"Tailwind! Move +1.",eff:{move:1}},
-    {id:"s11",text:"Regatta prize! +$30.",eff:{money:30}},{id:"s12",text:"Sold gear! +$10.",eff:{money:10}}
-  ];
-  var KCARDS = [
-    {id:"k1",text:"Storm! Go back 3.",eff:{move:-3}},{id:"k2",text:"Docking fee. -$8.",eff:{money:-8}},
-    {id:"k3",text:"Maintenance! -$5.",eff:{money:-5}},{id:"k4",text:"Rogue wave! Back 2.",eff:{move:-2}},
-    {id:"k5",text:"Customs! -$7.",eff:{money:-7}},{id:"k6",text:"Fog delay, skip turn.",eff:{skip:1}},
-    {id:"k7",text:"Engine trouble! -$10.",eff:{money:-10}},{id:"k8",text:"Fine! -$12.",eff:{money:-12}},
-    {id:"k9",text:"Wave! Back 1.",eff:{move:-1}},{id:"k10",text:"Anchor stuck! Skip turn.",eff:{skip:1}},
-    {id:"k11",text:"Nav error! Back 2.",eff:{move:-2}},{id:"k12",text:"Fuel leak! -$6.",eff:{money:-6}}
-  ];
-  var SWDEFS = [
-    {type:"robbery", icon:"[R]",label:"Highway Robbery",desc:"Take ALL money from any one player.",copies:5},
-    {type:"shortcut",icon:"[S]",label:"Shortcut",       desc:"Reduce one challenge requirement.",copies:5},
-    {type:"teleport",icon:"[T]",label:"Teleportation",  desc:"Jump to any space on the oval.",   copies:5},
-    {type:"freeze",  icon:"[F]",label:"Freeze Frame",   desc:"Target skips their next 2 turns.", copies:5},
-    {type:"double",  icon:"[D]",label:"Double Time",    desc:"2 bonus rolls this turn.",         copies:5},
-    {type:"fasttrack",icon:"[!]",label:"Fast Track",    desc:"No exact roll needed to WIN. Auto-active.",copies:1}
-  ];
+// ── Setup screens ────────────────────────────────────────────────────────────
+var selectedOnlineToken = "captain";
+var selectedAIToken = "captain";
+var selectedDiff = "easy";
+var selectedCount = 1;
+var selectedSpeed = "show";
+var AI_NAMES = ["Admiral Rex","Captain Nova","Skipper Lee","Navigator Sam","Commodore Finn","Lieutenant Jade","Commander Cruz"];
 
-  // ── Helpers ────────────────────────────────────────────────────────────────
-  function mg(a,b){var r={};for(var k in a)r[k]=a[k];for(var k in b)r[k]=b[k];return r;}
-  function dc(o){return JSON.parse(JSON.stringify(o));}
-  function shuf(a){var b=a.slice();for(var i=b.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=b[i];b[i]=b[j];b[j]=t;}return b;}
-  function mkSwim(){return shuf(SCARDS.concat(SCARDS).concat(SCARDS));}
-  function mkSink(){return shuf(KCARDS.concat(KCARDS).concat(KCARDS));}
-  function mkDeck(defs){
-    var d=[];
-    for(var i=0;i<defs.length;i++){
-      for(var j=0;j<defs[i].copies;j++){
-        d.push(mg(defs[i],{uid:Math.random().toString(36).slice(2)}));
+function buildTokenGrid(containerId, selectedRef, setFn, color) {
+  var el = document.getElementById(containerId);
+  el.innerHTML = "";
+  TOKEN_DEFS.forEach(function(t) {
+    var btn = document.createElement("div");
+    btn.className = "token-btn" + (selectedRef === t.key ? " sel" : "");
+    btn.innerHTML = '<svg width="44" height="52" viewBox="-22 -30 44 58">' + tokenSVG(t.key, color, false) + '</svg><span>' + t.label + '</span>';
+    btn.addEventListener("click", function() {
+      el.querySelectorAll(".token-btn").forEach(function(b){ b.classList.remove("sel"); });
+      btn.classList.add("sel");
+      setFn(t.key);
+    });
+    el.appendChild(btn);
+  });
+}
+
+buildTokenGrid("onlineTokenGrid", selectedOnlineToken, function(k){ selectedOnlineToken=k; }, "#2471a3");
+buildTokenGrid("aiTokenGrid", selectedAIToken, function(k){ selectedAIToken=k; }, "#c0392b");
+
+// Difficulty buttons
+document.getElementById("diffBtns").querySelectorAll(".diff-btn").forEach(function(b){
+  b.addEventListener("click", function(){
+    document.getElementById("diffBtns").querySelectorAll(".diff-btn").forEach(function(x){x.classList.remove("sel");});
+    b.classList.add("sel"); selectedDiff = b.getAttribute("data-diff");
+  });
+});
+// Count buttons
+document.getElementById("countBtns").querySelectorAll(".count-btn").forEach(function(b){
+  b.addEventListener("click", function(){
+    document.getElementById("countBtns").querySelectorAll(".count-btn").forEach(function(x){x.classList.remove("sel");});
+    b.classList.add("sel"); selectedCount = parseInt(b.getAttribute("data-count"));
+    updateAINames();
+  });
+});
+// Speed buttons
+document.getElementById("speedBtns").querySelectorAll(".speed-btn").forEach(function(b){
+  b.addEventListener("click", function(){
+    document.getElementById("speedBtns").querySelectorAll(".speed-btn").forEach(function(x){x.classList.remove("sel");});
+    b.classList.add("sel"); selectedSpeed = b.getAttribute("data-speed");
+  });
+});
+
+function updateAINames(){
+  var names = AI_NAMES.slice(0, selectedCount).join(", ");
+  document.getElementById("aiOpponentNames").textContent = "AI opponents: " + names;
+}
+updateAINames();
+
+function showScreen(id){
+  document.querySelectorAll(".screen").forEach(function(s){s.classList.remove("on");});
+  var el = document.getElementById(id);
+  if(el) el.classList.add("on");
+}
+
+document.getElementById("btnHowTo").addEventListener("click", function(){ showScreen("scHTP"); });
+document.getElementById("btnHTPClose").addEventListener("click", function(){ showScreen("scHome"); });
+document.getElementById("btnModeOnline").addEventListener("click", function(){ showScreen("scOnline"); });
+document.getElementById("btnModeAI").addEventListener("click", function(){ showScreen("scAI"); });
+document.getElementById("btnOnlineBack").addEventListener("click", function(){ showScreen("scHome"); });
+document.getElementById("btnAIBack").addEventListener("click", function(){ showScreen("scHome"); });
+
+document.getElementById("btnStartAI").addEventListener("click", function(){
+  var name = document.getElementById("aiName").value.trim() || "Player 1";
+  var players = [mkP(0, name, PC[0], false, null, selectedAIToken)];
+  for(var i=0; i<selectedCount; i++){
+    players.push(mkP(i+1, AI_NAMES[i], PC[i+1], true, selectedDiff, TOKEN_DEFS[(i+1)%TOKEN_DEFS.length].key));
+  }
+  startGame(players, selectedSpeed);
+});
+
+// ── Constants ────────────────────────────────────────────────────────────────
+var PC = ["#c0392b","#2471a3","#1e8449","#d68910","#6c3483","#117a65"];
+var BW=1300,BH=980,OL=140,OR=1160,OT=130,OB=850,SW=52,SH=52;
+var WIN_IDX = 33;
+
+var BOATS = [
+  {name:"Dinghy",   icon:"🚣", price:15},
+  {name:"Kayak",    icon:"🛶", price:20},
+  {name:"Skiff",    icon:"⛵", price:25},
+  {name:"Cruiser",  icon:"🚢", price:40},
+  {name:"Catamaran",icon:"⛵", price:50},
+  {name:"Yacht",    icon:"🛥️", price:60}
+];
+var SWSP = [3,9,16,28];
+var SKSP = [6,23,30];
+
+var TASKS = {
+  boat_school: {
+    key:"boat_school",label:"Boat School",entryIdx:5,exitIdx:6,count:6,colGap:SW,color:"#5b2c8c",
+    spaces:[
+      {story:"You ace a test drive!",          eff:function(p){return mg(p,{stars:p.stars+1});},                   desc:"+1 ⭐",reward:1},
+      {story:"F on nav test.",                 eff:function(p){return mg(p,{stars:Math.max(0,p.stars-1)});},       desc:"-1 ⭐",reward:-1},
+      {story:"New friends at sailing camp!",   eff:function(p){return mg(p,{stars:p.stars+1});},                   desc:"+1 ⭐",reward:1},
+      {story:"Fell asleep in class.",          eff:function(p){return mg(p,{stars:Math.max(0,p.stars-1)});},       desc:"-1 ⭐",reward:-1},
+      {story:"You learn to tow water skiers!", eff:function(p){return mg(p,{stars:p.stars+2});},                   desc:"+2 ⭐",reward:2},
+      {story:"You pass your final exam!",      eff:function(p){return mg(p,{stars:p.stars+1});},                   desc:"+1 ⭐",reward:1}
+    ],
+    req:function(p){return p.stars>=(p.shortcut&&p.shortcut.stars?2:3);},
+    done:"🎓 Graduated",
+    prog:function(p){return "⭐ "+p.stars+"/"+(p.shortcut&&p.shortcut.stars?2:3)+" stars";}
+  },
+  boat:{key:"boat",label:"The Boat Store",entryIdx:12,exitIdx:13,count:6,colGap:SW,color:"#b7600a",
+    spaces:[],req:function(p){return p.boat!==null;},done:null,
+    prog:function(){return "🛥️ No boat yet";}
+  },
+  fish:{key:"fish",label:"Catch a Fish",entryIdx:19,exitIdx:20,count:8,colGap:SW,color:"#0e6655",
+    spaces:[
+      {story:"Great fishing spot!",         eff:function(p){return mg(p,{fish:p.fish+3});},desc:"+3 🐟",reward:3},
+      {story:"Bad stream.",                 eff:function(p){return p;},                    desc:"Empty.",reward:0},
+      {story:"Sister teaches bait tricks!", eff:function(p){return mg(p,{fish:p.fish+6});},desc:"+6 🐟",reward:6},
+      {story:"Just one nibble.",            eff:function(p){return mg(p,{fish:p.fish+1});},desc:"+1 🐟",reward:1},
+      {story:"Wake up at dawn, worth it!",  eff:function(p){return mg(p,{fish:p.fish+4});},desc:"+4 🐟",reward:4},
+      {story:"Sailor shares his spot.",     eff:function(p){return mg(p,{fish:p.fish+2});},desc:"+2 🐟",reward:2},
+      {story:"Jackpot! Fish are jumping.",  eff:function(p){return mg(p,{fish:p.fish+5});},desc:"+5 🐟",reward:5},
+      {story:"Your line snaps.",            eff:function(p){return p;},                    desc:"Got away.",reward:0}
+    ],
+    req:function(p){return p.fish>=(p.shortcut&&p.shortcut.fish?6:10);},
+    done:"🐟 Expert Fisherman",
+    prog:function(p){return "🐟 "+p.fish+"/"+(p.shortcut&&p.shortcut.fish?6:10)+" fish";}
+  },
+  rescue:{key:"rescue",label:"Let's Rescue!",entryIdx:26,exitIdx:27,count:6,colGap:SW,color:"#1a5276",
+    spaces:[
+      {story:"You perform CPR!",             eff:function(p){return mg(p,{rescues:p.rescues+1});},                  desc:"+1 🆘",reward:1},
+      {story:"Swimmer got away.",            eff:function(p){return p;},                                            desc:"None.",reward:0},
+      {story:"Rescue someone who tips you!", eff:function(p){return mg(p,{rescues:p.rescues+1,money:p.money+20});}, desc:"+1 🆘 +💰$20",reward:1},
+      {story:"Rescued person fell back in!", eff:function(p){return mg(p,{rescues:Math.max(0,p.rescues-1)});},      desc:"-1 🆘",reward:-1},
+      {story:"Save two from rip current!",   eff:function(p){return mg(p,{rescues:p.rescues+2});},                  desc:"+2 🆘",reward:2},
+      {story:"Conditions too rough.",        eff:function(p){return p;},                                            desc:"None.",reward:0}
+    ],
+    req:function(p){return p.rescues>=(p.shortcut&&p.shortcut.rescues?1:2);},
+    done:"🆘 Life Saver",
+    prog:function(p){return "🆘 "+p.rescues+"/"+(p.shortcut&&p.shortcut.rescues?1:2)+" rescues";}
+  }
+};
+
+var JMAP = {5:"boat_school",12:"boat",19:"fish",26:"rescue",33:"winner"};
+var WDOCK = [
+  {label:"Dock 1",   eff:function(p){return p;}},
+  {label:"Lose Turn",eff:function(p){return mg(p,{skip:(p.skip||0)+1});}},
+  {label:"Back 1",   eff:function(p){return mg(p,{winPos:Math.max(0,(p.winPos||0)-1)});}},
+  {label:"⭐ WIN",   eff:function(p){return p;},win:true}
+];
+var SCARDS = [
+  {id:"s1",text:"Fair winds! Move +3.",eff:{move:3}},{id:"s2",text:"💰 Wallet found! +$20.",eff:{money:20}},
+  {id:"s3",text:"Smooth sailing! Move +2.",eff:{move:2}},{id:"s4",text:"💰 Sponsorship! +$25.",eff:{money:25}},
+  {id:"s5",text:"💰 Crew tip! +$15.",eff:{money:15}},{id:"s6",text:"Current! Move +4.",eff:{move:4}},
+  {id:"s7",text:"💰 Weather bonus! +$12.",eff:{money:12}},{id:"s8",text:"💰 Sailor tips you! +$8.",eff:{money:8}},
+  {id:"s9",text:"💰 Harbor festival! +$18.",eff:{money:18}},{id:"s10",text:"Tailwind! Move +1.",eff:{move:1}},
+  {id:"s11",text:"💰 Regatta prize! +$30.",eff:{money:30}},{id:"s12",text:"💰 Sold gear! +$10.",eff:{money:10}}
+];
+var KCARDS = [
+  {id:"k1",text:"🌊 Storm! Go back 3.",eff:{move:-3}},{id:"k2",text:"💸 Docking fee. -$8.",eff:{money:-8}},
+  {id:"k3",text:"💸 Maintenance! -$5.",eff:{money:-5}},{id:"k4",text:"🌊 Rogue wave! Back 2.",eff:{move:-2}},
+  {id:"k5",text:"💸 Customs! -$7.",eff:{money:-7}},{id:"k6",text:"🌫️ Fog delay, skip turn.",eff:{skip:1}},
+  {id:"k7",text:"💸 Engine trouble! -$10.",eff:{money:-10}},{id:"k8",text:"💸 Fine! -$12.",eff:{money:-12}},
+  {id:"k9",text:"🌊 Wave! Back 1.",eff:{move:-1}},{id:"k10",text:"⚓ Anchor stuck! Skip turn.",eff:{skip:1}},
+  {id:"k11",text:"🧭 Nav error! Back 2.",eff:{move:-2}},{id:"k12",text:"💸 Fuel leak! -$6.",eff:{money:-6}}
+];
+var SWDEFS = [
+  {type:"robbery", icon:"💰",label:"Highway Robbery",desc:"Take ALL money from any one player.",copies:5},
+  {type:"shortcut",icon:"⚡",label:"Shortcut",       desc:"Reduce one challenge requirement.",copies:5},
+  {type:"teleport",icon:"🌀",label:"Teleportation",  desc:"Jump to any space on the oval.",   copies:5},
+  {type:"freeze",  icon:"❄️",label:"Freeze Frame",   desc:"Target skips their next 2 turns.", copies:5},
+  {type:"double",  icon:"🎲",label:"Double Time",    desc:"2 bonus rolls this turn.",         copies:5},
+  {type:"fasttrack",icon:"🚀",label:"Fast Track",    desc:"No exact roll needed to WIN. Auto-active.",copies:1}
+];
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+function mg(a,b){var r={};for(var k in a)r[k]=a[k];for(var k in b)r[k]=b[k];return r;}
+function dc(o){return JSON.parse(JSON.stringify(o));}
+function shuf(a){var b=a.slice();for(var i=b.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=b[i];b[i]=b[j];b[j]=t;}return b;}
+function mkSwim(){return shuf(SCARDS.concat(SCARDS).concat(SCARDS));}
+function mkSink(){return shuf(KCARDS.concat(KCARDS).concat(KCARDS));}
+function mkDeck(defs){
+  var d=[];
+  for(var i=0;i<defs.length;i++)
+    for(var j=0;j<defs[i].copies;j++)
+      d.push(mg(defs[i],{uid:Math.random().toString(36).slice(2)}));
+  return shuf(d);
+}
+function mkP(id,name,color,isAI,diff,tokenKey){
+  return {id:id,name:name,color:color,isAI:!!isAI,aiDiff:diff||null,tokenKey:tokenKey||"captain",
+    pos:0,money:35,stars:0,graduated:false,rescues:0,fish:0,boat:null,skip:0,
+    inTask:null,taskPos:-1,winPos:-1,done:false,eliminated:false,
+    heldCards:[],shortcut:{fish:false,rescues:false,stars:false},fasttrack:false,
+    doubleRollsLeft:0,completedTasks:[],frozen:0,frozenBy:null,
+    boughtCardThisTurn:false,usedShipwreckThisTurn:false,cardsBoughtThisTurn:[],
+    pendingTrade:null};
+}
+
+// ── Geometry ──────────────────────────────────────────────────────────────────
+function oPos(i){
+  if(i<10)return{x:OL+(i/9)*(OR-OL),y:OB};
+  if(i<18)return{x:OR,y:OB-((i-10)/7)*(OB-OT)};
+  if(i<28)return{x:OR-((i-18)/9)*(OR-OL),y:OT};
+  return{x:OL,y:OT+((i-28)/7)*(OB-OT)};
+}
+function jDir(ei){if(ei<10)return{x:0,y:-1};if(ei<18)return{x:-1,y:0};if(ei<28)return{x:0,y:1};return{x:1,y:0};}
+function jPerp(ei){if(ei<10)return{x:1,y:0};if(ei<18)return{x:0,y:1};if(ei<28)return{x:-1,y:0};return{x:0,y:-1};}
+function jut2col(ei,count,cg){
+  var base=oPos(ei),d=jDir(ei),p=jPerp(ei),half=Math.ceil(count/2),pts=[];
+  for(var i=0;i<half;i++)pts.push({x:base.x+d.x*(i+1)*SW-p.x*cg/2,y:base.y+d.y*(i+1)*SW-p.y*cg/2});
+  for(var i=half-1;i>=0&&pts.length<count;i--)pts.push({x:base.x+d.x*(i+1)*SW+p.x*cg/2,y:base.y+d.y*(i+1)*SW+p.y*cg/2});
+  return pts;
+}
+function buildJC(){
+  var c={};
+  var keys=Object.keys(TASKS);
+  for(var ki=0;ki<keys.length;ki++){
+    var t=TASKS[keys[ki]],cg=t.colGap||SW;
+    var pts=jut2col(t.entryIdx,t.count,cg);
+    var p=jPerp(t.entryIdx),base=oPos(t.entryIdx);
+    var ep={x:base.x-p.x*cg/2,y:base.y-p.y*cg/2};
+    var cl=pts[pts.length-1];
+    var xp=t.key==="boat"?{x:ep.x,y:cl.y}:{x:cl.x,y:ep.y};
+    c[t.key]={pts:pts,ep:ep,xp:xp};
+  }
+  var wd=jDir(WIN_IDX),wb=oPos(WIN_IDX),wp=[];
+  for(var i=0;i<4;i++)wp.push({x:wb.x+wd.x*(i+1)*SW,y:wb.y+wd.y*(i+1)*SW});
+  c.winner={pts:wp,ep:wb,xp:null};
+  return c;
+}
+function sKind(i){
+  if(i===0)return"start";
+  if(SWSP.indexOf(i)>=0)return"swim";
+  if(SKSP.indexOf(i)>=0)return"sink";
+  if(JMAP[i])return"entry_"+JMAP[i];
+  return"normal";
+}
+function sColor(k){
+  var m={start:"#1a7a3a",swim:"#1565c0",sink:"#b71c1c",
+    entry_boat_school:"#6a1b9a",entry_boat:"#e65100",entry_fish:"#00695c",
+    entry_rescue:"#0d47a1",entry_winner:"#f57f17",normal:"#c8a96e"};
+  return m[k]||"#c8a96e";
+}
+
+// ── State ─────────────────────────────────────────────────────────────────────
+var GS=null,myId=0,rCode=null,rUnsub=null,isHost=false,isMulti=false;
+var scale=1.2,JC={},aiSpeed="show";
+
+function push(s){
+  if(isMulti&&rCode){
+    dbSet("rooms/"+rCode,s).catch(function(e){console.error("push failed",e);});
+  } else {
+    GS=s; renderAll();
+  }
+}
+
+// ── Lobby / Room ──────────────────────────────────────────────────────────────
+function genCode(){return String(Math.floor(1000+Math.random()*9000));}
+
+document.getElementById("btnCreateRoom").addEventListener("click", function(){
+  var name = document.getElementById("onlineName").value.trim() || "Player 1";
+  var code = genCode();
+  rCode=code; isHost=true; myId=0; isMulti=true;
+  var p0 = mkP(0, name, PC[0], false, null, selectedOnlineToken);
+  var s = {players:[p0,null],curIdx:0,phase:"waiting",log:[],
+    swimDeck:mkSwim(),sinkDeck:mkSink(),swDeck:mkDeck(SWDEFS),winner:null};
+  dbSet("rooms/"+code, s).then(function(){
+    document.getElementById("createSection").style.display="block";
+    document.getElementById("ccode").textContent=code;
+    rUnsub = dbOn("rooms/"+code, function(v){
+      if(!v)return;
+      updateSlots(v.players);
+      if(v.players&&v.players[1]&&v.phase==="waiting"){
+        var b=document.getElementById("cbadge");
+        b.className="badge bok"; b.textContent="Opponent joined! Starting...";
+        setTimeout(function(){enterGame(code,v);},1500);
       }
+    });
+  }).catch(function(e){alert("Error: "+e.message);});
+});
+
+document.getElementById("btnJoinRoom").addEventListener("click", function(){
+  var code = document.getElementById("ji").value.trim().toUpperCase();
+  var name = document.getElementById("onlineName").value.trim() || "Player 2";
+  if(code.length!==4){setBadge("j","Enter 4-digit code","berr");return;}
+  dbGet("rooms/"+code).then(function(v){
+    if(!v){setBadge("j","Room not found","berr");return;}
+    if(v.players&&v.players[1]){setBadge("j","Room is full","berr");return;}
+    rCode=code; isHost=false; myId=1; isMulti=true;
+    var p1 = mkP(1, name, PC[1], false, null, selectedOnlineToken);
+    dbSet("rooms/"+code+"/players/1", p1).then(function(){
+      setBadge("j","Joined! Starting...","bok");
+      setTimeout(function(){
+        dbGet("rooms/"+code).then(function(v2){ enterGame(code, v2); });
+      },1500);
+    });
+  }).catch(function(e){setBadge("j","Error: "+e.message,"berr");});
+});
+
+function setBadge(w,msg,cls){
+  var id=w==="j"?"jbadge":"cbadge";
+  var el=document.getElementById(id);
+  el.style.display="inline-block"; el.className="badge "+cls; el.textContent=msg;
+}
+function updateSlots(players){
+  var el=document.getElementById("lslots"); if(!el||!players)return;
+  var h="";
+  for(var i=0;i<players.length;i++){
+    var pl=players[i];
+    h+='<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;background:#071728;margin-bottom:6px;border:1px solid #1a3a55">'+
+      '<div style="width:11px;height:11px;border-radius:50%;background:'+PC[i]+'"></div>'+
+      '<div style="font-size:13px;font-weight:600">'+(pl?pl.name:"Waiting...")+'</div>'+
+      '<div style="font-size:11px;color:#4a7a9b;margin-left:auto">'+(pl?"✅ Connected":"⏳")+'</div></div>';
+  }
+  el.innerHTML=h;
+}
+
+function enterGame(code, initState){
+  if(rUnsub){rUnsub();rUnsub=null;}
+  showScreen("__none__");
+  document.getElementById("game").classList.add("on");
+  document.getElementById("rpill").textContent="ROOM "+code;
+  JC=buildJC(); drawBoard();
+  rUnsub = dbOn("rooms/"+code, function(v){
+    if(!v)return;
+    // Check for pending trade for this player
+    if(v.pendingTrade&&v.pendingTrade.toIdx===myId&&!v.pendingTrade.responded){
+      showTradeOffer(v.pendingTrade, v);
     }
-    return shuf(d);
-  }
-  function mkP(id,name,color,isAI,diff){
-    return {id:id,name:name,color:color,isAI:!!isAI,aiDiff:diff||null,
-      pos:0,money:35,stars:0,graduated:false,rescues:0,fish:0,boat:null,skip:0,
-      inTask:null,taskPos:-1,winPos:-1,done:false,eliminated:false,
-      heldCards:[],shortcut:{fish:false,rescues:false,stars:false},fasttrack:false,
-      doubleRollsLeft:0,completedTasks:[],frozen:0,frozenBy:null,
-      boughtCardThisTurn:false,usedShipwreckThisTurn:false,cardsBoughtThisTurn:[]};
-  }
+    GS=v; renderAll();
+  });
+}
 
-  // ── Geometry ───────────────────────────────────────────────────────────────
-  function oPos(i){
-    if(i<10)return{x:OL+(i/9)*(OR-OL),y:OB};
-    if(i<18)return{x:OR,y:OB-((i-10)/7)*(OB-OT)};
-    if(i<28)return{x:OR-((i-18)/9)*(OR-OL),y:OT};
-    return{x:OL,y:OT+((i-28)/7)*(OB-OT)};
-  }
-  function jDir(ei){if(ei<10)return{x:0,y:-1};if(ei<18)return{x:-1,y:0};if(ei<28)return{x:0,y:1};return{x:1,y:0};}
-  function jPerp(ei){if(ei<10)return{x:1,y:0};if(ei<18)return{x:0,y:1};if(ei<28)return{x:-1,y:0};return{x:0,y:-1};}
-  function jut2col(ei,count,cg){
-    var base=oPos(ei),d=jDir(ei),p=jPerp(ei),half=Math.ceil(count/2),pts=[];
-    for(var i=0;i<half;i++)pts.push({x:base.x+d.x*(i+1)*SW-p.x*cg/2,y:base.y+d.y*(i+1)*SW-p.y*cg/2});
-    for(var i=half-1;i>=0&&pts.length<count;i--)pts.push({x:base.x+d.x*(i+1)*SW+p.x*cg/2,y:base.y+d.y*(i+1)*SW+p.y*cg/2});
-    return pts;
-  }
-  function buildJC(){
-    var c={};
-    var keys=Object.keys(TASKS);
-    for(var ki=0;ki<keys.length;ki++){
-      var t=TASKS[keys[ki]],cg=t.colGap||SW;
-      var pts=jut2col(t.entryIdx,t.count,cg);
-      var p=jPerp(t.entryIdx),base=oPos(t.entryIdx);
-      var ep={x:base.x-p.x*cg/2,y:base.y-p.y*cg/2};
-      var cl=pts[pts.length-1];
-      var xp=t.key==="boat"?{x:ep.x,y:cl.y}:{x:cl.x,y:ep.y};
-      c[t.key]={pts:pts,ep:ep,xp:xp};
-    }
-    var wd=jDir(WIN_IDX),wb=oPos(WIN_IDX),wp=[];
-    for(var i=0;i<4;i++)wp.push({x:wb.x+wd.x*(i+1)*SW,y:wb.y+wd.y*(i+1)*SW});
-    c.winner={pts:wp,ep:wb,xp:null};
-    return c;
-  }
-  function sKind(i){
-    if(i===0)return"start";
-    if(SWSP.indexOf(i)>=0)return"swim";
-    if(SKSP.indexOf(i)>=0)return"sink";
-    if(JMAP[i])return"entry_"+JMAP[i];
-    return"normal";
-  }
-  function sColor(k){
-    var m={start:"#1a7a3a",swim:"#1565c0",sink:"#b71c1c",
-      entry_boat_school:"#6a1b9a",entry_boat:"#e65100",entry_fish:"#00695c",
-      entry_rescue:"#0d47a1",entry_winner:"#f57f17",normal:"#c8a96e"};
-    return m[k]||"#c8a96e";
-  }
+function startGame(players, speed){
+  isMulti=false; myId=0; isHost=true; aiSpeed=speed||"show";
+  showScreen("__none__");
+  document.getElementById("game").classList.add("on");
+  document.getElementById("rpill").textContent="OFFLINE";
+  JC=buildJC();
+  GS={players:players,curIdx:0,phase:"transition",log:[],
+    swimDeck:mkSwim(),sinkDeck:mkSink(),swDeck:mkDeck(SWDEFS),winner:null};
+  drawBoard(); renderAll(); showTrans();
+}
 
-  // ── State ──────────────────────────────────────────────────────────────────
-  var GS=null,myId=0,rCode=null,rUnsub=null,isHost=false,isMulti=false;
-  var scale=1.2,JC={},paused=false;
+function leaveGame(){
+  if(rUnsub){rUnsub();rUnsub=null;}
+  GS=null; isMulti=false;
+  document.getElementById("game").classList.remove("on");
+  document.getElementById("wo").classList.remove("on");
+  document.getElementById("tro").classList.remove("on");
+  hideP();
+  showScreen("scHome");
+  document.getElementById("createSection").style.display="none";
+  document.getElementById("jbadge").style.display="none";
+  document.getElementById("ji").value="";
+}
 
-  function push(s){
-    if(isMulti&&rCode){
-      dbSet("rooms/"+rCode,s).catch(function(e){console.error("push failed",e);});
+// ── Render ────────────────────────────────────────────────────────────────────
+function renderAll(){
+  if(!GS)return;
+  var s=GS,cur=s.players[s.curIdx]; if(!cur)return;
+  document.getElementById("tinfo").textContent=(cur.isAI?"🤖 ":"")+cur.name+"'s Turn";
+  document.getElementById("tinfo").style.color=cur.color;
+  renderPList(s); renderCur(s,cur); renderAct(s,cur); updateTok(s);
+  if(s.winner)showWin(s.winner);
+  if(s.phase==="transition"){
+    if(!document.getElementById("tro").classList.contains("on"))showTrans();
+  }
+  if(s.log){
+    var arr=Array.isArray(s.log)?s.log:Object.values(s.log);
+    var h="";
+    for(var i=0;i<arr.length;i++)h+='<div style="margin-bottom:2px">'+arr[i]+'</div>';
+    document.getElementById("glog").innerHTML=h;
+  }
+}
+
+function renderPList(s){
+  var h="";
+  for(var i=0;i<s.players.length;i++){
+    var pl=s.players[i]; if(!pl)continue;
+    var act=i===s.curIdx;
+    h+='<div class="pr'+(act?" act":"")+'" data-pi="'+i+'">'+
+      '<div style="width:9px;height:9px;border-radius:50%;background:'+pl.color+';flex-shrink:0"></div>'+
+      '<div style="flex:1;min-width:0">'+
+      '<div style="font-size:11px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+
+      (pl.isAI?"🤖 ":"")+pl.name+(pl.eliminated?" ❌":pl.done?" 🏆":act?" ▶":"")+
+      '</div><div style="font-size:9px;color:'+(pl.money<0?"#ff9999":"#7ecbe0")+'">'+
+      '💰$'+pl.money+(pl.money<0?" ⚠️":"")+" | "+(pl.completedTasks||[]).length+"/4"+
+      (pl.frozen>0?" ❄️"+pl.frozen:"")+
+      '</div></div></div>';
+  }
+  document.getElementById("plist").innerHTML=h;
+  document.getElementById("plist").querySelectorAll("[data-pi]").forEach(function(row){
+    row.addEventListener("click",(function(idx){return function(){inspP(idx);};})(parseInt(row.getAttribute("data-pi"))));
+  });
+}
+
+function renderCur(s,cur){
+  document.getElementById("ctn").textContent=(cur.isAI?"🤖 ":"")+cur.name;
+  document.getElementById("ctn").style.color=cur.color;
+  var pd=posD(cur);
+  document.getElementById("ctp").textContent=pd||"";
+  document.getElementById("ctp").style.display=pd?"":"none";
+  var id=cur.money<0;
+  document.getElementById("ctm").textContent="💰 $"+cur.money+(id?" ⚠️ IN DEBT":"");
+  document.getElementById("ctm").style.color=id?"#ff6b6b":"#7dff9a";
+  var tks=["boat_school","boat","fish","rescue"],h="";
+  for(var i=0;i<tks.length;i++){var r=tLine(cur,tks[i]);h+='<div style="color:'+(r.g?"#4eff91":"#8aaccc")+'">'+r.t+'</div>';}
+  document.getElementById("ctt").innerHTML=h;
+  var br=cur.doubleRollsLeft||0;
+  document.getElementById("ctb").textContent=br>0?"🎲 "+br+" bonus roll(s) left!":"";
+  renderCards(s,cur);
+}
+
+function renderCards(s,cur){
+  var el=document.getElementById("cds");
+  if(!cur.heldCards||!cur.heldCards.length){el.innerHTML="";return;}
+  var mine=!isMulti||s.curIdx===myId;
+  var h='<div class="sl">🃏 CARDS'+(cur.usedShipwreckThisTurn?" (1 played)":"")+"</div>";
+  for(var i=0;i<cur.heldCards.length;i++){
+    var c=cur.heldCards[i];
+    if(c.type==="fasttrack"){
+      h+='<div style="display:flex;align-items:center;gap:5px;padding:3px 7px;border-radius:5px;background:#0f3d1a;border:1.5px solid #2ecc71;color:#2ecc71;font-size:10px;margin-bottom:3px">'+
+        c.icon+" "+c.label+'<span style="margin-left:auto;font-size:8px;background:#2ecc71;color:#0a1f0e;border-radius:3px;padding:1px 4px;font-weight:700">ACTIVE</span></div>';
     } else {
-      GS=s;
-      renderAll();
+      var bn=(cur.cardsBoughtThisTurn||[]).indexOf(c.uid)>=0;
+      var dis=cur.usedShipwreckThisTurn||bn||!mine;
+      h+='<button class="cb2" data-cardidx="'+i+'"'+(dis?' disabled':'')+'>'+
+        c.icon+" "+c.label+(bn?" (next turn)")+'</button>';
     }
   }
+  el.innerHTML=h;
+  el.querySelectorAll("[data-cardidx]").forEach(function(btn){
+    btn.addEventListener("click",(function(idx){return function(){openCard(idx);};})(parseInt(btn.getAttribute("data-cardidx"))));
+  });
+}
 
-  // ── Lobby ──────────────────────────────────────────────────────────────────
-  function genCode(){return String(Math.floor(1000+Math.random()*9000));}
-
-  function createRoom(){
-    var code=genCode();
-    rCode=code;isHost=true;myId=0;isMulti=true;
-    var p0=mkP(0,"Player 1",PC[0],false,null);
-    var s={players:[p0,null],curIdx:0,phase:"waiting",log:[],
-      swimDeck:mkSwim(),sinkDeck:mkSink(),swDeck:mkDeck(SWDEFS),winner:null};
-    dbSet("rooms/"+code,s).then(function(){
-      document.getElementById("cs").style.display="block";
-      document.getElementById("ccode").textContent=code;
-      rUnsub=dbOn("rooms/"+code,function(v){
-        if(!v)return;
-        updateSlots(v.players);
-        if(v.players&&v.players[1]&&v.phase==="waiting"){
-          var b=document.getElementById("cbadge");
-          b.className="badge bok";
-          b.textContent="Opponent joined! Starting...";
-          setTimeout(function(){enterGame(code);},1500);
-        }
-      });
-    }).catch(function(e){alert("Error creating room: "+e.message);});
+function renderAct(s,cur){
+  var el=document.getElementById("aa");
+  var mine=!isMulti||s.curIdx===myId;
+  document.getElementById("phl").textContent="PRE-TURN";
+  if(cur.isAI||!mine){
+    el.innerHTML='<div style="text-align:center;padding:14px;color:#7ecbe0;font-size:12px">'+(cur.isAI?"🤖 AI is playing...":"⏳ Waiting for "+cur.name+"...")+'</div>';
+    return;
   }
-
-  function joinRoom(){
-    var code=document.getElementById("ji").value.trim().toUpperCase();
-    if(code.length!==4){setBadge("j","Enter 4-digit code","berr");return;}
-    dbGet("rooms/"+code).then(function(v){
-      if(!v){setBadge("j","Room not found","berr");return;}
-      if(v.players&&v.players[1]){setBadge("j","Room is full","berr");return;}
-      rCode=code;isHost=false;myId=1;isMulti=true;
-      var p1=mkP(1,"Player 2",PC[1],false,null);
-      dbSet("rooms/"+code+"/players/1",p1).then(function(){
-        setBadge("j","Joined! Starting...","bok");
-        setTimeout(function(){enterGame(code);},1500);
-      });
-    }).catch(function(e){setBadge("j","Error: "+e.message,"berr");});
+  el.innerHTML="";
+  if(s.phase==="rolling"){
+    el.innerHTML='<div style="text-align:center;padding:8px;color:#7ecbe0;font-size:12px">🎲 Rolling...</div>';
+    return;
   }
-
-  function setBadge(w,msg,cls){
-    var id=w==="j"?"jbadge":"cbadge";
-    var el=document.getElementById(id);
-    el.style.display="inline-block";el.className="badge "+cls;el.textContent=msg;
+  // Debt relief
+  if(cur.money<0){
+    var db2=document.createElement("button");
+    db2.className="ab"; db2.style.cssText="background:#1a0a0a;border:2px solid #c0392b;color:#ff9999;font-size:11px";
+    db2.innerHTML="🆘 Eliminate Debt<div style='font-size:9px;font-weight:400;margin-top:1px'>Sacrifice challenge → $0</div>";
+    db2.addEventListener("click",debtR); el.appendChild(db2);
   }
+  // Roll
+  var rb=document.createElement("button");
+  rb.className="ab"; rb.style.background=(cur.doubleRollsLeft||0)>0?"#d68910":"#1a7a3a";
+  rb.textContent="🎲 Roll the Dice!"+(((cur.doubleRollsLeft||0)>0)?" (+"+(cur.doubleRollsLeft||0)+")":"");
+  rb.addEventListener("click",doRoll); el.appendChild(rb);
+  // Buy card
+  var bb=document.createElement("button");
+  bb.className="ab"; bb.style.background=cur.boughtCardThisTurn?"#333":"#6a1b9a";
+  bb.textContent="🃏 Buy Shipwreck Card ($10)"+(cur.boughtCardThisTurn?" ✓":"");
+  if(cur.boughtCardThisTurn)bb.disabled=true;
+  bb.addEventListener("click",buyCard); el.appendChild(bb);
+  // Trade button
+  var tb=document.createElement("button");
+  tb.className="ab"; tb.style.background="#1a5a8a";
+  tb.textContent="🤝 Suggest a Trade";
+  tb.addEventListener("click",openTradePanel); el.appendChild(tb);
+  // Trade panel placeholder
+  var tp=document.createElement("div");
+  tp.id="tradePanel"; el.appendChild(tp);
+}
 
-  function updateSlots(players){
-    var el=document.getElementById("lslots");if(!el||!players)return;
-    var h="";
-    for(var i=0;i<players.length;i++){
-      var pl=players[i];
-      h+='<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;background:#071728;margin-bottom:6px;border:1px solid #1a3a55">'+
-        '<div style="width:11px;height:11px;border-radius:50%;background:'+PC[i]+'"></div>'+
-        '<div style="font-size:13px;font-weight:600">'+(pl?pl.name:"Waiting...")+'</div>'+
-        '<div style="font-size:11px;color:#4a7a9b;margin-left:auto">'+(pl?"Connected":"...")+'</div></div>';
+// ── Trade ─────────────────────────────────────────────────────────────────────
+var tradeOpen = false;
+
+function openTradePanel(){
+  var tp=document.getElementById("tradePanel");
+  if(!tp||!GS)return;
+  if(tradeOpen){tp.innerHTML="";tradeOpen=false;return;}
+  tradeOpen=true;
+  var s=GS, cur=s.players[s.curIdx];
+  var others=s.players.filter(function(p,i){return i!==s.curIdx&&p&&!p.done;});
+  if(!others.length){tp.innerHTML='<div style="font-size:11px;color:#aaa;padding:6px">No other active players.</div>';return;}
+  var h='<div id="tradePanel" style="background:#0d2137;border-radius:10px;padding:10px;margin-top:6px;border:1px solid #1a3a55">';
+  h+='<div style="font-size:11px;font-weight:700;color:#7ecbe0;margin-bottom:8px">🤝 Propose a Trade</div>';
+  h+='<div style="font-size:10px;color:#aaa;margin-bottom:4px">Trade with:</div>';
+  h+='<select id="tradeTarget" style="width:100%;padding:4px;border-radius:5px;background:#071728;color:#fff;border:1px solid #1a3a55;font-size:11px;margin-bottom:8px">';
+  others.forEach(function(op){h+='<option value="'+op.id+'">'+(op.isAI?"🤖 ":"")+op.name+'</option>';});
+  h+='</select>';
+  h+='<div style="font-size:10px;color:#f5a623;font-weight:700;margin-bottom:4px">YOU GIVE:</div>';
+  h+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px"><span style="font-size:11px;color:#7ecbe0;width:60px">💰 Money</span><input id="tgMoney" type="number" min="0" value="0" style="width:52px;padding:3px 5px;border-radius:4px;background:#071728;border:1px solid #1a3a55;color:#fff;font-size:11px"/><span style="font-size:10px;color:#555">max: $'+cur.money+'</span></div>';
+  h+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px"><span style="font-size:11px;color:#7ecbe0;width:60px">🐟 Fish</span><input id="tgFish" type="number" min="0" value="0" style="width:52px;padding:3px 5px;border-radius:4px;background:#071728;border:1px solid #1a3a55;color:#fff;font-size:11px"/><span style="font-size:10px;color:#555">have: '+cur.fish+'</span></div>';
+  h+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px"><span style="font-size:11px;color:#7ecbe0;width:60px">🆘 Rescues</span><input id="tgRescues" type="number" min="0" value="0" style="width:52px;padding:3px 5px;border-radius:4px;background:#071728;border:1px solid #1a3a55;color:#fff;font-size:11px"/><span style="font-size:10px;color:#555">have: '+cur.rescues+'</span></div>';
+  if(cur.heldCards&&cur.heldCards.length){
+    h+='<div style="font-size:10px;color:#aaa;margin-bottom:3px">Give card (optional):</div>';
+    h+='<select id="tgCard" style="width:100%;padding:4px;border-radius:5px;background:#071728;color:#fff;border:1px solid #1a3a55;font-size:11px;margin-bottom:8px"><option value="">— none —</option>';
+    cur.heldCards.forEach(function(c,i){h+='<option value="'+i+'">'+c.icon+' '+c.label+'</option>';});
+    h+='</select>';
+  }
+  h+='<div style="font-size:10px;color:#f5a623;font-weight:700;margin-bottom:4px">YOU WANT:</div>';
+  h+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px"><span style="font-size:11px;color:#7ecbe0;width:60px">💰 Money</span><input id="trMoney" type="number" min="0" value="0" style="width:52px;padding:3px 5px;border-radius:4px;background:#071728;border:1px solid #1a3a55;color:#fff;font-size:11px"/></div>';
+  h+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px"><span style="font-size:11px;color:#7ecbe0;width:60px">🐟 Fish</span><input id="trFish" type="number" min="0" value="0" style="width:52px;padding:3px 5px;border-radius:4px;background:#071728;border:1px solid #1a3a55;color:#fff;font-size:11px"/></div>';
+  h+='<div style="display:flex;align-items:center;gap:6px;margin-bottom:8px"><span style="font-size:11px;color:#7ecbe0;width:60px">🆘 Rescues</span><input id="trRescues" type="number" min="0" value="0" style="width:52px;padding:3px 5px;border-radius:4px;background:#071728;border:1px solid #1a3a55;color:#fff;font-size:11px"/></div>';
+  h+='<div style="display:flex;gap:6px"><button id="btnSendTrade" style="flex:1;padding:6px;border-radius:6px;border:none;background:#1a7a3a;color:#fff;font-weight:600;font-size:11px;cursor:pointer">Send Offer</button>';
+  h+='<button id="btnCancelTrade" style="flex:1;padding:6px;border-radius:6px;border:none;background:#444;color:#fff;font-size:11px;cursor:pointer">Cancel</button></div></div>';
+  tp.innerHTML=h;
+  document.getElementById("btnSendTrade").addEventListener("click",sendTrade);
+  document.getElementById("btnCancelTrade").addEventListener("click",function(){tradeOpen=false;tp.innerHTML="";});
+}
+
+function sendTrade(){
+  if(!GS)return;
+  var s=dc(GS), cur=s.players[s.curIdx];
+  var targetId=parseInt(document.getElementById("tradeTarget").value);
+  var give={
+    money:parseInt(document.getElementById("tgMoney").value)||0,
+    fish:parseInt(document.getElementById("tgFish").value)||0,
+    rescues:parseInt(document.getElementById("tgRescues").value)||0,
+    cardIdx:document.getElementById("tgCard")?document.getElementById("tgCard").value:""
+  };
+  var want={
+    money:parseInt(document.getElementById("trMoney").value)||0,
+    fish:parseInt(document.getElementById("trFish").value)||0,
+    rescues:parseInt(document.getElementById("trRescues").value)||0
+  };
+  var toIdx=-1;
+  for(var i=0;i<s.players.length;i++)if(s.players[i]&&s.players[i].id===targetId){toIdx=i;break;}
+  if(toIdx<0)return;
+  var tp={fromIdx:s.curIdx,toIdx:toIdx,give:give,want:want,responded:false,counter:null};
+  // If AI, resolve immediately
+  if(s.players[toIdx].isAI){
+    resolveTradeAI(tp,s); return;
+  }
+  // Store pending trade in state for online sync
+  s.pendingTrade=tp;
+  addL(s,cur.name+" proposes a trade to "+s.players[toIdx].name+"!");
+  push(s);
+  tradeOpen=false;
+  document.getElementById("tradePanel").innerHTML='<div style="font-size:11px;color:#7dff9a;padding:6px">⏳ Trade offer sent! Waiting for response...</div>';
+}
+
+function resolveTradeAI(tp, s){
+  // AI accepts if it profits or breaks even
+  var ai=s.players[tp.toIdx];
+  var netMoney=(tp.give.money||0)-(tp.want.money||0);
+  var accept=netMoney>=0||Math.random()<0.3;
+  if(accept){
+    executeTrade(tp,s);
+    addL(s,"🤖 "+ai.name+" accepts the trade!");
+  } else {
+    addL(s,"🤖 "+ai.name+" declines the trade.");
+  }
+  s.pendingTrade=null;
+  push(s);
+  tradeOpen=false;
+  if(document.getElementById("tradePanel"))document.getElementById("tradePanel").innerHTML="";
+}
+
+function showTradeOffer(tp, s){
+  if(!s||!tp)return;
+  var from=s.players[tp.fromIdx];
+  var give=tp.give,want=tp.want;
+  var giveStr=[];
+  if(give.money>0)giveStr.push("💰 $"+give.money);
+  if(give.fish>0)giveStr.push("🐟 "+give.fish+" fish");
+  if(give.rescues>0)giveStr.push("🆘 "+give.rescues+" rescues");
+  if(give.cardIdx!==""&&give.cardIdx!==undefined&&from.heldCards&&from.heldCards[parseInt(give.cardIdx)])giveStr.push("🃏 "+from.heldCards[parseInt(give.cardIdx)].label);
+  var wantStr=[];
+  if(want.money>0)wantStr.push("💰 $"+want.money);
+  if(want.fish>0)wantStr.push("🐟 "+want.fish+" fish");
+  if(want.rescues>0)wantStr.push("🆘 "+want.rescues+" rescues");
+  var body="Trade offer from "+from.name+":\n\nThey give: "+(giveStr.join(", ")||"nothing")+"\nThey want: "+(wantStr.join(", ")||"nothing");
+  showP("🤝 Trade Offer!","info",body,[
+    {l:"✅ Accept",c:"pp",fn:function(){
+      var s2=dc(GS);executeTrade(tp,s2);s2.pendingTrade=null;addL(s2,s2.players[tp.toIdx].name+" accepts the trade!");push(s2);
+    }},
+    {l:"❌ Decline",c:"pn",fn:function(){
+      var s2=dc(GS);s2.pendingTrade=null;addL(s2,s2.players[tp.toIdx].name+" declines the trade.");push(s2);
+    }},
+    {l:"↩️ Counter",c:"pw",fn:function(){
+      hideP(); openCounterTrade(tp,s);
+    }}
+  ]);
+}
+
+function openCounterTrade(originalTp, s){
+  // Show a trade panel pre-filled as counter
+  showP("↩️ Counter Offer","info","Propose your own terms:",[ {l:"Close",c:"pn",fn:hideP} ]);
+  // For simplicity, just reopen trade panel with roles reversed
+  var s2=dc(GS);
+  var reversedTp={fromIdx:originalTp.toIdx,toIdx:originalTp.fromIdx,give:originalTp.want,want:originalTp.give,responded:false,counter:true};
+  s2.pendingTrade=reversedTp;
+  addL(s2,s2.players[originalTp.toIdx].name+" sends a counter-offer!");
+  push(s2);
+}
+
+function executeTrade(tp, s){
+  var from=s.players[tp.fromIdx], to=s.players[tp.toIdx];
+  var give=tp.give, want=tp.want;
+  // Transfer give
+  from=mg(from,{money:from.money-(give.money||0),fish:from.fish-(give.fish||0),rescues:from.rescues-(give.rescues||0)});
+  to=mg(to,{money:to.money+(give.money||0),fish:to.fish+(give.fish||0),rescues:to.rescues+(give.rescues||0)});
+  // Transfer want
+  to=mg(to,{money:to.money-(want.money||0),fish:to.fish-(want.fish||0),rescues:to.rescues-(want.rescues||0)});
+  from=mg(from,{money:from.money+(want.money||0),fish:from.fish+(want.fish||0),rescues:from.rescues+(want.rescues||0)});
+  // Transfer card
+  if(give.cardIdx!==""&&give.cardIdx!==undefined){
+    var ci=parseInt(give.cardIdx);
+    if(!isNaN(ci)&&from.heldCards&&from.heldCards[ci]){
+      var card=from.heldCards[ci];
+      from.heldCards=from.heldCards.filter(function(_,i){return i!==ci;});
+      to.heldCards=(to.heldCards||[]).concat([mg(card,{uid:Math.random().toString(36).slice(2)})]);
     }
-    el.innerHTML=h;
   }
+  s.players[tp.fromIdx]=from;
+  s.players[tp.toIdx]=to;
+  addL(s,"Trade completed: "+from.name+" ↔ "+to.name);
+}
 
-  function enterGame(code){
-    if(rUnsub){rUnsub();rUnsub=null;}
-    document.getElementById("lobby").style.display="none";
-    document.getElementById("game").classList.add("on");
-    document.getElementById("rpill").textContent="ROOM "+code;
-    JC=buildJC();drawBoard();
-    rUnsub=dbOn("rooms/"+code,function(v){if(!v)return;GS=v;renderAll();});
+// ── Board ──────────────────────────────────────────────────────────────────────
+var NS="http://www.w3.org/2000/svg";
+function mkEl(tag,attrs){var e=document.createElementNS(NS,tag);for(var k in attrs)e.setAttribute(k,attrs[k]);return e;}
+function mkTxt(str,attrs){var e=mkEl("text",attrs);e.textContent=str;return e;}
+
+function drawBoard(){
+  var svg=document.getElementById("bsvg");
+  svg.setAttribute("width",BW); svg.setAttribute("height",BH); svg.innerHTML="";
+  var defs=mkEl("defs",{});
+  var st=document.createElementNS(NS,"style");
+  st.textContent="@keyframes w1{0%{transform:translateX(0)}100%{transform:translateX(-140px)}}@keyframes w2{0%{transform:translateX(0)}100%{transform:translateX(140px)}}@keyframes w3{0%{transform:translateX(-70px)}100%{transform:translateX(70px)}}";
+  defs.appendChild(st);
+  var cl=mkEl("clipPath",{id:"bc"}); cl.appendChild(mkEl("rect",{width:BW,height:BH})); defs.appendChild(cl);
+  svg.appendChild(defs);
+  svg.appendChild(mkEl("rect",{width:BW,height:BH,fill:"#4a9ebb"}));
+  var wst=["w1","w2","w3"];
+  for(var row=0;row<18;row++){
+    var g=mkEl("g",{style:"animation:"+wst[row%3]+" "+(2.5+row*0.3)+"s linear infinite","clip-path":"url(#bc)"});
+    [-280,-140,0,140,280,420,560,700,840,980,1120,1260,1400].forEach(function(wx){
+      g.appendChild(mkEl("path",{d:"M"+wx+" "+(55+row*52)+" Q"+(wx+17)+" "+(45+row*52)+" "+(wx+35)+" "+(55+row*52)+" Q"+(wx+52)+" "+(65+row*52)+" "+(wx+70)+" "+(55+row*52),stroke:"#7ecbe0","stroke-width":2,fill:"none",opacity:0.5}));
+    });
+    svg.appendChild(g);
   }
+  svg.appendChild(mkEl("rect",{x:OL-SW,y:OT-SW,width:OR-OL+SW*2,height:OB-OT+SW*2,rx:22,fill:"#d6b87a",opacity:0.9}));
+  svg.appendChild(mkEl("rect",{x:OL-SW/2,y:OT-SW/2,width:OR-OL+SW,height:OB-OT+SW,rx:16,fill:"#4a9ebb",opacity:0.9}));
+  svg.appendChild(mkTxt("Boat Ride 2.0",{x:(OL+OR)/2,y:(OT+OB)/2-14,"text-anchor":"middle","font-size":26,"font-weight":900,fill:"#fff",stroke:"#1a3a55","stroke-width":4,"paint-order":"stroke",opacity:0.45}));
+  svg.appendChild(mkTxt("An Online Adventure",{x:(OL+OR)/2,y:(OT+OB)/2+20,"text-anchor":"middle","font-size":20,"font-weight":700,fill:"#fff",stroke:"#1a3a55","stroke-width":4,"paint-order":"stroke",opacity:0.45}));
+  drawJuts(svg); drawOval(svg);
+  svg.appendChild(mkEl("g",{id:"tlayer"}));
+  applyScale();
+}
 
-  function startSolo(){
-    isMulti=false;myId=0;isHost=true;
-    document.getElementById("lobby").style.display="none";
-    document.getElementById("game").classList.add("on");
-    document.getElementById("rpill").textContent="OFFLINE";
-    JC=buildJC();
-    GS={
-      players:[mkP(0,"Player 1",PC[0],false,null),mkP(1,"AI Skipper",PC[1],true,"medium")],
-      curIdx:0,phase:"transition",log:[],
-      swimDeck:mkSwim(),sinkDeck:mkSink(),swDeck:mkDeck(SWDEFS),winner:null
-    };
-    drawBoard();renderAll();showTrans();
+function jLP(key){
+  if(key==="boat_school"){var b=oPos(5);return{x:b.x,y:b.y-3*SW-SW-10};}
+  if(key==="boat"){var b=oPos(12);return{x:b.x-2*SW,y:b.y-SW/2-SW-10};}
+  if(key==="fish"){var b=oPos(19);return{x:b.x,y:b.y+4*SW+SW+10};}
+  if(key==="rescue"){var b=oPos(26);return{x:b.x,y:b.y+SW/2+3*SW+10};}
+  if(key==="winner"){var b=oPos(33);return{x:b.x+2*SW,y:b.y-SW-10};}
+  return null;
+}
+
+function drawJuts(svg){
+  var jcols={boat_school:"#a855f7",boat:"#fb923c",fish:"#34d399",rescue:"#60a5fa",winner:"#fbbf24"};
+  var jlbls={boat_school:"🎓 Boat School",boat:"🛥️ Boat Store",fish:"🐟 Catch a Fish",rescue:"🆘 Rescue!"};
+  // Winner
+  var wjd=JC.winner;
+  for(var i=0;i<wjd.pts.length-1;i++)
+    svg.appendChild(mkEl("line",{x1:wjd.pts[i].x,y1:wjd.pts[i].y,x2:wjd.pts[i+1].x,y2:wjd.pts[i+1].y,stroke:"#c47d0e","stroke-width":SW+1,"stroke-opacity":0.15}));
+  var wlbls=["Dock 1","Lose Turn","Back 1","⭐ WIN"];
+  for(var i=0;i<wjd.pts.length;i++){
+    var pt=wjd.pts[i],g=mkEl("g",{});
+    g.appendChild(mkEl("rect",{x:pt.x-SW/2,y:pt.y-SH/2,width:SW,height:SH,rx:6,fill:i===3?"#f5a623":"#c47d0e",stroke:"#ffffffa0","stroke-width":0.8}));
+    var pp2=wlbls[i].split(" ");
+    g.appendChild(mkTxt(pp2[0],{x:pt.x,y:pt.y-4,"text-anchor":"middle","dominant-baseline":"central","font-size":9,fill:"#fff","font-weight":"bold"}));
+    g.appendChild(mkTxt(pp2.slice(1).join(" "),{x:pt.x,y:pt.y+8,"text-anchor":"middle","dominant-baseline":"central","font-size":9,fill:"#fff"}));
+    svg.appendChild(g);
   }
-
-  function leaveGame(){
-    if(rUnsub){rUnsub();rUnsub=null;}
-    GS=null;isMulti=false;
-    document.getElementById("game").classList.remove("on");
-    document.getElementById("wo").classList.remove("on");
-    document.getElementById("tro").classList.remove("on");
-    document.getElementById("lobby").style.display="flex";
-    document.getElementById("cs").style.display="none";
-    document.getElementById("jbadge").style.display="none";
-    document.getElementById("ji").value="";
-    hideP();
-  }
-
-  // ── Render ─────────────────────────────────────────────────────────────────
-  function renderAll(){
-    if(!GS)return;
-    var s=GS,cur=s.players[s.curIdx];if(!cur)return;
-    document.getElementById("tinfo").textContent=(cur.isAI?"AI: ":"")+cur.name+"'s Turn";
-    document.getElementById("tinfo").style.color=cur.color;
-    renderPList(s);renderCur(s,cur);renderAct(s,cur);updateTok(s);
-    if(s.winner)showWin(s.winner);
-    if(s.log){
-      var arr=Array.isArray(s.log)?s.log:Object.values(s.log);
-      var h="";
-      for(var i=0;i<arr.length;i++)h+='<div style="margin-bottom:2px">'+arr[i]+'</div>';
-      document.getElementById("glog").innerHTML=h;
-    }
-  }
-
-  function renderPList(s){
-    var h="";
-    for(var i=0;i<s.players.length;i++){
-      var pl=s.players[i];if(!pl)continue;
-      var act=i===s.curIdx;
-      h+='<div class="pr'+(act?" act":"")+'" data-pi="'+i+'">'+
-        '<div style="width:9px;height:9px;border-radius:50%;background:'+pl.color+';flex-shrink:0"></div>'+
-        '<div style="flex:1;min-width:0">'+
-        '<div style="font-size:11px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+
-        (pl.isAI?"AI: ":"")+pl.name+(pl.eliminated?" X":pl.done?" WIN":act?" >":"")+
-        '</div><div style="font-size:9px;color:'+(pl.money<0?"#ff9999":"#7ecbe0")+'">'+
-        '$'+pl.money+(pl.money<0?" (!!)":"")+" | "+(pl.completedTasks||[]).length+"/4"+
-        (pl.frozen>0?" frozen:"+pl.frozen:"")+
-        '</div></div></div>';
-    }
-    document.getElementById("plist").innerHTML=h;
-    var rows=document.getElementById("plist").querySelectorAll("[data-pi]");
-    for(var i=0;i<rows.length;i++){
-      rows[i].addEventListener("click",(function(idx){return function(){inspP(idx);};})(parseInt(rows[i].getAttribute("data-pi"))));
-    }
-  }
-
-  function renderCur(s,cur){
-    document.getElementById("ctn").textContent=(cur.isAI?"AI: ":"")+cur.name;
-    document.getElementById("ctn").style.color=cur.color;
-    var pd=posD(cur);
-    document.getElementById("ctp").textContent=pd||"";
-    document.getElementById("ctp").style.display=pd?"":"none";
-    var id=cur.money<0;
-    document.getElementById("ctm").textContent="$"+cur.money+(id?" (!!)":"");
-    document.getElementById("ctm").style.color=id?"#ff6b6b":"#7dff9a";
-    var tks=["boat_school","boat","fish","rescue"],h="";
-    for(var i=0;i<tks.length;i++){var r=tLine(cur,tks[i]);h+='<div style="color:'+(r.g?"#4eff91":"#8aaccc")+'">'+r.t+'</div>';}
-    document.getElementById("ctt").innerHTML=h;
-    var br=cur.doubleRollsLeft||0;
-    document.getElementById("ctb").textContent=br>0?br+" bonus roll(s) left!":"";
-    renderCards(s,cur);
-  }
-
-  function renderCards(s,cur){
-    var el=document.getElementById("cds");
-    if(!cur.heldCards||!cur.heldCards.length){el.innerHTML="";return;}
-    var mine=!isMulti||s.curIdx===myId;
-    var h='<div class="sl">CARDS'+(cur.usedShipwreckThisTurn?" (1 played)":"")+"</div>";
-    for(var i=0;i<cur.heldCards.length;i++){
-      var c=cur.heldCards[i];
-      if(c.type==="fasttrack"){
-        h+='<div style="display:flex;align-items:center;gap:5px;padding:3px 7px;border-radius:5px;background:#0f3d1a;border:1.5px solid #2ecc71;color:#2ecc71;font-size:10px;margin-bottom:3px" data-cardactive="1">'+
-          c.icon+" "+c.label+'<span style="margin-left:auto;font-size:8px;background:#2ecc71;color:#0a1f0e;border-radius:3px;padding:1px 4px;font-weight:700">ACTIVE</span></div>';
+  var tkeys=Object.keys(TASKS);
+  for(var ki=0;ki<tkeys.length;ki++){
+    var key=tkeys[ki],t=TASKS[key],jd=JC[key];
+    for(var i=0;i<jd.pts.length-1;i++)
+      svg.appendChild(mkEl("line",{x1:jd.pts[i].x,y1:jd.pts[i].y,x2:jd.pts[i+1].x,y2:jd.pts[i+1].y,stroke:t.color,"stroke-width":SW+1,"stroke-opacity":0.15}));
+    for(var i=0;i<jd.pts.length;i++){
+      var pt2=jd.pts[i],g2=mkEl("g",{});
+      if(key==="boat"){
+        var boat=BOATS[i];
+        g2.appendChild(mkEl("rect",{x:pt2.x-SW/2,y:pt2.y-SH/2,width:SW,height:SH,rx:6,fill:t.color,stroke:"#ffffffa0","stroke-width":0.8}));
+        g2.appendChild(mkTxt(boat.icon,{x:pt2.x,y:pt2.y-5,"text-anchor":"middle","dominant-baseline":"central","font-size":16}));
+        g2.appendChild(mkTxt(boat.name,{x:pt2.x,y:pt2.y+7,"text-anchor":"middle","dominant-baseline":"central","font-size":7,fill:"#fff","font-weight":"bold"}));
+        g2.appendChild(mkTxt("$"+boat.price,{x:pt2.x,y:pt2.y+17,"text-anchor":"middle","dominant-baseline":"central","font-size":8,fill:"#FFD700"}));
       } else {
-        var bn=(cur.cardsBoughtThisTurn||[]).indexOf(c.uid)>=0;
-        var dis=cur.usedShipwreckThisTurn||bn||!mine;
-        h+='<button class="cb2" data-cardidx="'+i+'"'+(dis?' disabled':'')+'>'+
-          c.icon+" "+c.label+(bn?" (next turn)":"")+'</button>';
-      }
-    }
-    el.innerHTML=h;
-    var btns=el.querySelectorAll("[data-cardidx]");
-    for(var i=0;i<btns.length;i++){
-      btns[i].addEventListener("click",(function(idx){return function(){openCard(idx);};})(parseInt(btns[i].getAttribute("data-cardidx"))));
-    }
-  }
-
-  function renderAct(s,cur){
-    var el=document.getElementById("aa");
-    var mine=!isMulti||s.curIdx===myId;
-    document.getElementById("phl").textContent=s.phase==="preturn"?"PRE-TURN":"ROLL PHASE";
-    if(cur.isAI||!mine){
-      el.innerHTML='<div style="text-align:center;padding:14px;color:#7ecbe0;font-size:12px">'+(cur.isAI?"AI is playing...":"Waiting for "+cur.name+"...")+'</div>';
-      return;
-    }
-    if(s.phase==="preturn"){
-      el.innerHTML="";
-      if(cur.money<0){
-        var db2=document.createElement("button");
-        db2.className="ab";db2.style.cssText="background:#1a0a0a;border:2px solid #c0392b;color:#ff9999;font-size:11px";
-        db2.innerHTML="Eliminate Debt<div style='font-size:9px;font-weight:400;margin-top:1px'>Sacrifice challenge to get $0</div>";
-        db2.addEventListener("click",debtR);
-        el.appendChild(db2);
-      }
-      var rb=document.createElement("button");
-      rb.className="ab";
-      rb.style.background=(cur.doubleRollsLeft||0)>0?"#d68910":"#1a7a3a";
-      rb.textContent="Roll the Dice!"+(((cur.doubleRollsLeft||0)>0)?" (+"+(cur.doubleRollsLeft||0)+")":"");
-      rb.addEventListener("click",doRoll);
-      el.appendChild(rb);
-      var bb=document.createElement("button");
-      bb.className="ab";bb.style.background=cur.boughtCardThisTurn?"#333":"#6a1b9a";
-      bb.textContent="Buy Shipwreck Card ($10)"+(cur.boughtCardThisTurn?" done":"");
-      if(cur.boughtCardThisTurn)bb.disabled=true;
-      bb.addEventListener("click",buyCard);
-      el.appendChild(bb);
-    } else {
-      el.innerHTML='<div style="text-align:center;padding:8px;color:#7ecbe0;font-size:12px">Rolling...</div>';
-    }
-  }
-
-  // ── Board SVG ──────────────────────────────────────────────────────────────
-  var NS="http://www.w3.org/2000/svg";
-  function mkEl(tag,attrs){var e=document.createElementNS(NS,tag);for(var k in attrs)e.setAttribute(k,attrs[k]);return e;}
-  function mkTxt(str,attrs){var e=mkEl("text",attrs);e.textContent=str;return e;}
-
-  function drawBoard(){
-    var svg=document.getElementById("bsvg");
-    svg.setAttribute("width",BW);svg.setAttribute("height",BH);svg.innerHTML="";
-    var defs=mkEl("defs",{});
-    var st=document.createElementNS(NS,"style");
-    st.textContent="@keyframes w1{0%{transform:translateX(0)}100%{transform:translateX(-140px)}}@keyframes w2{0%{transform:translateX(0)}100%{transform:translateX(140px)}}@keyframes w3{0%{transform:translateX(-70px)}100%{transform:translateX(70px)}}";
-    defs.appendChild(st);
-    var cl=mkEl("clipPath",{id:"bc"});cl.appendChild(mkEl("rect",{width:BW,height:BH}));defs.appendChild(cl);
-    svg.appendChild(defs);
-    svg.appendChild(mkEl("rect",{width:BW,height:BH,fill:"#4a9ebb"}));
-    var wst=["w1","w2","w3"];
-    for(var row=0;row<18;row++){
-      var g=mkEl("g",{style:"animation:"+wst[row%3]+" "+(2.5+row*0.3)+"s linear infinite","clip-path":"url(#bc)"});
-      var wxs=[-280,-140,0,140,280,420,560,700,840,980,1120,1260,1400];
-      for(var wi=0;wi<wxs.length;wi++){
-        g.appendChild(mkEl("path",{d:"M"+wxs[wi]+" "+(55+row*52)+" Q"+(wxs[wi]+17)+" "+(45+row*52)+" "+(wxs[wi]+35)+" "+(55+row*52)+" Q"+(wxs[wi]+52)+" "+(65+row*52)+" "+(wxs[wi]+70)+" "+(55+row*52),stroke:"#7ecbe0","stroke-width":2,fill:"none",opacity:0.5}));
-      }
-      svg.appendChild(g);
-    }
-    svg.appendChild(mkEl("rect",{x:OL-SW,y:OT-SW,width:OR-OL+SW*2,height:OB-OT+SW*2,rx:22,fill:"#d6b87a",opacity:0.9}));
-    svg.appendChild(mkEl("rect",{x:OL-SW/2,y:OT-SW/2,width:OR-OL+SW,height:OB-OT+SW,rx:16,fill:"#4a9ebb",opacity:0.9}));
-    svg.appendChild(mkTxt("Boat Ride 2.0",{x:(OL+OR)/2,y:(OT+OB)/2-14,"text-anchor":"middle","font-size":26,"font-weight":900,fill:"#fff",stroke:"#1a3a55","stroke-width":4,"paint-order":"stroke",opacity:0.45}));
-    svg.appendChild(mkTxt("An Online Adventure",{x:(OL+OR)/2,y:(OT+OB)/2+20,"text-anchor":"middle","font-size":20,"font-weight":700,fill:"#fff",stroke:"#1a3a55","stroke-width":4,"paint-order":"stroke",opacity:0.45}));
-    drawJuts(svg);drawOval(svg);
-    svg.appendChild(mkEl("g",{id:"tlayer"}));
-    applyScale();
-  }
-
-  function jLP(key){
-    if(key==="boat_school"){var b=oPos(5);return{x:b.x,y:b.y-3*SW-SW-10};}
-    if(key==="boat"){var b=oPos(12);return{x:b.x-2*SW,y:b.y-SW/2-SW-10};}
-    if(key==="fish"){var b=oPos(19);return{x:b.x,y:b.y+4*SW+SW+10};}
-    if(key==="rescue"){var b=oPos(26);return{x:b.x,y:b.y+SW/2+3*SW+10};}
-    if(key==="winner"){var b=oPos(33);return{x:b.x+2*SW,y:b.y-SW-10};}
-    return null;
-  }
-
-  function drawJuts(svg){
-    var jcols={boat_school:"#a855f7",boat:"#fb923c",fish:"#34d399",rescue:"#60a5fa",winner:"#fbbf24"};
-    var jlbls={boat_school:"Boat School",boat:"Boat Store",fish:"Catch a Fish",rescue:"Lets Rescue!"};
-    var wjd=JC.winner;
-    for(var i=0;i<wjd.pts.length-1;i++)
-      svg.appendChild(mkEl("line",{x1:wjd.pts[i].x,y1:wjd.pts[i].y,x2:wjd.pts[i+1].x,y2:wjd.pts[i+1].y,stroke:"#c47d0e","stroke-width":SW+1,"stroke-opacity":0.15}));
-    var wlbls=["Dock 1","Lose Turn","Back 1","WIN"];
-    for(var i=0;i<wjd.pts.length;i++){
-      var pt=wjd.pts[i],g=mkEl("g",{});
-      g.appendChild(mkEl("rect",{x:pt.x-SW/2,y:pt.y-SH/2,width:SW,height:SH,rx:6,fill:i===3?"#f5a623":"#c47d0e",stroke:"#ffffffa0","stroke-width":0.8}));
-      var pp=wlbls[i].split(" ");
-      g.appendChild(mkTxt(pp[0],{x:pt.x,y:pt.y-4,"text-anchor":"middle","dominant-baseline":"central","font-size":9,fill:"#fff","font-weight":"bold"}));
-      g.appendChild(mkTxt(pp.slice(1).join(" "),{x:pt.x,y:pt.y+8,"text-anchor":"middle","dominant-baseline":"central","font-size":9,fill:"#fff"}));
-      svg.appendChild(g);
-    }
-    var tkeys=Object.keys(TASKS);
-    for(var ki=0;ki<tkeys.length;ki++){
-      var key=tkeys[ki],t=TASKS[key],jd=JC[key];
-      for(var i=0;i<jd.pts.length-1;i++)
-        svg.appendChild(mkEl("line",{x1:jd.pts[i].x,y1:jd.pts[i].y,x2:jd.pts[i+1].x,y2:jd.pts[i+1].y,stroke:t.color,"stroke-width":SW+1,"stroke-opacity":0.15}));
-      for(var i=0;i<jd.pts.length;i++){
-        var pt2=jd.pts[i],g2=mkEl("g",{});
-        if(key==="boat"){
-          var boat=BOATS[i];
-          g2.appendChild(mkEl("rect",{x:pt2.x-SW/2,y:pt2.y-SH/2,width:SW,height:SH,rx:6,fill:t.color,stroke:"#ffffffa0","stroke-width":0.8}));
-          g2.appendChild(mkTxt(boat.name,{x:pt2.x,y:pt2.y-4,"text-anchor":"middle","dominant-baseline":"central","font-size":8,fill:"#fff","font-weight":"bold"}));
-          g2.appendChild(mkTxt("$"+boat.price,{x:pt2.x,y:pt2.y+9,"text-anchor":"middle","dominant-baseline":"central","font-size":9,fill:"#FFD700"}));
-        } else {
-          var sp=t.spaces[i],rw=sp?sp.reward:null;
-          g2.appendChild(mkEl("rect",{x:pt2.x-SW/2,y:pt2.y-SH/2,width:SW,height:SH,rx:6,fill:t.color,stroke:"#ffffffa0","stroke-width":0.8}));
-          if(rw!==null&&rw!==undefined&&rw!==0){
-            if(rw<0){
-              g2.appendChild(mkTxt(String(rw),{x:pt2.x,y:pt2.y,"text-anchor":"middle","dominant-baseline":"central","font-size":14,"font-weight":"bold",fill:"#ff4444"}));
-            } else {
-              var ic=key==="boat_school"?"*":key==="fish"?"~":"!";
-              var mpr=rw<=2?rw:rw<=4?2:3,rows2=Math.ceil(rw/mpr);
-              var fs=Math.max(6,Math.min(12,Math.floor((SW-6)/mpr)-1));
-              var lh=fs+2,th=rows2*lh;
-              for(var r2=0;r2<rows2;r2++){
-                var rc=Math.min(mpr,rw-r2*mpr),iw=fs+2,rx3=pt2.x-rc*iw/2+iw/2,ry=pt2.y-th/2+r2*lh+lh/2;
-                for(var ci=0;ci<rc;ci++)g2.appendChild(mkTxt(ic,{x:rx3+ci*iw,y:ry,"text-anchor":"middle","dominant-baseline":"central","font-size":fs,fill:"#fff"}));
-              }
+        var sp=t.spaces[i],rw=sp?sp.reward:null;
+        g2.appendChild(mkEl("rect",{x:pt2.x-SW/2,y:pt2.y-SH/2,width:SW,height:SH,rx:6,fill:t.color,stroke:"#ffffffa0","stroke-width":0.8}));
+        if(rw!==null&&rw!==undefined&&rw!==0){
+          if(rw<0){
+            g2.appendChild(mkTxt(String(rw),{x:pt2.x,y:pt2.y,"text-anchor":"middle","dominant-baseline":"central","font-size":13,"font-weight":"bold",fill:"#ff4444"}));
+          } else {
+            var ic=key==="boat_school"?"⭐":key==="fish"?"🐟":"🆘";
+            var mpr=rw<=2?rw:rw<=4?2:3,rows2=Math.ceil(rw/mpr);
+            var fs=Math.max(6,Math.min(12,Math.floor((SW-6)/mpr)-1));
+            var lh=fs+2,th=rows2*lh;
+            for(var r2=0;r2<rows2;r2++){
+              var rc=Math.min(mpr,rw-r2*mpr),iw=fs+2,rx3=pt2.x-rc*iw/2+iw/2,ry=pt2.y-th/2+r2*lh+lh/2;
+              for(var ci=0;ci<rc;ci++)g2.appendChild(mkTxt(ic,{x:rx3+ci*iw,y:ry,"text-anchor":"middle","dominant-baseline":"central","font-size":fs}));
             }
           }
         }
-        svg.appendChild(g2);
       }
-      if(jd.xp){
-        var xg=mkEl("g",{});
-        xg.appendChild(mkEl("rect",{x:jd.xp.x-SW/2,y:jd.xp.y-SH/2,width:SW,height:SH,rx:8,fill:sColor("entry_"+key),stroke:"#ffffffa0","stroke-width":0.8}));
-        xg.appendChild(mkTxt(key.charAt(0).toUpperCase(),{x:jd.xp.x,y:jd.xp.y,"text-anchor":"middle","dominant-baseline":"central","font-size":18,fill:"#fff","font-weight":"bold"}));
-        svg.appendChild(xg);
+      svg.appendChild(g2);
+    }
+    if(jd.xp){
+      var xg=mkEl("g",{});
+      xg.appendChild(mkEl("rect",{x:jd.xp.x-SW/2,y:jd.xp.y-SH/2,width:SW,height:SH,rx:8,fill:sColor("entry_"+key),stroke:"#ffffffa0","stroke-width":0.8}));
+      var xi=key==="boat_school"?"🎓":key==="boat"?"🛥️":key==="fish"?"🐟":"🆘";
+      xg.appendChild(mkTxt(xi,{x:jd.xp.x,y:jd.xp.y,"text-anchor":"middle","dominant-baseline":"central","font-size":16}));
+      svg.appendChild(xg);
+    }
+    var lp=jLP(key);
+    if(lp){
+      var lg=mkEl("g",{});
+      lg.appendChild(mkEl("rect",{x:lp.x-62,y:lp.y-14,width:124,height:26,rx:7,fill:"rgba(7,23,40,0.92)",stroke:jcols[key]||"#fff","stroke-width":1.5}));
+      lg.appendChild(mkTxt(jlbls[key]||key,{x:lp.x,y:lp.y,"text-anchor":"middle","dominant-baseline":"central","font-size":11,"font-weight":"bold",fill:jcols[key]||"#fff"}));
+      svg.appendChild(lg);
+    }
+  }
+  var wlp=jLP("winner");
+  if(wlp){
+    var wlg=mkEl("g",{});
+    wlg.appendChild(mkEl("rect",{x:wlp.x-62,y:wlp.y-25,width:124,height:38,rx:7,fill:"rgba(7,23,40,0.92)",stroke:"#fbbf24","stroke-width":1.5}));
+    wlg.appendChild(mkTxt("🏆 Supreme Boat",{x:wlp.x,y:wlp.y-9,"text-anchor":"middle","dominant-baseline":"central","font-size":10,"font-weight":"bold",fill:"#fbbf24"}));
+    wlg.appendChild(mkTxt("Captain HQ",{x:wlp.x,y:wlp.y+9,"text-anchor":"middle","dominant-baseline":"central","font-size":10,"font-weight":"bold",fill:"#fbbf24"}));
+    svg.appendChild(wlg);
+  }
+}
+
+function drawOval(svg){
+  var exits={};
+  Object.keys(TASKS).forEach(function(k){exits[TASKS[k].exitIdx]=true;});
+  for(var i=0;i<36;i++){
+    var pos=oPos(i),x=pos.x,y=pos.y;
+    var k=sKind(i),isEnt=k.indexOf("entry_")===0,isEx=exits[i];
+    Object.keys(TASKS).forEach(function(tk){
+      var t=TASKS[tk];
+      if(i===t.entryIdx){var p=jPerp(t.entryIdx);x-=p.x*(t.colGap||SW)/2;y-=p.y*(t.colGap||SW)/2;}
+    });
+    var fill=isEx?"#c8a96e":sColor(k);
+    var rx=(isEnt||k==="start")?8:5;
+    var g=mkEl("g",{id:"sp"+i});
+    g.appendChild(mkEl("rect",{x:x-SW/2,y:y-SH/2,width:SW,height:SH,rx:rx,fill:fill,stroke:k==="start"?"#7dff9a":"#ffffffa0","stroke-width":k==="start"?2:0.8}));
+    var lbl="";
+    if(k==="start")lbl="START";
+    else if(k==="swim")lbl="🏊";
+    else if(k==="sink")lbl="🌊";
+    else if(k==="entry_winner")lbl="🏆";
+    if(lbl)g.appendChild(mkTxt(lbl,{x:x,y:y,"text-anchor":"middle","dominant-baseline":"central","font-size":k==="start"?9:14,fill:k==="start"?"#7dff9a":"#fff","font-weight":k==="start"?"bold":"normal"}));
+    svg.appendChild(g);
+  }
+}
+
+// ── Tokens ────────────────────────────────────────────────────────────────────
+function pXY(pl){
+  if(pl.winPos>=0){var pts=JC.winner?JC.winner.pts:[];if(pts[pl.winPos])return pts[pl.winPos];}
+  if(pl.inTask){var jd=JC[pl.inTask];if(jd){if(pl.taskPos>=0&&jd.pts[pl.taskPos])return jd.pts[pl.taskPos];return jd.ep||oPos(TASKS[pl.inTask].entryIdx);}}
+  return oPos(pl.pos);
+}
+
+function updateTok(s){
+  var layer=document.getElementById("tlayer"); if(!layer)return;
+  layer.innerHTML="";
+  var groups={};
+  for(var i=0;i<s.players.length;i++){
+    var pl=s.players[i]; if(!pl||pl.eliminated)continue;
+    var xy=pXY(pl),k=Math.round(xy.x)+","+Math.round(xy.y);
+    if(!groups[k])groups[k]=[];
+    groups[k].push({pl:pl,pi:i});
+  }
+  Object.keys(groups).forEach(function(gk){
+    var grp=groups[gk],pts2=gk.split(",");
+    var bx=parseFloat(pts2[0]),by=parseFloat(pts2[1]);
+    for(var oi=0;oi<grp.length;oi++){
+      var pl=grp[oi].pl,pi=grp[oi].pi,act=pi===s.curIdx;
+      var ox=grp.length>1?(oi-(grp.length-1)/2)*28:0;
+      var oy=grp.length>1?-oi*6:0;
+      var g=mkEl("g",{transform:"translate("+(bx+ox)+","+(by+oy)+")"});
+      g.innerHTML=tokenSVG(pl.tokenKey||"captain",pl.color,act);
+      var ws=pl.name.split(" ");
+      for(var wi=0;wi<ws.length;wi++){
+        g.appendChild(mkTxt(ws[wi],{x:0,y:30+wi*10,"text-anchor":"middle","dominant-baseline":"central","font-size":8,fill:"#fff","font-weight":"bold",stroke:"#000","stroke-width":0.6,"paint-order":"stroke"}));
       }
-      var lp=jLP(key);
-      if(lp){
-        var lg=mkEl("g",{});
-        lg.appendChild(mkEl("rect",{x:lp.x-58,y:lp.y-13,width:116,height:24,rx:7,fill:"rgba(7,23,40,0.92)",stroke:jcols[key]||"#fff","stroke-width":1.5}));
-        lg.appendChild(mkTxt(jlbls[key]||key,{x:lp.x,y:lp.y,"text-anchor":"middle","dominant-baseline":"central","font-size":11,"font-weight":"bold",fill:jcols[key]||"#fff"}));
-        svg.appendChild(lg);
-      }
+      layer.appendChild(g);
     }
-    var wlp=jLP("winner");
-    if(wlp){
-      var wlg=mkEl("g",{});
-      wlg.appendChild(mkEl("rect",{x:wlp.x-62,y:wlp.y-25,width:124,height:38,rx:7,fill:"rgba(7,23,40,0.92)",stroke:"#fbbf24","stroke-width":1.5}));
-      wlg.appendChild(mkTxt("Supreme Boat",{x:wlp.x,y:wlp.y-9,"text-anchor":"middle","dominant-baseline":"central","font-size":11,"font-weight":"bold",fill:"#fbbf24"}));
-      wlg.appendChild(mkTxt("Captain HQ",{x:wlp.x,y:wlp.y+9,"text-anchor":"middle","dominant-baseline":"central","font-size":11,"font-weight":"bold",fill:"#fbbf24"}));
-      svg.appendChild(wlg);
-    }
-  }
+  });
+}
 
-  function drawOval(svg){
-    var exits={};
-    var tkeys=Object.keys(TASKS);
-    for(var ki=0;ki<tkeys.length;ki++)exits[TASKS[tkeys[ki]].exitIdx]=true;
-    for(var i=0;i<36;i++){
-      var pos=oPos(i),x=pos.x,y=pos.y;
-      var k=sKind(i),isEnt=k.indexOf("entry_")===0,isEx=exits[i];
-      for(var ki=0;ki<tkeys.length;ki++){
-        var t=TASKS[tkeys[ki]];
-        if(i===t.entryIdx){var p=jPerp(t.entryIdx);x-=p.x*(t.colGap||SW)/2;y-=p.y*(t.colGap||SW)/2;break;}
-      }
-      var fill=isEx?"#c8a96e":sColor(k);
-      var rx=(isEnt||k==="start")?8:5;
-      var g=mkEl("g",{id:"sp"+i});
-      g.appendChild(mkEl("rect",{x:x-SW/2,y:y-SH/2,width:SW,height:SH,rx:rx,fill:fill,stroke:k==="start"?"#7dff9a":"#ffffffa0","stroke-width":k==="start"?2:0.8}));
-      if(k==="start"){
-        g.appendChild(mkEl("rect",{x:x-SW/2+3,y:y-SH/2+3,width:SW-6,height:SH-6,rx:5,fill:"none",stroke:"#ffffff40","stroke-width":1}));
-        g.appendChild(mkTxt("START",{x:x,y:y,"text-anchor":"middle","dominant-baseline":"central","font-size":9,fill:"#7dff9a","font-weight":"bold"}));
-      } else if(k==="swim"){
-        g.appendChild(mkTxt("SWIM",{x:x,y:y,"text-anchor":"middle","dominant-baseline":"central","font-size":8,fill:"#fff"}));
-      } else if(k==="sink"){
-        g.appendChild(mkTxt("SINK",{x:x,y:y,"text-anchor":"middle","dominant-baseline":"central","font-size":8,fill:"#fff"}));
-      } else if(k==="entry_winner"){
-        g.appendChild(mkTxt("WIN",{x:x,y:y,"text-anchor":"middle","dominant-baseline":"central","font-size":11,fill:"#fff","font-weight":"bold"}));
-      }
-      svg.appendChild(g);
-    }
-  }
+// ── Game logic ────────────────────────────────────────────────────────────────
+function addL(s,m){
+  if(!s.log)s.log=[];
+  if(Array.isArray(s.log))s.log=[m].concat(s.log).slice(0,60);
+  else s.log=[m];
+}
 
-  // ── Tokens ─────────────────────────────────────────────────────────────────
-  function pXY(pl){
-    if(pl.winPos>=0){var pts=JC.winner?JC.winner.pts:[];if(pts[pl.winPos])return pts[pl.winPos];}
-    if(pl.inTask){var jd=JC[pl.inTask];if(jd){if(pl.taskPos>=0&&jd.pts[pl.taskPos])return jd.pts[pl.taskPos];return jd.ep||oPos(TASKS[pl.inTask].entryIdx);}}
-    return oPos(pl.pos);
-  }
+function posD(pl){
+  if(pl.winPos>=0){var l=["Dock 1","Lose Turn","Back 1","⭐ WIN"];return"🏆 Winner's Dock: "+(l[pl.winPos]||"");}
+  if(pl.inTask==="boat")return"🛥️ Boat Store: sp "+(pl.taskPos+1);
+  if(pl.inTask)return(TASKS[pl.inTask]?TASKS[pl.inTask].label:pl.inTask)+": sp "+(pl.taskPos+1);
+  return null;
+}
 
-  function updateTok(s){
-    var layer=document.getElementById("tlayer");if(!layer)return;
-    layer.innerHTML="";
-    var groups={};
-    for(var i=0;i<s.players.length;i++){
-      var pl=s.players[i];if(!pl||pl.eliminated)continue;
-      var xy=pXY(pl),k=Math.round(xy.x)+","+Math.round(xy.y);
-      if(!groups[k])groups[k]=[];
-      groups[k].push({pl:pl,pi:i});
-    }
-    var gkeys=Object.keys(groups);
-    for(var gi=0;gi<gkeys.length;gi++){
-      var grp=groups[gkeys[gi]],pts2=gkeys[gi].split(",");
-      var bx=parseFloat(pts2[0]),by=parseFloat(pts2[1]);
-      for(var oi=0;oi<grp.length;oi++){
-        var pl=grp[oi].pl,pi=grp[oi].pi,act=pi===s.curIdx;
-        var ox=grp.length>1?(oi-(grp.length-1)/2)*28:0;
-        var oy=grp.length>1?-oi*6:0;
-        var g=mkEl("g",{transform:"translate("+(bx+ox)+","+(by+oy)+")"});
-        if(act){
-          g.appendChild(mkEl("circle",{cx:0,cy:-14,r:18,fill:"none",stroke:"#FFD700","stroke-width":3,opacity:0.8}));
-          g.appendChild(mkEl("circle",{cx:0,cy:-14,r:22,fill:"none",stroke:"#FFD700","stroke-width":1.5,opacity:0.4}));
-        }
-        g.appendChild(mkEl("rect",{x:-8,y:-4,width:16,height:20,rx:4,fill:pl.color}));
-        g.appendChild(mkEl("circle",{cx:0,cy:-12,r:8,fill:"#FDDBB4"}));
-        g.appendChild(mkEl("rect",{x:-9,y:-22,width:18,height:8,rx:2,fill:"#1a2a4a"}));
-        g.appendChild(mkEl("rect",{x:-9,y:-16,width:18,height:2,fill:"#FFD700"}));
-        g.appendChild(mkEl("rect",{x:-7,y:16,width:6,height:10,rx:2,fill:"#1a2a4a"}));
-        g.appendChild(mkEl("rect",{x:1,y:16,width:6,height:10,rx:2,fill:"#1a2a4a"}));
-        var ws=pl.name.split(" ");
-        for(var wi=0;wi<ws.length;wi++){
-          g.appendChild(mkTxt(ws[wi],{x:0,y:30+wi*10,"text-anchor":"middle","dominant-baseline":"central","font-size":8,fill:"#fff","font-weight":"bold",stroke:"#000","stroke-width":0.6,"paint-order":"stroke"}));
-        }
-        layer.appendChild(g);
-      }
+function tLine(pl,tk){
+  var done=(pl.completedTasks||[]).indexOf(tk)>=0;
+  if(tk==="boat"){
+    if(done)return{t:"🛥️ "+(pl.boat?pl.boat.icon+" "+pl.boat.name:"Boat owned"),g:true};
+    return{t:"🛥️ No boat yet",g:false};
+  }
+  var t=TASKS[tk]; if(!t)return{t:"",g:false};
+  if(done)return{t:t.done||t.label+": done",g:true};
+  return{t:t.prog(pl),g:t.req(pl)};
+}
+
+function doRoll(){
+  if(!GS)return;
+  var s=dc(GS),pl=s.players[s.curIdx];
+  if((pl.doubleRollsLeft||0)>0)pl.doubleRollsLeft--;
+  s.phase="preturn";
+  var r=Math.ceil(Math.random()*6);
+  addL(s,"🎲 "+pl.name+" rolls "+r);
+  s.players[s.curIdx]=pl;
+  push(s);
+  processRoll(r,s);
+}
+
+function processRoll(r,s){
+  var pl=s.players[s.curIdx];
+  if(pl.frozen>0){
+    var nf=pl.frozen-1;
+    s.players[s.curIdx]=mg(pl,{frozen:nf});
+    addL(s,"❄️ "+pl.name+" is frozen! "+(nf>0?nf+" turns left.":"Free next turn!"));
+    showP("❄️ Frozen!","info",pl.name+" is frozen!\n"+(nf>0?nf+" turn(s) remaining.":"Free next turn!"),[{l:"Oh no...",c:"pn",fn:function(){advTurn(s);}}]);
+    push(s); return;
+  }
+  if(pl.skip>0){s.players[s.curIdx]=mg(pl,{skip:pl.skip-1});addL(s,"⏭ "+pl.name+" skips.");advTurn(s);return;}
+  if(pl.winPos>=0){doWin(pl,s,r);return;}
+  if(pl.inTask==="boat"){doBoat(pl,s,r);return;}
+  if(pl.inTask){doTask(pl,s,r);return;}
+  doMove(pl,s,r);
+}
+
+function doMove(pl,s,r){
+  var path=[];for(var i=1;i<=r;i++)path.push((pl.pos+i)%36);
+  var fc=pl.completedTasks||[];
+  var jes=[
+    {idx:TASKS.boat_school.entryIdx,key:"boat_school",need:fc.indexOf("boat_school")<0},
+    {idx:TASKS.boat.entryIdx,key:"boat",need:fc.indexOf("boat")<0},
+    {idx:TASKS.fish.entryIdx,key:"fish",need:fc.indexOf("fish")<0},
+    {idx:TASKS.rescue.entryIdx,key:"rescue",need:fc.indexOf("rescue")<0},
+    {idx:WIN_IDX,key:"winner",need:fc.length>=4}
+  ];
+  var ss=r,jh=null;
+  for(var i=0;i<path.length&&!jh;i++){
+    for(var j=0;j<jes.length;j++){
+      if(jes[j].need&&jes[j].idx===path[i]){ss=i+1;jh=jes[j];break;}
     }
   }
+  var sp=path[ss-1],extra=r-ss;
+  var u=mg(pl,{pos:sp});
+  var passed=false;
+  for(var i=0;i<ss;i++)if(path[i]===0&&pl.pos!==0){passed=true;break;}
+  if(passed){u=mg(u,{money:u.money+5});addL(s,"⭐ Passed START! +$5");}
+  s.players[s.curIdx]=u;
+  if(jh){if(extra>0)enterJutX(u,s,jh.key,extra);else enterJut(u,s,jh.key);}
+  else landOn(u,s);
+}
 
-  // ── Game logic ──────────────────────────────────────────────────────────────
-  function addL(s,m){
-    if(!s.log)s.log=[];
-    if(Array.isArray(s.log))s.log=[m].concat(s.log).slice(0,60);
-    else s.log=[m];
+function landOn(pl,s){
+  var k=sKind(pl.pos);
+  if(k==="swim"){
+    var deck=(s.swimDeck||[]).slice();if(!deck.length)deck=mkSwim();
+    var card=deck[0];deck=deck.slice(1);s.swimDeck=deck;
+    var u=mg(pl,{});
+    if(card.eff.money)u=mg(u,{money:u.money+card.eff.money});
+    if(card.eff.skip)u=mg(u,{skip:(u.skip||0)+card.eff.skip});
+    var mv=card.eff.move||0;
+    s.players[s.curIdx]=u;addL(s,"🏊 "+u.name+": "+card.text);
+    var sc2=dc(s);
+    showP("🏊 Swim Card!","swim",card.text,[{l:"Woohoo! 🎉",c:"pp",fn:function(){
+      if(mv!==0){var fp=((u.pos+mv+360*10)%36);var um=mg(u,{pos:fp});sc2.players[sc2.curIdx]=um;push(sc2);landOn(um,sc2);}
+      else advTurn(sc2);
+    }}]);
+    push(s);return;
   }
-
-  function posD(pl){
-    if(pl.winPos>=0){var l=["Dock 1","Lose Turn","Back 1","WIN"];return"Winners Dock: "+(l[pl.winPos]||"");}
-    if(pl.inTask==="boat")return"Boat Store: sp "+(pl.taskPos+1);
-    if(pl.inTask)return(TASKS[pl.inTask]?TASKS[pl.inTask].label:pl.inTask)+": sp "+(pl.taskPos+1);
-    return null;
+  if(k==="sink"){
+    var deck2=(s.sinkDeck||[]).slice();if(!deck2.length)deck2=mkSink();
+    var card2=deck2[0];deck2=deck2.slice(1);s.sinkDeck=deck2;
+    var u2=mg(pl,{});
+    if(card2.eff.money)u2=mg(u2,{money:u2.money+card2.eff.money});
+    if(card2.eff.skip)u2=mg(u2,{skip:(u2.skip||0)+card2.eff.skip});
+    var mv2=card2.eff.move||0;
+    s.players[s.curIdx]=u2;addL(s,"🌊 "+u2.name+": "+card2.text);
+    var sc3=dc(s);
+    showP("🌊 Sink Card!","sink",card2.text,[{l:"Yikes...",c:"pn",fn:function(){
+      if(mv2!==0){var fp2=((u2.pos+mv2+360*10)%36);var um2=mg(u2,{pos:fp2});sc3.players[sc3.curIdx]=um2;push(sc3);landOn(um2,sc3);}
+      else advTurn(sc3);
+    }}]);
+    push(s);return;
   }
+  advTurn(s);
+}
 
-  function tLine(pl,tk){
-    var done=(pl.completedTasks||[]).indexOf(tk)>=0;
-    if(tk==="boat"){if(done)return{t:"Boat: "+(pl.boat?pl.boat.name:"?"),g:true};return{t:"No boat yet",g:false};}
-    var t=TASKS[tk];if(!t)return{t:"",g:false};
-    if(done)return{t:t.label+": done",g:true};
-    return{t:t.prog(pl),g:t.req(pl)};
+function enterJut(pl,s,key){
+  if(key==="winner"){
+    if(pl.money<0){showP("💸 Wallet Too Low!","debt","Need $0+ to enter!\nBalance: $"+pl.money,[{l:"Dang!",c:"pn",fn:function(){advTurn(s);}}]);return;}
+    s.players[s.curIdx]=mg(pl,{winPos:-1});
+    showP("🏆 Winner's Dock!","info","All 4 challenges done!\nRoll exact number to reach ⭐ WIN!",[{l:"Let's go!",c:"pp",fn:function(){advTurn(s);}}]);
+    push(s);return;
   }
-
-  function doRoll(){
-    if(!GS)return;
-    var s=dc(GS),pl=s.players[s.curIdx];
-    if((pl.doubleRollsLeft||0)>0)pl.doubleRollsLeft--;
-    s.phase="rolling";
-    var r=Math.ceil(Math.random()*6);
-    addL(s,pl.name+" rolls "+r);
-    s.players[s.curIdx]=pl;
-    push(s);
-    processRoll(r,s);
-  }
-
-  function processRoll(r,s){
-    var pl=s.players[s.curIdx];
-    if(pl.skip>0){s.players[s.curIdx]=mg(pl,{skip:pl.skip-1});addL(s,pl.name+" skips.");advTurn(s);return;}
-    if(pl.winPos>=0){doWin(pl,s,r);return;}
-    if(pl.inTask==="boat"){doBoat(pl,s,r);return;}
-    if(pl.inTask){doTask(pl,s,r);return;}
-    doMove(pl,s,r);
-  }
-
-  function doMove(pl,s,r){
-    var path=[];for(var i=1;i<=r;i++)path.push((pl.pos+i)%36);
-    var fc=pl.completedTasks||[];
-    var jes=[
-      {idx:TASKS.boat_school.entryIdx,key:"boat_school",need:fc.indexOf("boat_school")<0},
-      {idx:TASKS.boat.entryIdx,key:"boat",need:fc.indexOf("boat")<0},
-      {idx:TASKS.fish.entryIdx,key:"fish",need:fc.indexOf("fish")<0},
-      {idx:TASKS.rescue.entryIdx,key:"rescue",need:fc.indexOf("rescue")<0},
-      {idx:WIN_IDX,key:"winner",need:fc.length>=4}
-    ];
-    var ss=r,jh=null;
-    for(var i=0;i<path.length&&!jh;i++){
-      for(var j=0;j<jes.length;j++){
-        if(jes[j].need&&jes[j].idx===path[i]){ss=i+1;jh=jes[j];break;}
-      }
-    }
-    var sp=path[ss-1],extra=r-ss;
-    var u=mg(pl,{pos:sp});
-    var passed=false;
-    for(var i=0;i<ss;i++)if(path[i]===0&&pl.pos!==0){passed=true;break;}
-    if(passed){u=mg(u,{money:u.money+5});addL(s,"Passed START! +$5");}
-    s.players[s.curIdx]=u;
-    if(jh){if(extra>0)enterJutX(u,s,jh.key,extra);else enterJut(u,s,jh.key);}
-    else landOn(u,s);
-  }
-
-  function landOn(pl,s){
-    var k=sKind(pl.pos);
-    if(k==="swim"){
-      var deck=(s.swimDeck||[]).slice();if(!deck.length)deck=mkSwim();
-      var card=deck[0];deck=deck.slice(1);s.swimDeck=deck;
-      var u=mg(pl,{});
-      if(card.eff.money)u=mg(u,{money:u.money+card.eff.money});
-      if(card.eff.skip)u=mg(u,{skip:(u.skip||0)+card.eff.skip});
-      var mv=card.eff.move||0;
-      s.players[s.curIdx]=u;addL(s,u.name+": "+card.text);
-      var sc2=dc(s);
-      showP("Swim Card!","swim",card.text,[{l:"Woohoo!",c:"pp",fn:function(){
-        if(mv!==0){var fp=((u.pos+mv+360*10)%36);var um=mg(u,{pos:fp});sc2.players[sc2.curIdx]=um;push(sc2);landOn(um,sc2);}
-        else advTurn(sc2);
-      }}]);
-      push(s);return;
-    }
-    if(k==="sink"){
-      var deck2=(s.sinkDeck||[]).slice();if(!deck2.length)deck2=mkSink();
-      var card2=deck2[0];deck2=deck2.slice(1);s.sinkDeck=deck2;
-      var u2=mg(pl,{});
-      if(card2.eff.money)u2=mg(u2,{money:u2.money+card2.eff.money});
-      if(card2.eff.skip)u2=mg(u2,{skip:(u2.skip||0)+card2.eff.skip});
-      var mv2=card2.eff.move||0;
-      s.players[s.curIdx]=u2;addL(s,u2.name+": "+card2.text);
-      var sc3=dc(s);
-      showP("Sink Card!","sink",card2.text,[{l:"Yikes...",c:"pn",fn:function(){
-        if(mv2!==0){var fp2=((u2.pos+mv2+360*10)%36);var um2=mg(u2,{pos:fp2});sc3.players[sc3.curIdx]=um2;push(sc3);landOn(um2,sc3);}
-        else advTurn(sc3);
-      }}]);
-      push(s);return;
-    }
-    advTurn(s);
-  }
-
-  function enterJut(pl,s,key){
-    if(key==="winner"){
-      if(pl.money<0){showP("Wallet Too Low!","debt","Need $0+ to enter!\nBalance: $"+pl.money,[{l:"Dang!",c:"pp",fn:function(){advTurn(s);}}]);return;}
-      s.players[s.curIdx]=mg(pl,{winPos:-1});
-      showP("Winners Dock!","info","All 4 done!\nRoll exact number to reach WIN!",[{l:"Lets go!",c:"pp",fn:function(){advTurn(s);}}]);
-      push(s);return;
-    }
-    if(key==="boat"&&!pl.graduated){
-      if(pl.isAI){
-        if(Math.random()<0.3&&pl.money>-50){s.players[s.curIdx]=mg(pl,{money:pl.money-100,inTask:"boat",taskPos:-1});addL(s,"AI pays $100 bypass");push(s);advTurn(s);}
-        else{addL(s,"AI skips Boat Store");push(s);advTurn(s);}
-        return;
-      }
-      showP("The Boat Store!","info","Need to graduate first!\nPay $100 to bypass, or skip.\nBalance: $"+pl.money,[
-        {l:"Pay $100 and Shop",c:"pw",fn:function(){var s2=dc(GS);s2.players[s2.curIdx]=mg(s2.players[s2.curIdx],{money:s2.players[s2.curIdx].money-100,inTask:"boat",taskPos:-1});push(s2);advTurn(s2);}},
-        {l:"Skip",c:"pn",fn:function(){advTurn(dc(GS));}}
-      ]);
-      return;
-    }
-    s.players[s.curIdx]=mg(pl,{inTask:key,taskPos:-1});
-    addL(s,pl.name+" enters "+(TASKS[key]?TASKS[key].label:key)+"!");
-    push(s);advTurn(s);
-  }
-
-  function enterJutX(pl,s,key,extra){
-    if(key==="winner"){
-      if(pl.money<0){showP("Wallet Too Low!","debt","Need $0+ to enter!",[{l:"Dang!",c:"pp",fn:function(){advTurn(s);}}]);return;}
-      s.players[s.curIdx]=mg(pl,{winPos:-1});push(s);doWin(s.players[s.curIdx],s,extra);return;
-    }
-    if(key==="boat"&&!pl.graduated){enterJut(pl,s,"boat");return;}
-    s.players[s.curIdx]=mg(pl,{inTask:key,taskPos:-1});
-    addL(s,pl.name+" enters "+(TASKS[key]?TASKS[key].label:key)+"!");
-    push(s);doTask(s.players[s.curIdx],s,extra);
-  }
-
-  function doTask(pl,s,r){
-    var t=TASKS[pl.inTask],np=pl.taskPos+r;
-    if(np>=t.count){
-      var rem=r-(t.count-1-pl.taskPos)-1;
-      var u=mg(pl,{inTask:null,taskPos:-1,pos:t.exitIdx});
-      var comp=t.req(u)&&(u.completedTasks||[]).indexOf(t.key)<0;
-      if(comp){
-        u=mg(u,{completedTasks:(u.completedTasks||[]).concat([t.key])});
-        if(t.key==="boat_school")u=mg(u,{graduated:true});
-        addL(s,"Completed "+t.label+"!");
-      }
-      s.players[s.curIdx]=u;
-      var body=comp?(u.completedTasks.length+"/4 done!"):t.prog(u);
-      var sc4=dc(s),uc=dc(u);
-      showP(comp?"Done!":"Exited "+t.label,comp?"success":"info",body,[{l:comp?"Yes!":"Continue",c:"pp",fn:function(){
-        if(rem>0){var fp3=(t.exitIdx+rem)%36;var um3=mg(uc,{pos:fp3});sc4.players[sc4.curIdx]=um3;push(sc4);landOn(um3,sc4);}
-        else advTurn(sc4);
-      }}]);
-      push(s);return;
-    }
-    var u2=mg(pl,{taskPos:np}),space=t.spaces[np];
-    if(space)u2=space.eff(u2);
-    s.players[s.curIdx]=u2;
-    addL(s,pl.name+" -> "+t.label+" sp"+(np+1)+": "+(space?space.desc:""));
-    var sc5=dc(s);
-    showP(t.label,"info",space?(space.story+"\n\n"+space.desc):t.prog(u2),[{l:"Continue",c:"pp",fn:function(){advTurn(sc5);}}]);
-    push(s);
-  }
-
-  function doBoat(pl,s,r){
-    var np=pl.taskPos+r;
-    if(np>=BOATS.length){s.players[s.curIdx]=mg(pl,{inTask:null,taskPos:-1,pos:TASKS.boat.exitIdx});push(s);advTurn(s);return;}
-    var u=mg(pl,{taskPos:np}),boat=BOATS[np];
-    var sold=false;
-    for(var i=0;i<s.players.length;i++){
-      if(i!==s.curIdx&&s.players[i]&&s.players[i].boat&&s.players[i].boat.name===boat.name){sold=true;break;}
-    }
-    s.players[s.curIdx]=u;
-    if(sold){showP(boat.name+" Sold","info","Already sold!",[{l:"Continue",c:"pp",fn:function(){advTurn(s);}}]);push(s);return;}
+  if(key==="boat"&&!pl.graduated){
     if(pl.isAI){
-      if(pl.aiDiff==="easy"?Math.random()<0.5:true){
-        var nc=(u.completedTasks||[]).concat(["boat"]);
-        s.players[s.curIdx]=mg(u,{money:u.money-boat.price,boat:boat,inTask:null,taskPos:-1,pos:TASKS.boat.exitIdx,completedTasks:nc});
-        addL(s,"AI buys "+boat.name+"!");push(s);advTurn(s);
-      } else {push(s);advTurn(s);}
+      if(Math.random()<0.3&&pl.money>-50){s.players[s.curIdx]=mg(pl,{money:pl.money-100,inTask:"boat",taskPos:-1});addL(s,"🤖 AI pays $100 bypass");push(s);advTurn(s);}
+      else{addL(s,"🤖 AI skips Boat Store");push(s);advTurn(s);}
       return;
     }
-    var sc6=dc(s);
-    showP(boat.name+" $"+boat.price,"info","Price: $"+boat.price+" | Balance: $"+u.money,[
-      {l:"Buy $"+boat.price,c:"pp",fn:function(){
-        var s2=dc(GS),pu=s2.players[s2.curIdx];
-        var nc2=(pu.completedTasks||[]).filter(function(x){return x!=="boat";}).concat(["boat"]);
-        s2.players[s2.curIdx]=mg(pu,{money:pu.money-boat.price,boat:boat,inTask:null,taskPos:-1,pos:TASKS.boat.exitIdx,completedTasks:nc2});
-        addL(s2,pu.name+" buys "+boat.name+"!");push(s2);advTurn(s2);
-      }},
-      {l:"Pass",c:"pn",fn:function(){advTurn(dc(GS));}}
+    showP("🛥️ The Boat Store!","info","Need to graduate first!\nPay 💰$100 to bypass, or skip.\nBalance: $"+pl.money,[
+      {l:"💸 Pay $100 & Shop",c:"pw",fn:function(){var s2=dc(GS);s2.players[s2.curIdx]=mg(s2.players[s2.curIdx],{money:s2.players[s2.curIdx].money-100,inTask:"boat",taskPos:-1});push(s2);advTurn(s2);}},
+      {l:"Skip",c:"pn",fn:function(){advTurn(dc(GS));}}
     ]);
-    push(s);
+    return;
   }
+  s.players[s.curIdx]=mg(pl,{inTask:key,taskPos:-1});
+  addL(s,pl.name+" enters "+(TASKS[key]?TASKS[key].label:key)+"!");
+  push(s);advTurn(s);
+}
 
-  function doWin(pl,s,r){
-    var cp=pl.winPos<0?-1:pl.winPos,MAX=3,tg=cp+r;
-    if(!pl.fasttrack&&tg>MAX){
-      showP("Overshot!","info","Need exactly "+(MAX-Math.max(cp,0))+" to reach WIN.\nStay put!",[{l:"OK",c:"pp",fn:function(){advTurn(s);}}]);return;
+function enterJutX(pl,s,key,extra){
+  if(key==="winner"){
+    if(pl.money<0){showP("💸 Wallet Too Low!","debt","Need $0+ to enter!",[{l:"Dang!",c:"pn",fn:function(){advTurn(s);}}]);return;}
+    s.players[s.curIdx]=mg(pl,{winPos:-1});push(s);doWin(s.players[s.curIdx],s,extra);return;
+  }
+  if(key==="boat"&&!pl.graduated){enterJut(pl,s,"boat");return;}
+  s.players[s.curIdx]=mg(pl,{inTask:key,taskPos:-1});
+  addL(s,pl.name+" enters "+(TASKS[key]?TASKS[key].label:key)+"!");
+  push(s);doTask(s.players[s.curIdx],s,extra);
+}
+
+function doTask(pl,s,r){
+  var t=TASKS[pl.inTask],np=pl.taskPos+r;
+  if(np>=t.count){
+    var rem=r-(t.count-1-pl.taskPos)-1;
+    var u=mg(pl,{inTask:null,taskPos:-1,pos:t.exitIdx});
+    var comp=t.req(u)&&(u.completedTasks||[]).indexOf(t.key)<0;
+    if(comp){
+      u=mg(u,{completedTasks:(u.completedTasks||[]).concat([t.key])});
+      if(t.key==="boat_school")u=mg(u,{graduated:true});
+      addL(s,"✅ "+u.name+" completed "+t.label+"!");
     }
-    var nwp=Math.min(tg,MAX),u=WDOCK[nwp].eff(mg(pl,{winPos:nwp}));
-    if(WDOCK[nwp].win){
-      if(u.money<0){s.players[s.curIdx]=u;push(s);showP("Still in Debt!","debt","Cannot win with $"+u.money+"!",[{l:"Dang!",c:"pp",fn:function(){advTurn(s);}}]);return;}
-      u=mg(u,{done:true});s.players[s.curIdx]=u;s.winner=u;push(s);showWin(u);return;
-    }
-    var wl=["Dock 1","Lose Turn","Back 1"];
-    addL(s,pl.name+" Dock -> "+(wl[nwp]||""));
     s.players[s.curIdx]=u;
-    var sc7=dc(s);
-    showP("Winners Dock","info",(wl[nwp]||"")+"!\n"+(nwp===1?"Lose next turn.":nwp===2?"Go back 1.":"At entrance."),[{l:"Continue",c:"pp",fn:function(){advTurn(sc7);}}]);
-    push(s);
+    var body=comp?("🎉 "+u.completedTasks.length+"/4 challenges done!"):t.prog(u);
+    var sc4=dc(s),uc=dc(u);
+    showP(comp?"✅ "+t.label+" Done!":"Exited "+t.label,comp?"success":"info",body,[{l:comp?"Yes! 🎉":"Continue",c:"pp",fn:function(){
+      if(rem>0){var fp3=(t.exitIdx+rem)%36;var um3=mg(uc,{pos:fp3});sc4.players[sc4.curIdx]=um3;push(sc4);landOn(um3,sc4);}
+      else advTurn(sc4);
+    }}]);
+    push(s);return;
   }
+  var u2=mg(pl,{taskPos:np}),space=t.spaces[np];
+  if(space)u2=space.eff(u2);
+  s.players[s.curIdx]=u2;
+  addL(s,pl.name+" → "+t.label+" sp"+(np+1)+": "+(space?space.desc:""));
+  var sc5=dc(s);
+  showP(t.label,"info",space?(space.story+"\n\n"+space.desc):t.prog(u2),[{l:"Continue",c:"pp",fn:function(){advTurn(sc5);}}]);
+  push(s);
+}
 
-  function advTurn(s){
-    var np=[];
-    for(var i=0;i<s.players.length;i++){
-      var pl=s.players[i];if(!pl){np.push(pl);continue;}
-      if(pl.done||pl.eliminated){np.push(pl);continue;}
-      if(pl.money<=-1000){addL(s,pl.name+" eliminated!");np.push(mg(pl,{eliminated:true,done:true}));}
-      else np.push(pl);
-    }
-    s.players=np;
-    var active=np.filter(function(p){return p&&!p.done;});
-    if(active.length<=1){
-      var w=active[0]||np[0];var wi=np.indexOf(w);
-      if(wi>=0)np[wi]=mg(w,{done:true});
-      s.players=np;s.winner=w;push(s);showWin(w);return;
-    }
-    var next=(s.curIdx+1)%np.length,its=0;
-    while((!np[next]||np[next].done)&&its<np.length){next=(next+1)%np.length;its++;}
-    np[next]=mg(np[next],{boughtCardThisTurn:false,usedShipwreckThisTurn:false,cardsBoughtThisTurn:[]});
-    s.players=np;s.curIdx=next;s.phase="transition";
-    push(s);showTrans();
+function doBoat(pl,s,r){
+  var np=pl.taskPos+r;
+  if(np>=BOATS.length){s.players[s.curIdx]=mg(pl,{inTask:null,taskPos:-1,pos:TASKS.boat.exitIdx});push(s);advTurn(s);return;}
+  var u=mg(pl,{taskPos:np}),boat=BOATS[np];
+  var sold=false;
+  for(var i=0;i<s.players.length;i++){
+    if(i!==s.curIdx&&s.players[i]&&s.players[i].boat&&s.players[i].boat.name===boat.name){sold=true;break;}
   }
-
-  // ── AI ─────────────────────────────────────────────────────────────────────
-  function runAI(){
-    if(!GS)return;
-    var s=dc(GS),pl=s.players[s.curIdx];
-    if(!pl||!pl.isAI)return;
-    if(!pl.boughtCardThisTurn&&pl.money>20&&pl.heldCards.length<3){
-      var deck=(s.swDeck||[]).slice();if(!deck.length)deck=mkDeck(SWDEFS);
-      var card=deck[0],uid=Math.random().toString(36).slice(2);
-      deck=deck.slice(1);s.swDeck=deck;
-      pl.heldCards=(pl.heldCards||[]).concat([mg(card,{uid:uid})]);
-      pl.money-=10;pl.boughtCardThisTurn=true;
-      pl.cardsBoughtThisTurn=(pl.cardsBoughtThisTurn||[]).concat([uid]);
-      if(card.type==="fasttrack")pl.fasttrack=true;
-      addL(s,"AI buys "+card.label);
-    }
-    s.players[s.curIdx]=pl;
-    var r=Math.ceil(Math.random()*6);
-    addL(s,"AI rolls "+r);s.phase="rolling";
-    push(s);processRoll(r,s);
+  s.players[s.curIdx]=u;
+  if(sold){showP("🚫 "+boat.name+" Sold","info","Already sold!",[{l:"Continue",c:"pp",fn:function(){advTurn(s);}}]);push(s);return;}
+  if(pl.isAI){
+    if(pl.aiDiff==="easy"?Math.random()<0.5:true){
+      var nc=(u.completedTasks||[]).concat(["boat"]);
+      s.players[s.curIdx]=mg(u,{money:u.money-boat.price,boat:boat,inTask:null,taskPos:-1,pos:TASKS.boat.exitIdx,completedTasks:nc});
+      addL(s,"🤖 AI buys "+boat.icon+" "+boat.name+"!");push(s);advTurn(s);
+    } else {push(s);advTurn(s);}
+    return;
   }
+  var sc6=dc(s);
+  showP(boat.icon+" "+boat.name+" — $"+boat.price,"info","Price: 💰$"+boat.price+" | Your balance: 💰$"+u.money+(u.money<boat.price?"\n⚠️ Going into debt!":""),[
+    {l:"Buy "+boat.icon+" $"+boat.price,c:"pp",fn:function(){
+      var s2=dc(GS),pu=s2.players[s2.curIdx];
+      var nc2=(pu.completedTasks||[]).filter(function(x){return x!=="boat";}).concat(["boat"]);
+      s2.players[s2.curIdx]=mg(pu,{money:pu.money-boat.price,boat:boat,inTask:null,taskPos:-1,pos:TASKS.boat.exitIdx,completedTasks:nc2});
+      addL(s2,pu.name+" buys "+boat.icon+" "+boat.name+"!");push(s2);advTurn(s2);
+    }},
+    {l:"Pass",c:"pn",fn:function(){advTurn(dc(GS));}}
+  ]);
+  push(s);
+}
 
-  // ── Cards ───────────────────────────────────────────────────────────────────
-  function buyCard(){
-    if(!GS)return;
-    var s=dc(GS),pl=s.players[s.curIdx];
-    if(pl.boughtCardThisTurn)return;
+function doWin(pl,s,r){
+  var cp=pl.winPos<0?-1:pl.winPos,MAX=3,tg=cp+r;
+  if(!pl.fasttrack&&tg>MAX){
+    showP("⚓ Overshot!","info","Need exactly "+(MAX-Math.max(cp,0))+" to reach ⭐ WIN.\nStay put!",[{l:"OK",c:"pn",fn:function(){advTurn(s);}}]);return;
+  }
+  var nwp=Math.min(tg,MAX),u=WDOCK[nwp].eff(mg(pl,{winPos:nwp}));
+  if(WDOCK[nwp].win){
+    if(u.money<0){s.players[s.curIdx]=u;push(s);showP("💸 Still in Debt!","debt","Cannot win with 💰$"+u.money+"!\nUse Eliminate Debt next turn.",[{l:"Dang!",c:"pn",fn:function(){advTurn(s);}}]);return;}
+    u=mg(u,{done:true});s.players[s.curIdx]=u;s.winner=u;push(s);showWin(u);return;
+  }
+  var wl=["Dock 1","Lose Turn","Back 1"];
+  addL(s,pl.name+" Dock → "+(wl[nwp]||""));
+  s.players[s.curIdx]=u;
+  var sc7=dc(s);
+  showP("🏆 Winner's Dock","info",(wl[nwp]||"")+"!\n"+(nwp===1?"Lose next turn.":nwp===2?"Go back 1 space.":"At dock entrance."),[{l:"Continue",c:"pp",fn:function(){advTurn(sc7);}}]);
+  push(s);
+}
+
+function advTurn(s){
+  tradeOpen=false;
+  var np=[];
+  for(var i=0;i<s.players.length;i++){
+    var pl=s.players[i]; if(!pl){np.push(pl);continue;}
+    if(pl.done||pl.eliminated){np.push(pl);continue;}
+    if(pl.money<=-1000){addL(s,pl.name+" eliminated! 💀");np.push(mg(pl,{eliminated:true,done:true}));}
+    else np.push(pl);
+  }
+  s.players=np;
+  // Apply interest
+  var cur=np[s.curIdx];
+  if(cur&&cur.money<0){
+    var interest=Math.floor(cur.money*0.05);
+    np[s.curIdx]=mg(cur,{money:cur.money+interest});
+    addL(s,"📈 "+cur.name+" interest: $"+cur.money+"→$"+(cur.money+interest));
+  }
+  var active=np.filter(function(p){return p&&!p.done;});
+  if(active.length<=1){
+    var w=active[0]||np[0];var wi=np.indexOf(w);
+    if(wi>=0)np[wi]=mg(w,{done:true});
+    s.players=np;s.winner=w;push(s);showWin(w);return;
+  }
+  var next=(s.curIdx+1)%np.length,its=0;
+  while((!np[next]||np[next].done)&&its<np.length){next=(next+1)%np.length;its++;}
+  np[next]=mg(np[next],{boughtCardThisTurn:false,usedShipwreckThisTurn:false,cardsBoughtThisTurn:[],pendingTrade:null});
+  s.players=np;s.curIdx=next;s.phase="transition";s.pendingTrade=null;
+  push(s);showTrans();
+}
+
+// ── AI ────────────────────────────────────────────────────────────────────────
+function runAI(){
+  if(!GS)return;
+  var s=dc(GS),pl=s.players[s.curIdx];
+  if(!pl||!pl.isAI)return;
+  if(!pl.boughtCardThisTurn&&pl.money>20&&pl.heldCards.length<3){
     var deck=(s.swDeck||[]).slice();if(!deck.length)deck=mkDeck(SWDEFS);
     var card=deck[0],uid=Math.random().toString(36).slice(2);
     deck=deck.slice(1);s.swDeck=deck;
@@ -1024,215 +1576,232 @@ function boot(dbSet, dbGet, dbOn) {
     pl.money-=10;pl.boughtCardThisTurn=true;
     pl.cardsBoughtThisTurn=(pl.cardsBoughtThisTurn||[]).concat([uid]);
     if(card.type==="fasttrack")pl.fasttrack=true;
-    s.players[s.curIdx]=pl;
-    addL(s,pl.name+" buys "+card.label);
+    addL(s,"🤖 AI buys "+card.icon+" "+card.label);
+  }
+  s.players[s.curIdx]=pl;
+  var r=Math.ceil(Math.random()*6);
+  addL(s,"🎲 AI rolls "+r);
+  push(s);processRoll(r,s);
+}
+
+// ── Cards ──────────────────────────────────────────────────────────────────────
+function buyCard(){
+  if(!GS)return;
+  var s=dc(GS),pl=s.players[s.curIdx];
+  if(pl.boughtCardThisTurn)return;
+  var deck=(s.swDeck||[]).slice();if(!deck.length)deck=mkDeck(SWDEFS);
+  var card=deck[0],uid=Math.random().toString(36).slice(2);
+  deck=deck.slice(1);s.swDeck=deck;
+  pl.heldCards=(pl.heldCards||[]).concat([mg(card,{uid:uid})]);
+  pl.money-=10;pl.boughtCardThisTurn=true;
+  pl.cardsBoughtThisTurn=(pl.cardsBoughtThisTurn||[]).concat([uid]);
+  if(card.type==="fasttrack")pl.fasttrack=true;
+  s.players[s.curIdx]=pl;
+  addL(s,pl.name+" buys "+card.icon+" "+card.label);
+  push(s);
+  showP(card.icon+" "+card.label,"info",card.desc+(card.type==="fasttrack"?"\n\n✅ Already active!":"\n\n⚠️ Can only be played next turn."),[{l:"Got it!",c:"pp",fn:hideP}]);
+}
+
+function openCard(idx){
+  if(!GS)return;
+  var pl=GS.players[GS.curIdx];
+  if(pl.usedShipwreckThisTurn){showP("One Per Turn","info","Only 1 shipwreck card can be played per turn.",[{l:"OK",c:"pn",fn:hideP}]);return;}
+  var card=pl.heldCards[idx]; if(!card)return;
+  if((pl.cardsBoughtThisTurn||[]).indexOf(card.uid)>=0){showP("Can't Play Yet","info","Cards bought this turn can only be played on a future turn.",[{l:"OK",c:"pn",fn:hideP}]);return;}
+  if(card.type==="double"){execCard(card,idx);return;}
+  showP(card.icon+" "+card.label,"info",card.desc,[
+    {l:"▶ Play Now",c:"pp",fn:function(){hideP();execCard(card,idx);}},
+    {l:"💾 Save for Later",c:"pn",fn:hideP}
+  ]);
+}
+
+function execCard(card,idx){
+  var s=dc(GS),pl=s.players[s.curIdx];
+  pl.heldCards=pl.heldCards.filter(function(_,i){return i!==idx;});
+  pl.usedShipwreckThisTurn=true;
+  s.players[s.curIdx]=pl;
+  if(card.type==="double"){
+    pl.doubleRollsLeft=(pl.doubleRollsLeft||0)+2;s.players[s.curIdx]=pl;push(s);
+    showP("🎲 Double Time!","info","2 bonus rolls this turn!\nClick Roll the Dice to use each.",[{l:"Let's roll!",c:"pp",fn:hideP}]);return;
+  }
+  if(card.type==="fasttrack"){pl.fasttrack=true;s.players[s.curIdx]=pl;push(s);return;}
+  if(card.type==="shortcut"){
     push(s);
-    showP(card.icon+" "+card.label,"info",card.desc+(card.type==="fasttrack"?"\nAlready active!":"\nCan play next turn."),[{l:"Got it!",c:"pp",fn:hideP}]);
+    showP("⚡ Shortcut","info","Reduce which challenge?",[
+      {l:"🐟 Fish (10→6)",c:"pp",fn:function(){var s2=dc(GS);s2.players[s2.curIdx].shortcut.fish=true;push(s2);hideP();}},
+      {l:"🆘 Rescues (2→1)",c:"pp",fn:function(){var s2=dc(GS);s2.players[s2.curIdx].shortcut.rescues=true;push(s2);hideP();}},
+      {l:"⭐ Stars (3→2)",c:"pp",fn:function(){var s2=dc(GS);s2.players[s2.curIdx].shortcut.stars=true;push(s2);hideP();}}
+    ]);return;
   }
-
-  function openCard(idx){
-    if(!GS)return;
-    var pl=GS.players[GS.curIdx];
-    if(pl.usedShipwreckThisTurn){showP("One Per Turn","info","Only one card per turn.",[{l:"OK",c:"pp",fn:hideP}]);return;}
-    var card=pl.heldCards[idx];
-    if(!card)return;
-    if((pl.cardsBoughtThisTurn||[]).indexOf(card.uid)>=0){showP("Cannot Play Yet","info","Play next turn.",[{l:"OK",c:"pp",fn:hideP}]);return;}
-    if(card.type==="double"){execCard(card,idx);return;}
-    showP(card.icon+" "+card.label,"info",card.desc,[
-      {l:"Play Now",c:"pp",fn:function(){hideP();execCard(card,idx);}},
-      {l:"Save for Later",c:"pn",fn:hideP}
-    ]);
+  if(card.type==="teleport"){push(s);doTeleport();return;}
+  if(card.type==="freeze"){
+    var others=s.players.filter(function(p,i){return i!==s.curIdx&&p&&!p.done;});
+    push(s);
+    showP("❄️ Freeze Frame","info","Choose a player to freeze for 2 turns:",others.map(function(op){
+      return {l:(op.isAI?"🤖 ":"")+op.name,c:"pp",fn:(function(opid){return function(){
+        var s2=dc(GS);
+        for(var i=0;i<s2.players.length;i++){
+          if(s2.players[i]&&s2.players[i].id===opid){s2.players[i]=mg(s2.players[i],{frozen:2,frozenBy:s2.players[s2.curIdx].name});break;}
+        }
+        addL(s2,s2.players[s2.curIdx].name+" freezes "+op.name+" for 2 turns!");
+        push(s2);hideP();
+      };})(op.id)};
+    }));return;
   }
+  if(card.type==="robbery"){
+    var others2=s.players.filter(function(p,i){return i!==s.curIdx&&p&&!p.done;});
+    push(s);
+    showP("💰 Highway Robbery","info","Steal ALL money from:",others2.map(function(op){
+      return {l:(op.isAI?"🤖 ":"")+op.name+" (💰$"+op.money+")",c:"pp",fn:(function(opid){return function(){
+        var s2=dc(GS),stolen=0;
+        for(var i=0;i<s2.players.length;i++){
+          if(s2.players[i]&&s2.players[i].id===opid){stolen=s2.players[i].money;s2.players[i]=mg(s2.players[i],{money:0});break;}
+        }
+        s2.players[s2.curIdx]=mg(s2.players[s2.curIdx],{money:s2.players[s2.curIdx].money+stolen});
+        addL(s2,"💰 "+s2.players[s2.curIdx].name+" steals $"+stolen+"!");
+        push(s2);hideP();
+      };})(op.id)};
+    }));return;
+  }
+}
 
-  function execCard(card,idx){
-    var s=dc(GS),pl=s.players[s.curIdx];
-    pl.heldCards=pl.heldCards.filter(function(_,i){return i!==idx;});
-    pl.usedShipwreckThisTurn=true;
-    s.players[s.curIdx]=pl;
-    if(card.type==="double"){
-      pl.doubleRollsLeft=(pl.doubleRollsLeft||0)+2;s.players[s.curIdx]=pl;push(s);
-      showP("Double Time!","info","2 bonus rolls this turn!",[{l:"Roll!",c:"pp",fn:hideP}]);return;
-    }
-    if(card.type==="fasttrack"){pl.fasttrack=true;s.players[s.curIdx]=pl;push(s);return;}
-    if(card.type==="shortcut"){
-      push(s);
-      showP("Shortcut","info","Reduce which challenge?",[
-        {l:"Fish (10 to 6)",c:"pp",fn:function(){var s2=dc(GS);s2.players[s2.curIdx].shortcut.fish=true;push(s2);hideP();}},
-        {l:"Rescues (2 to 1)",c:"pp",fn:function(){var s2=dc(GS);s2.players[s2.curIdx].shortcut.rescues=true;push(s2);hideP();}},
-        {l:"Stars (3 to 2)",c:"pp",fn:function(){var s2=dc(GS);s2.players[s2.curIdx].shortcut.stars=true;push(s2);hideP();}}
-      ]);return;
-    }
-    if(card.type==="teleport"){push(s);doTeleport();return;}
-    if(card.type==="freeze"){
-      var others=s.players.filter(function(p,i){return i!==s.curIdx&&p&&!p.done;});
-      push(s);
-      showP("Freeze Frame","info","Choose a player to freeze:",others.map(function(op){
-        return {l:op.name,c:"pp",fn:(function(opid){return function(){
-          var s2=dc(GS);
-          for(var i=0;i<s2.players.length;i++){
-            if(s2.players[i]&&s2.players[i].id===opid){s2.players[i]=mg(s2.players[i],{frozen:2,frozenBy:pl.name});break;}
-          }
-          push(s2);hideP();
-        };})(op.id)};
-      }));return;
-    }
-    if(card.type==="robbery"){
-      var others2=s.players.filter(function(p,i){return i!==s.curIdx&&p&&!p.done;});
-      push(s);
-      showP("Highway Robbery","info","Steal ALL money from:",others2.map(function(op){
-        return {l:op.name+" ($"+op.money+")",c:"pp",fn:(function(opid){return function(){
-          var s2=dc(GS),stolen=0;
-          for(var i=0;i<s2.players.length;i++){
-            if(s2.players[i]&&s2.players[i].id===opid){stolen=s2.players[i].money;s2.players[i]=mg(s2.players[i],{money:0});break;}
-          }
-          s2.players[s2.curIdx]=mg(s2.players[s2.curIdx],{money:s2.players[s2.curIdx].money+stolen});
-          addL(s2,s2.players[s2.curIdx].name+" robs $"+stolen);push(s2);hideP();
-        };})(op.id)};
-      }));return;
+function doTeleport(){
+  for(var i=0;i<36;i++){
+    var k=sKind(i);
+    if(k!=="entry_winner"&&i!==0){
+      (function(si){
+        var el=document.getElementById("sp"+si);
+        if(el){
+          el.style.cursor="pointer";
+          var rect=el.querySelector("rect");
+          if(rect){rect.setAttribute("stroke","#FFD700");rect.setAttribute("stroke-width","3");}
+          el.addEventListener("click",function h(){
+            el.removeEventListener("click",h);
+            el.style.cursor="";
+            if(rect){rect.setAttribute("stroke","#ffffffa0");rect.setAttribute("stroke-width","0.8");}
+            var s=dc(GS);
+            s.players[s.curIdx]=mg(s.players[s.curIdx],{pos:si,inTask:null,taskPos:-1});
+            addL(s,"🌀 "+s.players[s.curIdx].name+" teleports to space "+si+"!");
+            push(s);advTurn(s);
+          });
+        }
+      })(i);
     }
   }
+}
 
-  function doTeleport(){
-    for(var i=0;i<36;i++){
-      var k=sKind(i);
-      if(k!=="entry_winner"&&i!==0){
-        (function(si){
-          var el=document.getElementById("sp"+si);
-          if(el){
-            el.style.cursor="pointer";
-            el.addEventListener("click",function h(){
-              el.removeEventListener("click",h);
-              var s=dc(GS);
-              s.players[s.curIdx]=mg(s.players[s.curIdx],{pos:si,inTask:null,taskPos:-1});
-              addL(s,s.players[s.curIdx].name+" teleports to space "+si);
-              push(s);advTurn(s);
-            });
-          }
-        })(i);
-      }
-    }
+function debtR(){
+  if(!GS)return;
+  var pl=GS.players[GS.curIdx];
+  if(!pl.completedTasks||!pl.completedTasks.length){showP("🆘 Debt Relief","debt","No challenges to sacrifice yet.",[{l:"Close",c:"pn",fn:hideP}]);return;}
+  var lbls={boat_school:"🎓 Boat School",boat:"🛥️ Boat Store",fish:"🐟 Catch a Fish",rescue:"🆘 Rescues"};
+  showP("🆘 Debt Relief","debt","Sacrifice a challenge to reset balance to 💰$0:",
+    pl.completedTasks.map(function(tk){
+      return {l:lbls[tk]||tk,c:"pw",fn:(function(ttk){return function(){
+        var s=dc(GS);
+        var p2=mg(s.players[s.curIdx],{money:0,completedTasks:s.players[s.curIdx].completedTasks.filter(function(x){return x!==ttk;})});
+        if(ttk==="boat_school")p2=mg(p2,{graduated:false,stars:0});
+        if(ttk==="fish")p2=mg(p2,{fish:0});
+        if(ttk==="rescue")p2=mg(p2,{rescues:0});
+        if(ttk==="boat")p2=mg(p2,{boat:null});
+        s.players[s.curIdx]=p2;addL(s,p2.name+" debt relief: sacrificed "+ttk);push(s);hideP();
+      };})(tk)};
+    }).concat([{l:"Cancel",c:"pn",fn:hideP}])
+  );
+}
+
+function inspP(i){
+  if(!GS)return;
+  var pl=GS.players[i]; if(!pl)return;
+  var tks=["boat_school","boat","fish","rescue"],lines="💰 $"+pl.money+(pl.money<0?" ⚠️ IN DEBT":"")+"\n\n";
+  for(var j=0;j<tks.length;j++){
+    var tk=tks[j],done=(pl.completedTasks||[]).indexOf(tk)>=0,t=TASKS[tk];if(!t)continue;
+    lines+=(done?"✅ ":"⬜ ")+t.label+": "+(done?(tk==="boat"?(pl.boat?pl.boat.icon+" "+pl.boat.name:"owned"):t.done||"done"):t.prog(pl))+"\n";
   }
+  if(pl.heldCards&&pl.heldCards.length)lines+="\n🃏 Cards: "+pl.heldCards.map(function(c){return c.icon+" "+c.label;}).join(", ");
+  showP((pl.isAI?"🤖 ":"")+pl.name,"info",lines,[{l:"Close",c:"pn",fn:hideP}]);
+}
 
-  function debtR(){
-    if(!GS)return;
-    var pl=GS.players[GS.curIdx];
-    if(!pl.completedTasks||!pl.completedTasks.length){showP("Debt Relief","debt","No challenges to sacrifice.",[{l:"Close",c:"pp",fn:hideP}]);return;}
-    var lbls={boat_school:"Boat School",boat:"Boat Store",fish:"Catch a Fish",rescue:"Rescues"};
-    showP("Debt Relief","debt","Sacrifice a challenge to reset to $0:",
-      pl.completedTasks.map(function(tk){
-        return {l:lbls[tk]||tk,c:"pw",fn:(function(ttk){return function(){
-          var s=dc(GS);
-          var p2=mg(s.players[s.curIdx],{money:0,completedTasks:s.players[s.curIdx].completedTasks.filter(function(x){return x!==ttk;})});
-          if(ttk==="boat_school")p2=mg(p2,{graduated:false,stars:0});
-          if(ttk==="fish")p2=mg(p2,{fish:0});
-          if(ttk==="rescue")p2=mg(p2,{rescues:0});
-          if(ttk==="boat")p2=mg(p2,{boat:null});
-          s.players[s.curIdx]=p2;addL(s,p2.name+" debt relief: "+ttk);push(s);hideP();
-        };})(tk)};
-      }).concat([{l:"Cancel",c:"pn",fn:hideP}])
-    );
+// ── Transition ────────────────────────────────────────────────────────────────
+function showTrans(){
+  if(!GS)return;
+  var cur=GS.players[GS.curIdx]; if(!cur)return;
+  document.getElementById("trsub").textContent=cur.isAI?"🤖 AI TURN":"NEXT UP";
+  document.getElementById("trdot").style.background=cur.color;
+  document.getElementById("trdot").style.boxShadow="0 0 20px "+cur.color;
+  document.getElementById("trname").textContent=cur.name+"'s Turn";
+  document.getElementById("trstats").textContent="💰 $"+cur.money+(cur.money<0?" ⚠️":"")+" | "+(cur.completedTasks||[]).length+"/4 challenges";
+  var mine=!isMulti||GS.curIdx===myId;
+  document.getElementById("trBtn").style.display=(cur.isAI||!mine)?"none":"block";
+  document.getElementById("tro").classList.add("on");
+  if(cur.isAI){
+    var delay=aiSpeed==="fast"?300:1800;
+    setTimeout(function(){
+      document.getElementById("tro").classList.remove("on");
+      var s=dc(GS);s.phase="preturn";push(s);
+      setTimeout(runAI,aiSpeed==="fast"?100:400);
+    },delay);
   }
+}
 
-  function inspP(i){
-    if(!GS)return;
-    var pl=GS.players[i];if(!pl)return;
-    var tks=["boat_school","boat","fish","rescue"],lines="$"+pl.money+(pl.money<0?" (in debt)":"")+"\n\n";
-    for(var j=0;j<tks.length;j++){
-      var tk=tks[j],done=(pl.completedTasks||[]).indexOf(tk)>=0,t=TASKS[tk];if(!t)continue;
-      lines+=(done?"[done] ":"[    ] ")+t.label+": "+(done?(tk==="boat"?(pl.boat?pl.boat.name:"?"):t.done||"done"):t.prog(pl))+"\n";
-    }
-    showP(pl.name,"info",lines,[{l:"Close",c:"pp",fn:hideP}]);
-  }
+function disTrans(){
+  document.getElementById("tro").classList.remove("on");
+  if(GS&&GS.phase==="transition"){var s=dc(GS);s.phase="preturn";push(s);}
+}
 
-  // ── Transition overlay ──────────────────────────────────────────────────────
-  function showTrans(){
-    if(!GS)return;
-    var cur=GS.players[GS.curIdx];if(!cur)return;
-    document.getElementById("trsub").textContent=cur.isAI?"AI TURN":"NEXT UP";
-    document.getElementById("trdot").style.background=cur.color;
-    document.getElementById("trdot").style.boxShadow="0 0 20px "+cur.color;
-    document.getElementById("trname").textContent=cur.name+"s Turn";
-    document.getElementById("trstats").textContent="$"+cur.money+" | "+(cur.completedTasks||[]).length+"/4";
-    var mine=!isMulti||GS.curIdx===myId;
-    document.getElementById("trBtn").style.display=(cur.isAI||!mine)?"none":"block";
-    document.getElementById("tro").classList.add("on");
-    if(cur.isAI){
-      setTimeout(function(){
-        document.getElementById("tro").classList.remove("on");
-        var s=dc(GS);s.phase="preturn";push(s);setTimeout(runAI,400);
-      },1800);
-    }
-  }
+// ── Popup ─────────────────────────────────────────────────────────────────────
+var ACOLS={swim:"#1565c0",sink:"#b71c1c",debt:"#c0392b",info:"#1a3a55",success:"#1a7a3a"};
+function showP(title,accent,body,btns){
+  document.getElementById("phd").style.background=ACOLS[accent]||"#1a3a55";
+  document.getElementById("phd").innerHTML='<div style="font-size:18px;font-weight:700;color:#fff">'+title+'</div>';
+  document.getElementById("pbd").textContent=body;
+  var f=document.getElementById("pft"); f.innerHTML="";
+  (btns||[]).forEach(function(b){
+    var btn=document.createElement("button");
+    btn.textContent=b.l; btn.className=b.c||"pn";
+    btn.onclick=function(){hideP();if(b.fn)b.fn();};
+    f.appendChild(btn);
+  });
+  document.getElementById("po").classList.add("on");
+}
+function hideP(){document.getElementById("po").classList.remove("on");}
 
-  function disTrans(){
-    document.getElementById("tro").classList.remove("on");
-    if(GS&&GS.phase==="transition"){var s=dc(GS);s.phase="preturn";push(s);}
-  }
+function showWin(player){
+  document.getElementById("wname").textContent=player.name;
+  document.getElementById("wname").style.color=player.color;
+  document.getElementById("wo").classList.add("on");
+}
 
-  // ── Popup ───────────────────────────────────────────────────────────────────
-  var ACOLS={swim:"#1565c0",sink:"#b71c1c",debt:"#c0392b",info:"#1a3a55",success:"#1a7a3a"};
-  function showP(title,accent,body,btns){
-    document.getElementById("phd").style.background=ACOLS[accent]||"#1a3a55";
-    document.getElementById("phd").innerHTML='<div style="font-size:18px;font-weight:700;color:#fff">'+title+'</div>';
-    document.getElementById("pbd").textContent=body;
-    var f=document.getElementById("pft");f.innerHTML="";
-    (btns||[]).forEach(function(b){
-      var btn=document.createElement("button");
-      btn.textContent=b.l;btn.className=b.c||"pn";
-      btn.onclick=function(){hideP();if(b.fn)b.fn();};
-      f.appendChild(btn);
-    });
-    document.getElementById("po").classList.add("on");
-  }
-  function hideP(){document.getElementById("po").classList.remove("on");}
+// ── Zoom / scroll ──────────────────────────────────────────────────────────────
+var ZL=[0.5,0.65,0.8,1.0,1.2,1.5,1.8];
+function zoomIn(){scale=ZL[Math.min(ZL.indexOf(scale)+1,ZL.length-1)];applyScale();}
+function zoomOut(){scale=ZL[Math.max(ZL.indexOf(scale)-1,0)];applyScale();}
+function applyScale(){
+  var w=document.getElementById("bwrap"),s=document.getElementById("bs");
+  w.style.transform="scale("+scale+")";
+  w.style.width=BW+"px"; w.style.height=BH+"px";
+  s.style.width=(BW*scale)+"px"; s.style.height=(BH*scale)+"px";
+  document.getElementById("zlbl").textContent=Math.round(scale*100)+"%";
+}
+function ctrOn(){
+  if(!GS)return;
+  var pl=GS.players[GS.curIdx]; if(!pl)return;
+  var xy=pXY(pl);
+  var s=document.getElementById("bs");
+  s.scrollLeft=xy.x*scale-s.clientWidth/2;
+  s.scrollTop=xy.y*scale-s.clientHeight/2;
+}
 
-  function showWin(player){
-    document.getElementById("wemoji").textContent=player.isAI?"AI WIN":"YOU WIN";
-    document.getElementById("wname").textContent=player.name;
-    document.getElementById("wname").style.color=player.color;
-    document.getElementById("wo").classList.add("on");
-  }
-
-  // ── Zoom / scroll ───────────────────────────────────────────────────────────
-  var ZL=[0.5,0.65,0.8,1.0,1.2,1.5,1.8];
-  function zoomIn(){scale=ZL[Math.min(ZL.indexOf(scale)+1,ZL.length-1)];applyScale();}
-  function zoomOut(){scale=ZL[Math.max(ZL.indexOf(scale)-1,0)];applyScale();}
-  function applyScale(){
-    var w=document.getElementById("bwrap"),s=document.getElementById("bs");
-    w.style.transform="scale("+scale+")";w.style.width=BW+"px";w.style.height=BH+"px";
-    s.style.minWidth=(BW*scale)+"px";s.style.minHeight=(BH*scale)+"px";
-    document.getElementById("zlbl").textContent=Math.round(scale*100)+"%";
-  }
-  function ctrOn(){
-    if(!GS)return;
-    var pl=GS.players[GS.curIdx];if(!pl)return;
-    var xy=pXY(pl);
-    var s=document.getElementById("bs");
-    s.scrollLeft=xy.x*scale-s.clientWidth/2;
-    s.scrollTop=xy.y*scale-s.clientHeight/2;
-  }
-
-  // ── Wire up buttons ─────────────────────────────────────────────────────────
-  document.getElementById("btnCreate").addEventListener("click",createRoom);
-  document.getElementById("btnJoin").addEventListener("click",joinRoom);
-  document.getElementById("btnSolo").addEventListener("click",startSolo);
-  document.getElementById("btnLeave").addEventListener("click",leaveGame);
-  document.getElementById("btnPause").addEventListener("click",function(){paused=!paused;document.getElementById("btnPause").textContent=paused?"Resume":"Pause";});
-  document.getElementById("btnZI").addEventListener("click",zoomIn);
-  document.getElementById("btnZO").addEventListener("click",zoomOut);
-  document.getElementById("btnCtr").addEventListener("click",ctrOn);
-  document.getElementById("btnWL").addEventListener("click",leaveGame);
-  document.getElementById("trBtn").addEventListener("click",disTrans);
-  document.getElementById("ji").addEventListener("keydown",function(e){if(e.key==="Enter")joinRoom();});
-
-  console.log("Boat Ride 2.0 ready!");
+// ── Wire buttons ──────────────────────────────────────────────────────────────
+document.getElementById("btnLeave").addEventListener("click",leaveGame);
+document.getElementById("btnZI").addEventListener("click",zoomIn);
+document.getElementById("btnZO").addEventListener("click",zoomOut);
+document.getElementById("btnCtr").addEventListener("click",ctrOn);
+document.getElementById("btnWL").addEventListener("click",leaveGame);
+document.getElementById("trBtn").addEventListener("click",disTrans);
+document.getElementById("ji").addEventListener("keydown",function(e){if(e.key==="Enter")document.getElementById("btnJoinRoom").click();});
 
 } // end boot()
-
-// Firebase is already loaded via script tags above
-window.addEventListener("DOMContentLoaded", function(){
-  boot(dbSet, dbGet, dbOn);
-});
 </script>
 </body>
 </html>

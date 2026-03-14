@@ -10,10 +10,12 @@
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Segoe UI',sans-serif;background:#071728;color:#fff;min-height:100vh}
-.screen{display:none;min-height:100vh;align-items:center;justify-content:center;padding:24px}
+body{font-family:'Segoe UI',sans-serif;background:#4a9ebb;color:#fff;min-height:100vh;overflow-x:hidden}
+/* Animated wave background for pre-game screens */
+.screen{display:none;min-height:100vh;align-items:center;justify-content:center;padding:24px;position:relative}
+.screen::before{content:'';position:fixed;inset:0;background:#4a9ebb;z-index:-1}
 .screen.on{display:flex}
-.card{background:#0b1e30;border-radius:20px;padding:32px 40px;max-width:520px;width:100%;box-shadow:0 12px 48px rgba(0,0,0,.5);text-align:center}
+.card{background:#0d2d45;border-radius:20px;padding:32px 40px;max-width:520px;width:100%;box-shadow:0 12px 48px rgba(0,0,0,.35);text-align:center;position:relative;z-index:1}
 .card h1{font-size:26px;font-weight:900;color:#7ecbe0;margin-bottom:4px}
 .sub{font-size:13px;color:#4a7a9b;margin-bottom:24px}
 hr.div{border:none;border-top:1px solid #1a3a55;margin:18px 0}
@@ -77,8 +79,11 @@ hr.div{border:none;border-top:1px solid #1a3a55;margin:18px 0}
 .htp-ch p{font-size:12px;color:#555;line-height:1.5}
 .htp-rule{font-size:12px;color:#555;line-height:1.6;border-radius:8px;padding:10px 12px;margin-bottom:10px;border:1px solid #ddd}
 .htp-ft{padding:14px 24px;border-top:1px solid #eee;flex-shrink:0;text-align:center}
-#game{display:none;flex-direction:column;height:100vh}
+#game{display:none;flex-direction:column;height:100vh;background:#071728}
 #game.on{display:flex}
+/* Wave animation for pre-game background */
+#waveBg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+#waveBg svg{width:100%;height:100%;position:absolute}
 #topbar{background:#0b1e30;border-bottom:2px solid #1a3a55;padding:6px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0}
 .pill{background:#1a3a55;color:#7ecbe0;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:2px}
 #main{display:flex;flex:1;overflow:hidden}
@@ -122,6 +127,25 @@ hr.div{border:none;border-top:1px solid #1a3a55;margin:18px 0}
 </style>
 </head>
 <body>
+
+<div id="waveBg">
+  <svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"><defs><style>
+    @keyframes wv1{0%{transform:translateX(0)}100%{transform:translateX(-200px)}}
+    @keyframes wv2{0%{transform:translateX(0)}100%{transform:translateX(200px)}}
+    @keyframes wv3{0%{transform:translateX(-100px)}100%{transform:translateX(100px)}}
+    .w1{animation:wv1 4s linear infinite;opacity:0.18}
+    .w2{animation:wv2 6s linear infinite;opacity:0.13}
+    .w3{animation:wv3 5s linear infinite;opacity:0.1}
+  </style></defs>
+  <rect width="100%" height="100%" fill="#3a8cad"/>
+  <g class="w1"><path d="M-200,80 Q-170,65 -140,80 Q-110,95 -80,80 Q-50,65 -20,80 Q10,95 40,80 Q70,65 100,80 Q130,95 160,80 Q190,65 220,80 Q250,95 280,80 Q310,65 340,80 Q370,95 400,80 Q430,65 460,80 Q490,95 520,80 Q550,65 580,80 Q610,95 640,80 Q670,65 700,80 Q730,95 760,80 Q790,65 820,80 Q850,95 880,80 Q910,65 940,80 Q970,95 1000,80 Q1030,65 1060,80 Q1090,95 1120,80 Q1150,65 1180,80 Q1210,95 1240,80 Q1270,65 1300,80 Q1330,95 1360,80 Q1390,65 1420,80 Q1450,95 1480,80 Q1510,65 1540,80" stroke="#7ecbe0" stroke-width="2.5" fill="none"/></g>
+  <g class="w2"><path d="M-200,180 Q-160,162 -120,180 Q-80,198 -40,180 Q0,162 40,180 Q80,198 120,180 Q160,162 200,180 Q240,198 280,180 Q320,162 360,180 Q400,198 440,180 Q480,162 520,180 Q560,198 600,180 Q640,162 680,180 Q720,198 760,180 Q800,162 840,180 Q880,198 920,180 Q960,162 1000,180 Q1040,198 1080,180 Q1120,162 1160,180 Q1200,198 1240,180 Q1280,162 1320,180 Q1360,198 1400,180 Q1440,162 1480,180" stroke="#7ecbe0" stroke-width="2" fill="none"/></g>
+  <g class="w3"><path d="M-200,300 Q-150,282 -100,300 Q-50,318 0,300 Q50,282 100,300 Q150,318 200,300 Q250,282 300,300 Q350,318 400,300 Q450,282 500,300 Q550,318 600,300 Q650,282 700,300 Q750,318 800,300 Q850,282 900,300 Q950,318 1000,300 Q1050,282 1100,300 Q1150,318 1200,300 Q1250,282 1300,300 Q1350,318 1400,300 Q1450,282 1500,300" stroke="#7ecbe0" stroke-width="1.5" fill="none"/></g>
+  <g class="w1"><path d="M-200,450 Q-170,435 -140,450 Q-110,465 -80,450 Q-50,435 -20,450 Q10,465 40,450 Q70,435 100,450 Q130,465 160,450 Q190,435 220,450 Q250,465 280,450 Q310,435 340,450 Q370,465 400,450 Q430,435 460,450 Q490,465 520,450 Q550,435 580,450 Q610,465 640,450 Q670,435 700,450 Q730,465 760,450 Q790,435 820,450 Q850,465 880,450 Q910,435 940,450 Q970,465 1000,450 Q1030,435 1060,450 Q1090,465 1120,450 Q1150,435 1180,450 Q1210,465 1240,450 Q1270,435 1300,450 Q1330,465 1360,450 Q1390,435 1420,450 Q1450,465 1480,450" stroke="#7ecbe0" stroke-width="2" fill="none"/></g>
+  <g class="w2"><path d="M-200,600 Q-150,582 -100,600 Q-50,618 0,600 Q50,582 100,600 Q150,618 200,600 Q250,582 300,600 Q350,618 400,600 Q450,582 500,600 Q550,618 600,600 Q650,582 700,600 Q750,618 800,600 Q850,582 900,600 Q950,618 1000,600 Q1050,582 1100,600 Q1150,618 1200,600 Q1250,582 1300,600 Q1350,618 1400,600 Q1450,582 1500,600" stroke="#7ecbe0" stroke-width="2.5" fill="none"/></g>
+  <g class="w3"><path d="M-200,750 Q-170,735 -140,750 Q-110,765 -80,750 Q-50,735 -20,750 Q10,765 40,750 Q70,735 100,750 Q130,765 160,750 Q190,735 220,750 Q250,765 280,750 Q310,735 340,750 Q370,765 400,750 Q430,735 460,750 Q490,765 520,750 Q550,735 580,750 Q610,765 640,750 Q670,735 700,750 Q730,765 760,750 Q790,735 820,750 Q850,765 880,750 Q910,735 940,750 Q970,765 1000,750 Q1030,735 1060,750 Q1090,765 1120,750 Q1150,735 1180,750 Q1210,765 1240,750 Q1270,735 1300,750 Q1330,765 1360,750 Q1390,735 1420,750 Q1450,765 1480,750" stroke="#7ecbe0" stroke-width="1.8" fill="none"/></g>
+  </svg>
+</div>
 
 <div class="screen on" id="scAuth">
   <div class="card" style="max-width:420px">
@@ -528,6 +552,17 @@ function resetGameState(){
 document.addEventListener("visibilitychange",function(){
   pageIsVisible=!document.hidden;
   if(rCode&&currentUser) dbSet("rooms/"+rCode+"/presence/"+myId,pageIsVisible);
+  // Auto-save when tab becomes hidden (user switching away or closing)
+  if(document.hidden && GS && !isOnlineMultiplayer && currentUser){
+    saveGame(GS);
+  }
+});
+
+// Also save on page unload
+window.addEventListener("beforeunload",function(){
+  if(GS && !isOnlineMultiplayer && currentUser){
+    saveGame(GS);
+  }
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -569,6 +604,9 @@ function showScreen(id){
   for(var i=0;i<all.length;i++)all[i].classList.remove("on");
   if(id){var el=document.getElementById(id);if(el)el.classList.add("on");}
   if(id==="scHome")refreshResumeBtn();
+  // Show wave bg on pre-game screens, hide during game
+  var wb=document.getElementById("waveBg");
+  if(wb)wb.style.display=(id&&id!=="scHome"&&id!=="scAuth"&&id!=="scHTP"&&id!=="scOnline"&&id!=="scAI")?'none':'block';
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -701,6 +739,7 @@ function updateSlots(players,total){var el=document.getElementById("lslots");if(
 function enterGame(code){
   if(rUnsub){rUnsub();rUnsub=null;}
   showScreen(null);
+  var wb2=document.getElementById("waveBg");if(wb2)wb2.style.display='none';
   document.getElementById("game").classList.add("on");
   document.getElementById("rpill").textContent="ROOM "+code;
   JC=buildJC(); drawBoard();
@@ -757,7 +796,9 @@ function enterGame(code){
 function startGame(players,spd){
   resetGameState();
   isOnlineMultiplayer=false; myId=0; aiSpeed=spd||"show";
-  showScreen(null); document.getElementById("game").classList.add("on");
+  showScreen(null);
+  var wb=document.getElementById("waveBg");if(wb)wb.style.display='none';
+  document.getElementById("game").classList.add("on");
   document.getElementById("rpill").textContent="OFFLINE";
   JC=buildJC();
   GS={players:players,curIdx:0,phase:"transition",log:[],swimDeck:mkSwim(),sinkDeck:mkSink(),swDeck:mkDeck(SWDEFS),winner:null};
@@ -1272,8 +1313,38 @@ function drawJuts(svg){
     for(var i=0;i<jd.pts.length;i++){
       var pt2=jd.pts[i],g2=mkEl("g",{});
       if(key==="boat"){var boat=BOATS[i];g2.appendChild(mkEl("rect",{x:pt2.x-SW/2,y:pt2.y-SH/2,width:SW,height:SH,rx:6,fill:t.color,stroke:"#ffffffa0","stroke-width":0.8}));g2.appendChild(mkTxt(boat.icon,{x:pt2.x,y:pt2.y-6,"text-anchor":"middle","dominant-baseline":"central","font-size":14}));g2.appendChild(mkTxt("$"+boat.price,{x:pt2.x,y:pt2.y+10,"text-anchor":"middle","dominant-baseline":"central","font-size":9,fill:"#FFD700"}));}
-      else{var sp=t.spaces[i],rw=sp?sp.reward:null;g2.appendChild(mkEl("rect",{x:pt2.x-SW/2,y:pt2.y-SH/2,width:SW,height:SH,rx:6,fill:t.color,stroke:"#ffffffa0","stroke-width":0.8}));if(rw!==null&&rw!==undefined&&rw!==0){if(rw<0)g2.appendChild(mkTxt(String(rw),{x:pt2.x,y:pt2.y,"text-anchor":"middle","dominant-baseline":"central","font-size":13,"font-weight":"bold",fill:"#ff4444"}));else{var ic=key==="boat_school"?"⭐":key==="fish"?"🐟":"🆘";g2.appendChild(mkTxt("+"+rw,{x:pt2.x,y:pt2.y-4,"text-anchor":"middle","dominant-baseline":"central","font-size":11,"font-weight":"bold",fill:"#fff"}));g2.appendChild(mkTxt(ic,{x:pt2.x,y:pt2.y+9,"text-anchor":"middle","dominant-baseline":"central","font-size":10}));}}}
-      svg.appendChild(g2);
+      else{
+        var sp=t.spaces[i],rw=sp?sp.reward:null;
+        g2.appendChild(mkEl("rect",{x:pt2.x-SW/2,y:pt2.y-SH/2,width:SW,height:SH,rx:6,fill:t.color,stroke:"#ffffffa0","stroke-width":0.8}));
+        if(rw!==null&&rw!==undefined){
+          var ic=key==="boat_school"?"⭐":key==="fish"?"🐟":"🆘";
+          if(rw<0){
+            // Negative: show count in red
+            g2.appendChild(mkTxt(String(rw),{x:pt2.x,y:pt2.y,"text-anchor":"middle","dominant-baseline":"central","font-size":13,"font-weight":"bold",fill:"#ff4444"}));
+          } else if(rw===0){
+            // Zero: show +0 in yellow
+            g2.appendChild(mkTxt("+0",{x:pt2.x,y:pt2.y,"text-anchor":"middle","dominant-baseline":"central","font-size":11,"font-weight":"bold",fill:"#FFD700"}));
+          } else {
+            // Positive: show that many icons, up to 3 rows
+            var cols=rw<=2?rw:rw<=4?2:3;
+            var rows=Math.ceil(rw/cols);
+            var iconSize=rw<=2?14:rw<=4?11:9;
+            var spacingX=iconSize+2, spacingY=iconSize+2;
+            var totalW=(cols-1)*spacingX, totalH=(rows-1)*spacingY;
+            var count=0;
+            for(var row2=0;row2<rows&&count<rw;row2++){
+              var rowCols=Math.min(cols,rw-count);
+              var rowW=(rowCols-1)*spacingX;
+              for(var col2=0;col2<rowCols;col2++){
+                var ix=pt2.x-rowW/2+col2*spacingX;
+                var iy=pt2.y-totalH/2+row2*spacingY;
+                g2.appendChild(mkTxt(ic,{x:ix,y:iy,"text-anchor":"middle","dominant-baseline":"central","font-size":iconSize}));
+                count++;
+              }
+            }
+          }
+        }
+      }
     }
     if(jd.xp){var xg=mkEl("g",{});xg.appendChild(mkEl("rect",{x:jd.xp.x-SW/2,y:jd.xp.y-SH/2,width:SW,height:SH,rx:8,fill:sColor("entry_"+key),stroke:"#ffffffa0","stroke-width":0.8}));xg.appendChild(mkTxt(key==="boat_school"?"🎓":key==="boat"?"🛥️":key==="fish"?"🐟":"🆘",{x:jd.xp.x,y:jd.xp.y,"text-anchor":"middle","dominant-baseline":"central","font-size":18}));svg.appendChild(xg);}
     var lp=jLP(key);if(lp){var lg=mkEl("g",{});lg.appendChild(mkEl("rect",{x:lp.x-60,y:lp.y-13,width:120,height:24,rx:6,fill:"rgba(7,23,40,0.92)",stroke:jcols[key]||"#fff","stroke-width":1.5}));lg.appendChild(mkTxt(jlbls[key]||key,{x:lp.x,y:lp.y,"text-anchor":"middle","dominant-baseline":"central","font-size":11,"font-weight":"bold",fill:jcols[key]||"#fff"}));svg.appendChild(lg);}
@@ -1340,10 +1411,11 @@ function disTrans(){
   showTransActive=false;
   document.getElementById("tro").classList.remove("on");
   if(!GS)return;
-  if(GS.phase==="transition"){
-    var s=dc(GS);s.phase="preturn";
-    if(isOnlineMultiplayer){if(isMyTurnNow()){commitTurn(s);}}
-    else{GS=s;saveGame(s);renderAll();}
+  var s=dc(GS); s.phase="preturn";
+  if(isOnlineMultiplayer){
+    if(isMyTurnNow()){ GS=s; writeToFirebase(s); renderAll(); }
+  } else {
+    GS=s; saveGame(s); renderAll();
   }
   setTimeout(function(){centerOn(GS?GS.curIdx:0);},50);
 }

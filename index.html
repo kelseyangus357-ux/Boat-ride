@@ -1136,19 +1136,54 @@ function execCard(card,idx){
 }
 
 function debtR(){
-  if(!GS)return;var pl=GS.players[GS.curIdx];
-  if(!pl.completedTasks||!pl.completedTasks.length){showP("💸 Debt Relief","debt","No completed challenges to sacrifice.",[{l:"Close",c:"pn",fn:hideP}]);return;}
-  var lbls={boat_school:"🎓 Boat School",boat:"🛥️ Boat",fish:"🐟 Fish",rescue:"🆘 Rescues"};
-  showP("💸 Debt Relief","debt","Sacrifice a challenge to reset to $0:",pl.completedTasks.map(function(tk){return{l:lbls[tk]||tk,c:"pw",fn:(function(ttk){return function(){var s=dc(GS);var p2=mg(s.players[s.curIdx],{money:0,completedTasks:s.players[s.curIdx].completedTasks.filter(function(x){return x!==ttk;})});if(ttk==="boat_school")p2=mg(p2,{graduated:false,stars:0});if(ttk==="fish")p2=mg(p2,{fish:0});if(ttk==="rescue")p2=mg(p2,{rescues:0});if(ttk==="boat")p2=mg(p2,{boat:null});s.players[s.curIdx]=p2;addL(s,p2.name+" 💸 debt relief");push(s);hideP();};})(tk)};})).concat([{l:"Cancel",c:"pn",fn:hideP}]));
+  if(!GS) return;
+  var pl = GS.players[GS.curIdx];
+  if(!pl.completedTasks || !pl.completedTasks.length){
+    showP("💸 Debt Relief","debt","No completed challenges to sacrifice.",[{l:"Close",c:"pn",fn:hideP}]);
+    return;
+  }
+  var lbls = {boat_school:"🎓 Boat School", boat:"🛥️ Boat", fish:"🐟 Fish", rescue:"🆘 Rescues"};
+  var btns = pl.completedTasks.map(function(tk){
+    return {l: lbls[tk]||tk, c:"pw", fn: (function(ttk){
+      return function(){
+        var s = dc(GS);
+        var p2 = mg(s.players[s.curIdx], {money:0, completedTasks: s.players[s.curIdx].completedTasks.filter(function(x){return x!==ttk;})});
+        if(ttk==="boat_school") p2 = mg(p2,{graduated:false, stars:0});
+        if(ttk==="fish")        p2 = mg(p2,{fish:0});
+        if(ttk==="rescue")      p2 = mg(p2,{rescues:0});
+        if(ttk==="boat")        p2 = mg(p2,{boat:null});
+        s.players[s.curIdx] = p2;
+        addL(s, p2.name+" 💸 debt relief");
+        push(s); hideP();
+      };
+    })(tk)};
+  });
+  btns.push({l:"Cancel", c:"pn", fn:hideP});
+  showP("💸 Debt Relief","debt","Sacrifice a challenge to reset to $0:", btns);
 }
 
 function inspP(i){
-  if(!GS)return;var pl=GS.players[i];if(!pl)return;
-  var tks=["boat_school","boat","fish","rescue"],lines="💰 $"+pl.money+(pl.money<0?" ⚠️ IN DEBT":"")+"\n\n";
-  for(var j=0;j<tks.length;j++){var tk=tks[j],done=(pl.completedTasks||[]).indexOf(tk)>=0,t=TASKS[tk];if(!t)continue;lines+=(done?"✅ ":"⬜ ")+t.label+": "+(done?(tk==="boat"?(pl.boat?BOAT_EMOJIS[pl.boat.name]||"🛥️":"owned")+" "+(pl.boat?pl.boat.name:""):t.done||"done"):t.prog(pl))+"\n";}
-  if(pl.heldCards&&pl.heldCards.length)lines+="\n🃏 "+pl.heldCards.map(function(c){return c.icon+" "+c.label;}).join(", ");
-  if(pl.frozen>0)lines+="\n❄️ Frozen: "+pl.frozen+" turn(s)";
-  showP((pl.isAI?"🤖 ":"")+pl.name,"info",lines,[{l:"Close",c:"pn",fn:hideP}]);
+  if(!GS) return;
+  var pl = GS.players[i]; if(!pl) return;
+  var tks = ["boat_school","boat","fish","rescue"];
+  var lines = "💰 $"+pl.money+(pl.money<0?" ⚠️ IN DEBT":"")+"\n\n";
+  for(var j=0; j<tks.length; j++){
+    var tk = tks[j];
+    var done = (pl.completedTasks||[]).indexOf(tk)>=0;
+    var t = TASKS[tk]; if(!t) continue;
+    var status;
+    if(done){
+      if(tk==="boat") status = (pl.boat ? (BOAT_EMOJIS[pl.boat.name]||"🛥️")+" "+pl.boat.name : "owned");
+      else status = t.done||"done";
+    } else {
+      status = t.prog(pl);
+    }
+    lines += (done?"✅ ":"⬜ ")+t.label+": "+status+"\n";
+  }
+  if(pl.heldCards && pl.heldCards.length)
+    lines += "\n🃏 "+pl.heldCards.map(function(c){return c.icon+" "+c.label;}).join(", ");
+  if(pl.frozen>0) lines += "\n❄️ Frozen: "+pl.frozen+" turn(s)";
+  showP((pl.isAI?"🤖 ":"")+pl.name, "info", lines, [{l:"Close",c:"pn",fn:hideP}]);
 }
 
 // ── Transition ────────────────────────────────────────────────────────────────

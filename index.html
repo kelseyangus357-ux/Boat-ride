@@ -1,1 +1,1238 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"/><link rel="shortcut icon" href="./favicon.ico"/><meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/><meta http-equiv="Pragma" content="no-cache"/><meta http-equiv="Expires" content="0"/><meta name="viewport" content="width=device-width,initial-scale=1,shrink-to-fit=no"/><meta name="theme-color" content="#000000"/><title>Office Scripts</title><script>var url=window.location.href,isLocal=0===url.indexOf("https://localhost:3003/");window.OsfOptOut=isLocal,window.useAssociatedActionsOnly=!0</script><style>*,::after,::before{padding:0;margin:0;-webkit-box-sizing:inherit;box-sizing:inherit}html{font-size:62.5%}body{font-family:"Segoe UI Web (Arabic)","Segoe UI",-apple-system,BlinkMacSystemFont,Roboto,"Helvetica Neue",sans-serif!important;color:#323b3a;font-size:14px;-webkit-box-sizing:border-box;box-sizing:border-box;overscroll-behavior-y:none;background-color:#fff;overflow:hidden}#loadingWrapper{background:#f5f5f5;width:100%;height:100%;position:absolute}#loading{position:absolute;z-index:2000000;color:#212121;background:#f5f5f5;height:100%;width:100%;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-box-orient:vertical;-webkit-box-direction:normal;-ms-flex-direction:column;flex-direction:column;-webkit-box-align:center;-ms-flex-align:center;align-items:center;-webkit-box-pack:center;-ms-flex-pack:center;justify-content:center}#loading>img{height:120px;margin-bottom:15px}#loading>h1{color:#666;margin-top:10px;margin-bottom:10px;margin-left:8px}#loading>h2{color:#999;max-width:250px;text-align:center}#loading>a{color:#999!important;margin-top:10px}@media only screen and (max-width:500px){#loading>pre{padding:0 30px}}#loading>.loading-indicator{-webkit-box-sizing:border-box;box-sizing:border-box;text-align:center;border:2px solid #9fcdb3;border-top:2px solid #217346;border-radius:50%;width:30px;height:30px;animation:loading-animation 1s linear infinite}@-webkit-keyframes loading-animation{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}@keyframes loading-animation{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}#errorRoot{height:100%;width:100%;display:block;padding:0 1.6rem 1.6rem;background:#f5f5f5;height:100vh;min-height:100vh;width:100%;display:flex;flex-direction:column}#errorRoot label{display:block;padding-top:5px;padding-bottom:5px}#errorRoot #errorHeader{font-size:15px;font-weight:600}#errorRoot #errorDescription{font-size:12px}#errorRoot #errorFooter{font-size:12px}#errorRoot .endJustifiedFlexWrapper{width:100%;display:flex;justify-content:flex-end}#errorRoot button{background-color:#217346;color:#fff;font-size:12px;font-weight:600;min-width:80px;height:2.6rem;border-color:transparent;outline:transparent;border-width:1px;border-radius:2px;margin-top:2.4rem}#errorRoot button:hover{background-color:#0f522d}#errorRoot button:active{background-color:#084121}#errorRoot pre{font-size:100%;color:#999;margin-top:10px;max-height:50%;max-width:100%;padding:0 80px;word-break:break-all;white-space:pre-wrap;overflow-y:auto}</style><meta name="Content-Security-Policy" content="default-src 'none' ; script-src 'self' 'unsafe-inline' https://alcdn.msauth.net https://appsforoffice.microsoft.com ; img-src 'self' data: ; style-src 'unsafe-inline' ; font-src 'self' data: https://res-1.cdn.office.net https://spoprod-a.akamaihd.net ; frame-src 'self' *.test.arbitraryrunner.com *.runtime.arbitraryrunner.com *.officescripts.microsoftusercontent.com *.gcc.officescripts.microsoftusercontent.com https://telemetryservice.firstpartyapps.oaspapps.com https://login.microsoftonline.com https://microsoft-onmicrosoft-com.access.mcas.ms ; connect-src 'self' https://api.test.arbitraryrunner.com https://api.runtime.arbitraryrunner.com https://api.officescripts.microsoftusercontent.com https://api.gcc.officescripts.microsoftusercontent.com https://login.microsoftonline.com https://browser.events.data.microsoft.com https://graph.microsoft.com https://*.powerautomate.com https://*.events.data.microsoft.com https://*.api.flow.microsoft.com https://res.cdn.office.net https://login.live.com https://*.access.mcas.ms https://*.access.mcas-gov.ms https://eu-mobile.events.data.microsoft.com https://microsoft-my.sharepoint-df.com ; require-trusted-types-for 'script' ; trusted-types script-url#webpack officejs officejs-domparser officejs-url ;"><script>(()=>{"use strict";var e={},t={};function r(a){var c=t[a];if(void 0!==c)return c.exports;var f=t[a]={id:a,loaded:!1,exports:{}};return e[a].call(f.exports,f,f.exports,r),f.loaded=!0,f.exports}r.m=e,r.amdO={},(()=>{var e=[];r.O=(t,a,c,f)=>{if(!a){var o=1/0;for(i=0;i<e.length;i++){a=e[i][0],c=e[i][1],f=e[i][2];for(var d=!0,n=0;n<a.length;n++)(!1&f||o>=f)&&Object.keys(r.O).every((e=>r.O[e](a[n])))?a.splice(n--,1):(d=!1,f<o&&(o=f));if(d){e.splice(i--,1);var b=c();void 0!==b&&(t=b)}}return t}f=f||0;for(var i=e.length;i>0&&e[i-1][2]>f;i--)e[i]=e[i-1];e[i]=[a,c,f]}})(),r.n=e=>{var t=e&&e.__esModule?()=>e.default:()=>e;return r.d(t,{a:t}),t},(()=>{var e,t=Object.getPrototypeOf?e=>Object.getPrototypeOf(e):e=>e.__proto__;r.t=function(a,c){if(1&c&&(a=this(a)),8&c)return a;if("object"==typeof a&&a){if(4&c&&a.__esModule)return a;if(16&c&&"function"==typeof a.then)return a}var f=Object.create(null);r.r(f);var o={};e=e||[null,t({}),t([]),t(t)];for(var d=2&c&&a;"object"==typeof d&&!~e.indexOf(d);d=t(d))Object.getOwnPropertyNames(d).forEach((e=>o[e]=()=>a[e]));return o.default=()=>a,r.d(f,o),f}})(),r.d=(e,t)=>{for(var a in t)r.o(t,a)&&!r.o(e,a)&&Object.defineProperty(e,a,{enumerable:!0,get:t[a]})},r.f={},r.e=e=>Promise.all(Object.keys(r.f).reduce(((t,a)=>(r.f[a](e,t),t)),[])),r.u=e=>8227===e?"8227.2685c23d.js":9342===e?"9342.96f561fc.js":1773===e?"1773.b3f83937.js":3677===e?"3677.45e1f235.js":5183===e?"5183.286cdd2d.js":({932:"run-from-button",1715:"LocalStorageConsent",2178:"notfound",3275:"LocalStorageWorkbook",3293:"LocalStorageUsers",4261:"office.script.sync",4835:"office.script.synchronous.intellisense.types",5225:"LocalStorageVersion",5560:"LocalStorageAdmin",6008:"editor",7504:"office.script.synchronous.library",7537:"office.script.synchronous.intellisense.synchronous.preview",7594:"about",8456:"office.script.synchronous.intellisense.batch",8773:"power-automate",8943:"office.script.synchronous.intellisense.synchronous",9777:"recorder"}[e]||e)+"."+{50:"81bcfa68",54:"a8488bb5",362:"911f4102",402:"b5aa3350",559:"878058d5",564:"82b4bc74",572:"edce390f",632:"d2f72421",658:"7c9b90a8",672:"dc1d7016",738:"5faf481c",787:"bcc7a6d5",865:"7f015726",932:"7722de22",962:"519af2f7",968:"72801b8d",974:"380e6dfc",976:"2f48ee60",1042:"1eaf8078",1072:"61f6d2b9",1106:"1cb898df",1128:"65f85f3c",1244:"78d6f28d",1250:"78124570",1299:"028babe2",1354:"17bd5b34",1374:"d82e011e",1444:"d2df1f22",1468:"a0e19e50",1514:"66d378f8",1551:"304309d5",1634:"49d1a06f",1674:"d0808f02",1715:"a5540e66",1717:"86b65788",1770:"98549e90",1790:"29f1e6ac",1859:"ec0ad7a1",1994:"fba1019d",2156:"86ddb879",2178:"aaad3989",2200:"9eb760a0",2210:"6d74fbd2",2326:"3acfcccb",2338:"85f62988",2362:"903c7db8",2442:"cdd85337",2481:"b4bb69b1",2573:"f914161e",2653:"8bd9828a",2674:"81ec70db",2870:"aae2b35b",3039:"1e0cfcc0",3040:"b5aa3efd",3126:"8edae53d",3164:"cb87fa5d",3201:"7ac30101",3205:"d7fc5cb8",3275:"a6e7bf8f",3282:"177de2a6",3293:"ac939ba3",3329:"b72a7a76",3420:"5f934f8c",3430:"c8382908",3763:"8e70d031",3892:"dbc71c8b",4058:"c450e201",4063:"97d54b21",4094:"776a3f68",4128:"4b681774",4170:"b44717c5",4183:"1f77e9d9",4210:"41f27a4a",4240:"e0350b46",4261:"b8dd2068",4346:"6ab37e06",4358:"c8125f73",4470:"09ba3d57",4474:"73b29a8e",4517:"1cd1e537",4642:"aa4d3d64",4733:"4adea50e",4751:"cd656220",4754:"905d2606",4770:"a10e8b96",4782:"02123cad",4822:"757f6675",4835:"fed22594",4930:"87f6cbb8",4971:"5e2637e3",5031:"eaeeb123",5058:"8e83f4c3",5092:"6dbeb248",5142:"ebb12d06",5156:"7e06509e",5164:"c1b0a460",5225:"f60306da",5318:"9ef07e23",5346:"ab10c655",5352:"d8ef9633",5354:"eb732b35",5420:"af4e5929",5473:"52950762",5520:"44eab756",5560:"1fef5e92",5621:"d03c48f9",5662:"932c7f59",5758:"eec2b250",5874:"9afe7c27",5891:"e982c421",5902:"9add8c13",5916:"758813c6",5953:"f3c279be",5993:"eb0623cf",6008:"031e82bf",6026:"d1eb290b",6034:"387cf54a",6077:"974f4486",6082:"6eaf6a22",6128:"e282cb74",6130:"6f6abd14",6188:"de3de6b8",6223:"1150de1d",6295:"0fbf9051",6444:"f58af908",6471:"4fdeed43",6510:"ad17e12f",6561:"660fff00",6592:"a43f01f0",6608:"06a0276c",6676:"95376f1d",6738:"27d86d4a",6748:"04875d8c",6786:"9f25b074",6898:"54fde2c4",6900:"153349aa",6981:"aec7e43f",7244:"06f9287e",7254:"a369c600",7374:"d52ee860",7397:"d6097e29",7421:"b1e4dfaa",7432:"6fb543f0",7498:"e65ec1a2",7504:"29fa7b01",7537:"5b881c8e",7594:"2baa7cbc",7694:"86d438db",7771:"479db00d",7801:"3341546f",7868:"ce781019",7873:"989a65b5",7886:"83ce6ecc",7911:"d85d2049",7923:"27eafb90",7925:"9e84ff66",7940:"c0b6077a",7952:"37b6a30e",8006:"059d55f2",8172:"5587b14c",8196:"a11df0df",8206:"7cc9a0ed",8226:"118367fb",8314:"48c2670f",8328:"7a447237",8330:"cff758f7",8346:"49d7c998",8428:"013d1b3a",8456:"e5dc90cd",8566:"acf2120a",8595:"8342cb55",8599:"c949bf97",8688:"3360200f",8752:"29b52b4d",8773:"a8c42a9d",8811:"677a8a15",8834:"575a2f56",8888:"d44c257a",8943:"82ffd9b9",8962:"32d79b90",8974:"15dde1a7",9108:"f498fc13",9110:"3003a039",9118:"e061e68a",9185:"229f2b29",9246:"49585332",9306:"d09112cd",9327:"69d8fab6",9347:"cf641625",9441:"ea5e1248",9442:"4bcb482a",9450:"f0ef1041",9520:"ec0a486f",9559:"cb08e2bb",9618:"b98ea1d7",9682:"86f43b61",9698:"a8993508",9730:"921100d5",9777:"e19da612",9858:"1633d451",9958:"f23c0617"}[e]+".chunk.js",r.miniCssF=e=>"static/css/"+e+".9095b267.chunk.css",r.g=function(){if("object"==typeof globalThis)return globalThis;try{return this||new Function("return this")()}catch(e){if("object"==typeof window)return window}}(),r.hmd=e=>((e=Object.create(e)).children||(e.children=[]),Object.defineProperty(e,"exports",{enumerable:!0,set:()=>{throw new Error("ES Modules may not assign module.exports or exports.*, Use ESM export syntax, instead: "+e.id)}}),e),r.o=(e,t)=>Object.prototype.hasOwnProperty.call(e,t),(()=>{var e={},t="maker-code-editor:";r.l=(a,c,f,o)=>{if(e[a])e[a].push(c);else{var d,n;if(void 0!==f)for(var b=document.getElementsByTagName("script"),i=0;i<b.length;i++){var s=b[i];if(s.getAttribute("src")==a||s.getAttribute("data-webpack")==t+f){d=s;break}}d||(n=!0,(d=document.createElement("script")).charset="utf-8",d.timeout=120,r.nc&&d.setAttribute("nonce",r.nc),d.setAttribute("data-webpack",t+f),d.src=r.tu(a)),e[a]=[c];var l=(t,r)=>{d.onerror=d.onload=null,clearTimeout(u);var c=e[a];if(delete e[a],d.parentNode&&d.parentNode.removeChild(d),c&&c.forEach((e=>e(r))),t)return t(r)},u=setTimeout(l.bind(null,void 0,{type:"timeout",target:d}),12e4);d.onerror=l.bind(null,d.onerror),d.onload=l.bind(null,d.onload),n&&document.head.appendChild(d)}}})(),r.r=e=>{"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(e,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(e,"__esModule",{value:!0})},(()=>{var e;r.tt=()=>{if(void 0===e&&(e={createScriptURL:e=>e},"undefined"!=typeof trustedTypes&&trustedTypes.createPolicy))try{e=trustedTypes.createPolicy("script-url#webpack",e)}catch(e){console.warn('Could not create trusted-types policy "script-url#webpack"')}return e}})(),r.tu=e=>r.tt().createScriptURL(e),r.p="./",(()=>{var e=e=>new Promise(((t,a)=>{var c=r.miniCssF(e),f=r.p+c;if(((e,t)=>{for(var r=document.getElementsByTagName("link"),a=0;a<r.length;a++){var c=(o=r[a]).getAttribute("data-href")||o.getAttribute("href");if("stylesheet"===o.rel&&(c===e||c===t))return o}var f=document.getElementsByTagName("style");for(a=0;a<f.length;a++){var o;if((c=(o=f[a]).getAttribute("data-href"))===e||c===t)return o}})(c,f))return t();((e,t,r,a)=>{var c=document.createElement("link");c.rel="stylesheet",c.type="text/css",c.onerror=c.onload=f=>{if(c.onerror=c.onload=null,"load"===f.type)r();else{var o=f&&("load"===f.type?"missing":f.type),d=f&&f.target&&f.target.href||t,n=new Error("Loading CSS chunk "+e+" failed.\n("+d+")");n.code="CSS_CHUNK_LOAD_FAILED",n.type=o,n.request=d,c.parentNode.removeChild(c),a(n)}},c.href=t,document.head.appendChild(c)})(e,f,t,a)})),t={4577:0};r.f.miniCss=(r,a)=>{t[r]?a.push(t[r]):0!==t[r]&&{8330:1}[r]&&a.push(t[r]=e(r).then((()=>{t[r]=0}),(e=>{throw delete t[r],e})))}})(),(()=>{r.b=document.baseURI||self.location.href;var e={4577:0};r.f.j=(t,a)=>{var c=r.o(e,t)?e[t]:void 0;if(0!==c)if(c)a.push(c[2]);else if(4577!=t){var f=new Promise(((r,a)=>c=e[t]=[r,a]));a.push(c[2]=f);var o=r.p+r.u(t),d=new Error;r.l(o,(a=>{if(r.o(e,t)&&(0!==(c=e[t])&&(e[t]=void 0),c)){var f=a&&("load"===a.type?"missing":a.type),o=a&&a.target&&a.target.src;d.message="Loading chunk "+t+" failed.\n("+f+": "+o+")",d.name="ChunkLoadError",d.type=f,d.request=o,c[1](d)}}),"chunk-"+t,t)}else e[t]=0},r.O.j=t=>0===e[t];var t=(t,a)=>{var c,f,o=a[0],d=a[1],n=a[2],b=0;if(o.some((t=>0!==e[t]))){for(c in d)r.o(d,c)&&(r.m[c]=d[c]);if(n)var i=n(r)}for(t&&t(a);b<o.length;b++)f=o[b],r.o(e,f)&&e[f]&&e[f][0](),e[f]=0;return r.O(i)},a=self.webpackChunkmaker_code_editor=self.webpackChunkmaker_code_editor||[];a.forEach(t.bind(null,0)),a.push=t.bind(null,a.push.bind(a))})(),r.nc=void 0})()</script><script defer="defer" src="./7781.310041a4.js"></script><script defer="defer" src="./7448.76dca5dc.js"></script><script defer="defer" src="./3689.2e41bd8f.js"></script><script defer="defer" src="./4322.a2c713e6.js"></script><script defer="defer" src="./main.2489ca41.js"></script><link href="./static/css/main.cc196895.css" rel="stylesheet"></head><body class="ms-Fabric"><noscript>You need to enable JavaScript to enable this functionality.</noscript><div id="errorRoot" style="display:none"><label id="errorHeader" class="ms-label">Error</label> <label id="errorDescription" class="ms-label">An unexpected error occurred.</label> <button id="feedbackButton" style="display:none" class="ms-button" onclick='OfficeFirstParty.UserFeedback.CollectUserFeedback(3,1,"Extensibility\\Office Scripts",{})'><label id="feedBackText"></label></button> <label id="errorFooter" class="ms-label"></label><div class="endJustifiedFlexWrapper"><button id="refreshButton" class="ms-button" onclick="location.reload(!0)">Refresh</button></div></div><div id="loadingWrapper"><div id="loading" style="visibility:hidden"><div class="loading-indicator"></div><h2 class="ms-font-m"></h2></div></div><div id="root"></div></body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Boat Ride 2.0</title>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script>
+  // Initialize Firebase immediately after compat scripts load
+  var firebaseApp = firebase.initializeApp({
+    apiKey:"AIzaSyB_fBqYhfr061UY2xSYrBxO9UW1T16B5Jc",
+    authDomain:"boat-ride-629a8.firebaseapp.com",
+    databaseURL:"https://boat-ride-629a8-default-rtdb.firebaseio.com",
+    projectId:"boat-ride-629a8",
+    storageBucket:"boat-ride-629a8.firebasestorage.app",
+    messagingSenderId:"529814761740",
+    appId:"1:529814761740:web:04a5491c6e91a064cdd929"
+  });
+  var firebaseDB = firebase.database();
+  function dbSet(path,val){return firebaseDB.ref(path).set(val);}
+  function dbGet(path){return firebaseDB.ref(path).once("value").then(function(s){return s.val();});}
+  function dbOn(path,cb){
+    var r=firebaseDB.ref(path);
+    r.on("value",function(s){cb(s.val());});
+    return function(){r.off();};
+  }
+</script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',sans-serif;background:#071728;color:#fff;min-height:100vh}
+#lobby{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:24px}
+.card{background:#0b1e30;border-radius:20px;padding:36px 44px;max-width:460px;width:100%;text-align:center}
+.card h1{font-size:26px;font-weight:900;color:#7ecbe0;margin-bottom:4px}
+.sub{font-size:13px;color:#4a7a9b;margin-bottom:28px}
+hr.div{border:none;border-top:1px solid #1a3a55;margin:20px 0}
+.btn{display:block;width:100%;padding:13px;border-radius:10px;border:none;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:10px}
+.btn-green{background:#1a7a3a;color:#fff}
+.btn-blue{background:#1565c0;color:#fff}
+.btn-gray{background:#1a3a55;color:#7ecbe0}
+.inp{width:100%;padding:11px 14px;border-radius:9px;border:2px solid #1a3a55;background:#071728;color:#fff;font-size:20px;text-align:center;letter-spacing:6px;font-weight:700;outline:none;margin-bottom:10px}
+.inp:focus{border-color:#1565c0}
+.room-code{font-size:48px;font-weight:900;letter-spacing:10px;color:#FFD700;margin:12px 0}
+.badge{display:inline-block;padding:5px 14px;border-radius:16px;font-size:12px;font-weight:600;margin-top:8px}
+.bwait{background:#1a3a55;color:#7ecbe0}
+.bok{background:#1a7a3a;color:#7dff9a}
+.berr{background:#3a0a0a;color:#ff9999}
+#game{display:none;flex-direction:column;height:100vh}
+#game.on{display:flex}
+#topbar{background:#0b1e30;border-bottom:2px solid #1a3a55;padding:6px 16px;display:flex;align-items:center;gap:12px;flex-shrink:0}
+.pill{background:#1a3a55;color:#7ecbe0;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:700;letter-spacing:2px}
+.ti{font-size:13px;font-weight:700;flex:1;text-align:center}
+#main{display:flex;flex:1;overflow:hidden}
+#boardcol{flex:1;display:flex;flex-direction:column;overflow:hidden}
+#bs{flex:1;overflow:auto}
+#ctrlbar{height:44px;flex-shrink:0;background:rgba(7,23,40,.97);border-top:1px solid #1a3a55;display:flex;align-items:center;justify-content:center;gap:8px;padding:0 16px}
+#ctrlbar button{padding:5px 11px;border-radius:7px;border:none;font-size:11px;font-weight:600;cursor:pointer}
+#rp{width:280px;background:#0b1e30;border-left:2px solid #1a3a55;display:flex;flex-direction:column;overflow:hidden}
+.ph{padding:8px 12px;border-bottom:1px solid #1a3a55;text-align:center;flex-shrink:0}
+#rs{flex:1;overflow-y:auto;padding:10px 12px}
+.sl{font-size:10px;color:#7ecbe0;letter-spacing:1px;margin-bottom:5px;margin-top:8px}
+.pr{display:flex;align-items:center;gap:7px;padding:4px 7px;border-radius:7px;margin-bottom:4px;cursor:pointer}
+.pr.act{background:#1a3a55}
+.ab{display:block;width:100%;padding:9px;border-radius:7px;border:none;color:#fff;font-weight:600;font-size:13px;cursor:pointer;margin-bottom:5px}
+.ab:disabled{opacity:.4;cursor:default}
+.cb2{display:block;width:100%;padding:3px 7px;border-radius:5px;background:#1a3a55;border:1px solid #2a5a7a;color:#fff;font-size:10px;cursor:pointer;text-align:left;margin-bottom:3px}
+.cb2:disabled{background:#111;border-color:#333;color:#555;cursor:default}
+#po{display:none;position:fixed;inset:0;background:rgba(0,0,0,.65);align-items:center;justify-content:center;z-index:200}
+#po.on{display:flex}
+#pb{background:#fff;border-radius:16px;max-width:460px;width:92%;overflow:hidden}
+#phd{padding:14px 20px}
+#pbd{padding:18px 24px 6px;font-size:14px;color:#333;line-height:1.7;white-space:pre-line;text-align:left}
+#pft{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;padding:14px 20px 18px}
+#pft button{padding:9px 20px;border-radius:8px;border:none;cursor:pointer;font-weight:600;font-size:13px}
+.pp{background:#1565c0;color:#fff}
+.pw{background:#e67e22;color:#fff}
+.pn{background:#e0e0e0;color:#333}
+#wo{display:none;position:fixed;inset:0;background:linear-gradient(160deg,#1565c0,#071728);align-items:center;justify-content:center;flex-direction:column;z-index:300}
+#wo.on{display:flex}
+#tro{display:none;position:fixed;inset:0;background:linear-gradient(160deg,#0d3b6e,#071728);align-items:center;justify-content:center;flex-direction:column;z-index:250}
+#tro.on{display:flex}
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:#071728}
+::-webkit-scrollbar-thumb{background:#1a3a55;border-radius:3px}
+@keyframes w1{0%{transform:translateX(0)}100%{transform:translateX(-140px)}}
+@keyframes w2{0%{transform:translateX(0)}100%{transform:translateX(140px)}}
+@keyframes w3{0%{transform:translateX(-70px)}100%{transform:translateX(70px)}}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+</style>
+</head>
+<body>
+
+<div id="lobby">
+  <div class="card">
+    <h1>Boat Ride 2.0</h1>
+    <p class="sub">Online Multiplayer</p>
+    <button class="btn btn-green" id="btnCreate">Create Room</button>
+    <div id="cs" style="display:none;margin-top:12px">
+      <p style="font-size:13px;color:#7ecbe0;margin-bottom:4px">Share this code:</p>
+      <div class="room-code" id="ccode">----</div>
+      <div id="lslots"></div>
+      <span class="badge bwait" id="cbadge">Waiting for opponent...</span>
+    </div>
+    <hr class="div"/>
+    <input class="inp" id="ji" maxlength="4" placeholder="CODE"/>
+    <button class="btn btn-blue" id="btnJoin">Join Room</button>
+    <span class="badge" id="jbadge" style="display:none"></span>
+    <hr class="div"/>
+    <button class="btn btn-gray" id="btnSolo">vs AI (offline)</button>
+  </div>
+</div>
+
+<div id="game">
+  <div id="topbar">
+    <div class="pill" id="rpill">ROOM ----</div>
+    <div class="ti" id="tinfo">Loading...</div>
+  </div>
+  <div id="main">
+    <div id="boardcol">
+      <div id="bs">
+        <div id="bwrap" style="transform-origin:top left">
+          <svg id="bsvg" xmlns="http://www.w3.org/2000/svg"></svg>
+        </div>
+      </div>
+      <div id="ctrlbar">
+        <button id="btnLeave" style="background:#e67e22;color:#fff">Leave</button>
+        <button id="btnPause" style="background:#1a3a55;color:#7ecbe0">Pause</button>
+        <button id="btnZO" style="background:#1a3a55;color:#fff;font-size:17px;width:30px;height:30px;padding:0;border-radius:7px">-</button>
+        <div id="zlbl" style="background:#1a3a55;color:#7ecbe0;padding:4px 8px;border-radius:6px;font-size:11px;font-weight:600;min-width:42px;text-align:center">120%</div>
+        <button id="btnZI" style="background:#1a3a55;color:#fff;font-size:17px;width:30px;height:30px;padding:0;border-radius:7px">+</button>
+        <button id="btnCtr" style="background:#1a3a55;color:#7ecbe0">Center</button>
+      </div>
+    </div>
+    <div id="rp">
+      <div class="ph">
+        <div style="font-size:13px;font-weight:900;color:#7ecbe0">Boat Ride 2.0</div>
+        <div style="font-size:9px;color:#4a7a9b">Supreme Boat Captain Race</div>
+      </div>
+      <div id="rs">
+        <div class="sl">PLAYERS</div>
+        <div id="plist"></div>
+        <hr style="border:none;border-top:1px solid #1a3a55;margin:8px 0"/>
+        <div class="sl">CURRENT TURN</div>
+        <div id="ctn" style="font-size:14px;font-weight:700;margin-bottom:2px"></div>
+        <div id="ctp" style="font-size:10px;color:#f5a623;margin-bottom:3px"></div>
+        <div id="ctm" style="font-size:12px;font-weight:600;margin-bottom:2px"></div>
+        <div id="ctt" style="font-size:11px;margin-bottom:6px"></div>
+        <div id="ctb" style="font-size:10px;color:#FFD700;font-weight:700;margin-bottom:4px"></div>
+        <div id="cds"></div>
+        <hr style="border:none;border-top:1px solid #1a3a55;margin:6px 0"/>
+        <div class="sl" id="phl">PRE-TURN</div>
+        <div id="aa"></div>
+        <hr style="border:none;border-top:1px solid #1a3a55;margin:8px 0"/>
+        <div class="sl">GAME LOG</div>
+        <div id="glog" style="font-size:9px;color:#8aaccc"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="po"><div id="pb"><div id="phd"></div><div id="pbd"></div><div id="pft"></div></div></div>
+
+<div id="wo">
+  <div style="font-size:56px;margin-bottom:16px;animation:pulse 1.4s infinite" id="wemoji">WIN</div>
+  <div style="font-size:36px;font-weight:900;color:#FFD700;margin-bottom:8px">Supreme Boat Captain!</div>
+  <div style="font-size:28px;font-weight:800;margin-bottom:32px" id="wname"></div>
+  <button class="btn btn-blue" style="width:200px" id="btnWL">Play Again</button>
+</div>
+
+<div id="tro">
+  <div style="font-size:16px;color:#7ecbe0;margin-bottom:8px" id="trsub">NEXT UP</div>
+  <div style="width:22px;height:22px;border-radius:50%;margin-bottom:10px" id="trdot"></div>
+  <div style="font-size:30px;font-weight:900;color:#fff;margin-bottom:6px;text-align:center" id="trname"></div>
+  <div style="font-size:14px;color:#7ecbe0;margin-bottom:28px" id="trstats"></div>
+  <button id="trBtn" class="btn btn-blue" style="width:200px;font-size:16px">Lets go!</button>
+</div>
+
+<script>
+// All game code lives inside boot(), called once Firebase loads
+function boot(dbSet, dbGet, dbOn) {
+
+  // ── Constants ──────────────────────────────────────────────────────────────
+  var PC = ["#c0392b","#2471a3","#1e8449","#d68910","#6c3483","#117a65"];
+  var BW=1300, BH=980, OL=140, OR=1160, OT=130, OB=850, SW=52, SH=52;
+  var WIN_IDX = 33;
+
+  var BOATS = [
+    {name:"Dinghy",price:15},{name:"Kayak",price:20},{name:"Skiff",price:25},
+    {name:"Cruiser",price:40},{name:"Catamaran",price:50},{name:"Yacht",price:60}
+  ];
+  var SWSP = [3,9,16,28];
+  var SKSP = [6,23,30];
+
+  var TASKS = {
+    boat_school: {
+      key:"boat_school",label:"Boat School",entryIdx:5,exitIdx:6,count:6,colGap:SW,color:"#5b2c8c",
+      spaces:[
+        {story:"You ace a test drive!",         eff:function(p){return mg(p,{stars:p.stars+1});},                  desc:"+1 star",reward:1},
+        {story:"F on nav test.",                eff:function(p){return mg(p,{stars:Math.max(0,p.stars-1)});},      desc:"-1 star",reward:-1},
+        {story:"New friends at sailing camp!",  eff:function(p){return mg(p,{stars:p.stars+1});},                  desc:"+1 star",reward:1},
+        {story:"Fell asleep in class.",         eff:function(p){return mg(p,{stars:Math.max(0,p.stars-1)});},      desc:"-1 star",reward:-1},
+        {story:"You learn to tow water skiers!",eff:function(p){return mg(p,{stars:p.stars+2});},                  desc:"+2 stars",reward:2},
+        {story:"You pass your final exam!",     eff:function(p){return mg(p,{stars:p.stars+1});},                  desc:"+1 star",reward:1}
+      ],
+      req:function(p){return p.stars>=(p.shortcut&&p.shortcut.stars?2:3);},
+      done:"Graduated",
+      prog:function(p){return "Stars: "+p.stars+"/"+(p.shortcut&&p.shortcut.stars?2:3);}
+    },
+    boat: {
+      key:"boat",label:"The Boat Store",entryIdx:12,exitIdx:13,count:6,colGap:SW,color:"#b7600a",
+      spaces:[],req:function(p){return p.boat!==null;},done:null,prog:function(){return "No boat yet";}
+    },
+    fish: {
+      key:"fish",label:"Catch a Fish",entryIdx:19,exitIdx:20,count:8,colGap:SW,color:"#0e6655",
+      spaces:[
+        {story:"Great fishing spot!",          eff:function(p){return mg(p,{fish:p.fish+3});},desc:"+3 fish",reward:3},
+        {story:"Bad stream.",                  eff:function(p){return p;},                    desc:"Empty.",reward:0},
+        {story:"Sister teaches bait tricks!",  eff:function(p){return mg(p,{fish:p.fish+6});},desc:"+6 fish",reward:6},
+        {story:"Just one nibble.",             eff:function(p){return mg(p,{fish:p.fish+1});},desc:"+1 fish",reward:1},
+        {story:"Wake up at dawn, worth it!",   eff:function(p){return mg(p,{fish:p.fish+4});},desc:"+4 fish",reward:4},
+        {story:"Sailor shares his spot.",      eff:function(p){return mg(p,{fish:p.fish+2});},desc:"+2 fish",reward:2},
+        {story:"Jackpot! Fish are jumping.",   eff:function(p){return mg(p,{fish:p.fish+5});},desc:"+5 fish",reward:5},
+        {story:"Your line snaps.",             eff:function(p){return p;},                    desc:"Got away.",reward:0}
+      ],
+      req:function(p){return p.fish>=(p.shortcut&&p.shortcut.fish?6:10);},
+      done:"Expert Fisherman",
+      prog:function(p){return "Fish: "+p.fish+"/"+(p.shortcut&&p.shortcut.fish?6:10);}
+    },
+    rescue: {
+      key:"rescue",label:"Lets Rescue!",entryIdx:26,exitIdx:27,count:6,colGap:SW,color:"#1a5276",
+      spaces:[
+        {story:"You perform CPR!",             eff:function(p){return mg(p,{rescues:p.rescues+1});},                  desc:"+1",reward:1},
+        {story:"Swimmer got away.",            eff:function(p){return p;},                                            desc:"None.",reward:0},
+        {story:"Rescue someone who tips you!", eff:function(p){return mg(p,{rescues:p.rescues+1,money:p.money+20});}, desc:"+1+$20",reward:1},
+        {story:"Rescued person fell back in!", eff:function(p){return mg(p,{rescues:Math.max(0,p.rescues-1)});},      desc:"-1",reward:-1},
+        {story:"Save two from rip current!",   eff:function(p){return mg(p,{rescues:p.rescues+2});},                  desc:"+2",reward:2},
+        {story:"Conditions too rough.",        eff:function(p){return p;},                                            desc:"None.",reward:0}
+      ],
+      req:function(p){return p.rescues>=(p.shortcut&&p.shortcut.rescues?1:2);},
+      done:"Life Saver",
+      prog:function(p){return "Rescues: "+p.rescues+"/"+(p.shortcut&&p.shortcut.rescues?1:2);}
+    }
+  };
+
+  var JMAP = {5:"boat_school",12:"boat",19:"fish",26:"rescue",33:"winner"};
+  var WDOCK = [
+    {label:"Dock 1",   eff:function(p){return p;}},
+    {label:"Lose Turn",eff:function(p){return mg(p,{skip:(p.skip||0)+1});}},
+    {label:"Back 1",   eff:function(p){return mg(p,{winPos:Math.max(0,(p.winPos||0)-1)});}},
+    {label:"WIN",      eff:function(p){return p;},win:true}
+  ];
+  var SCARDS = [
+    {id:"s1",text:"Fair winds! Move +3.",eff:{move:3}},{id:"s2",text:"Wallet found! +$20.",eff:{money:20}},
+    {id:"s3",text:"Smooth sailing! Move +2.",eff:{move:2}},{id:"s4",text:"Sponsorship! +$25.",eff:{money:25}},
+    {id:"s5",text:"Crew tip! +$15.",eff:{money:15}},{id:"s6",text:"Current! Move +4.",eff:{move:4}},
+    {id:"s7",text:"Weather bonus! +$12.",eff:{money:12}},{id:"s8",text:"Sailor tips you! +$8.",eff:{money:8}},
+    {id:"s9",text:"Harbor festival! +$18.",eff:{money:18}},{id:"s10",text:"Tailwind! Move +1.",eff:{move:1}},
+    {id:"s11",text:"Regatta prize! +$30.",eff:{money:30}},{id:"s12",text:"Sold gear! +$10.",eff:{money:10}}
+  ];
+  var KCARDS = [
+    {id:"k1",text:"Storm! Go back 3.",eff:{move:-3}},{id:"k2",text:"Docking fee. -$8.",eff:{money:-8}},
+    {id:"k3",text:"Maintenance! -$5.",eff:{money:-5}},{id:"k4",text:"Rogue wave! Back 2.",eff:{move:-2}},
+    {id:"k5",text:"Customs! -$7.",eff:{money:-7}},{id:"k6",text:"Fog delay, skip turn.",eff:{skip:1}},
+    {id:"k7",text:"Engine trouble! -$10.",eff:{money:-10}},{id:"k8",text:"Fine! -$12.",eff:{money:-12}},
+    {id:"k9",text:"Wave! Back 1.",eff:{move:-1}},{id:"k10",text:"Anchor stuck! Skip turn.",eff:{skip:1}},
+    {id:"k11",text:"Nav error! Back 2.",eff:{move:-2}},{id:"k12",text:"Fuel leak! -$6.",eff:{money:-6}}
+  ];
+  var SWDEFS = [
+    {type:"robbery", icon:"[R]",label:"Highway Robbery",desc:"Take ALL money from any one player.",copies:5},
+    {type:"shortcut",icon:"[S]",label:"Shortcut",       desc:"Reduce one challenge requirement.",copies:5},
+    {type:"teleport",icon:"[T]",label:"Teleportation",  desc:"Jump to any space on the oval.",   copies:5},
+    {type:"freeze",  icon:"[F]",label:"Freeze Frame",   desc:"Target skips their next 2 turns.", copies:5},
+    {type:"double",  icon:"[D]",label:"Double Time",    desc:"2 bonus rolls this turn.",         copies:5},
+    {type:"fasttrack",icon:"[!]",label:"Fast Track",    desc:"No exact roll needed to WIN. Auto-active.",copies:1}
+  ];
+
+  // ── Helpers ────────────────────────────────────────────────────────────────
+  function mg(a,b){var r={};for(var k in a)r[k]=a[k];for(var k in b)r[k]=b[k];return r;}
+  function dc(o){return JSON.parse(JSON.stringify(o));}
+  function shuf(a){var b=a.slice();for(var i=b.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=b[i];b[i]=b[j];b[j]=t;}return b;}
+  function mkSwim(){return shuf(SCARDS.concat(SCARDS).concat(SCARDS));}
+  function mkSink(){return shuf(KCARDS.concat(KCARDS).concat(KCARDS));}
+  function mkDeck(defs){
+    var d=[];
+    for(var i=0;i<defs.length;i++){
+      for(var j=0;j<defs[i].copies;j++){
+        d.push(mg(defs[i],{uid:Math.random().toString(36).slice(2)}));
+      }
+    }
+    return shuf(d);
+  }
+  function mkP(id,name,color,isAI,diff){
+    return {id:id,name:name,color:color,isAI:!!isAI,aiDiff:diff||null,
+      pos:0,money:35,stars:0,graduated:false,rescues:0,fish:0,boat:null,skip:0,
+      inTask:null,taskPos:-1,winPos:-1,done:false,eliminated:false,
+      heldCards:[],shortcut:{fish:false,rescues:false,stars:false},fasttrack:false,
+      doubleRollsLeft:0,completedTasks:[],frozen:0,frozenBy:null,
+      boughtCardThisTurn:false,usedShipwreckThisTurn:false,cardsBoughtThisTurn:[]};
+  }
+
+  // ── Geometry ───────────────────────────────────────────────────────────────
+  function oPos(i){
+    if(i<10)return{x:OL+(i/9)*(OR-OL),y:OB};
+    if(i<18)return{x:OR,y:OB-((i-10)/7)*(OB-OT)};
+    if(i<28)return{x:OR-((i-18)/9)*(OR-OL),y:OT};
+    return{x:OL,y:OT+((i-28)/7)*(OB-OT)};
+  }
+  function jDir(ei){if(ei<10)return{x:0,y:-1};if(ei<18)return{x:-1,y:0};if(ei<28)return{x:0,y:1};return{x:1,y:0};}
+  function jPerp(ei){if(ei<10)return{x:1,y:0};if(ei<18)return{x:0,y:1};if(ei<28)return{x:-1,y:0};return{x:0,y:-1};}
+  function jut2col(ei,count,cg){
+    var base=oPos(ei),d=jDir(ei),p=jPerp(ei),half=Math.ceil(count/2),pts=[];
+    for(var i=0;i<half;i++)pts.push({x:base.x+d.x*(i+1)*SW-p.x*cg/2,y:base.y+d.y*(i+1)*SW-p.y*cg/2});
+    for(var i=half-1;i>=0&&pts.length<count;i--)pts.push({x:base.x+d.x*(i+1)*SW+p.x*cg/2,y:base.y+d.y*(i+1)*SW+p.y*cg/2});
+    return pts;
+  }
+  function buildJC(){
+    var c={};
+    var keys=Object.keys(TASKS);
+    for(var ki=0;ki<keys.length;ki++){
+      var t=TASKS[keys[ki]],cg=t.colGap||SW;
+      var pts=jut2col(t.entryIdx,t.count,cg);
+      var p=jPerp(t.entryIdx),base=oPos(t.entryIdx);
+      var ep={x:base.x-p.x*cg/2,y:base.y-p.y*cg/2};
+      var cl=pts[pts.length-1];
+      var xp=t.key==="boat"?{x:ep.x,y:cl.y}:{x:cl.x,y:ep.y};
+      c[t.key]={pts:pts,ep:ep,xp:xp};
+    }
+    var wd=jDir(WIN_IDX),wb=oPos(WIN_IDX),wp=[];
+    for(var i=0;i<4;i++)wp.push({x:wb.x+wd.x*(i+1)*SW,y:wb.y+wd.y*(i+1)*SW});
+    c.winner={pts:wp,ep:wb,xp:null};
+    return c;
+  }
+  function sKind(i){
+    if(i===0)return"start";
+    if(SWSP.indexOf(i)>=0)return"swim";
+    if(SKSP.indexOf(i)>=0)return"sink";
+    if(JMAP[i])return"entry_"+JMAP[i];
+    return"normal";
+  }
+  function sColor(k){
+    var m={start:"#1a7a3a",swim:"#1565c0",sink:"#b71c1c",
+      entry_boat_school:"#6a1b9a",entry_boat:"#e65100",entry_fish:"#00695c",
+      entry_rescue:"#0d47a1",entry_winner:"#f57f17",normal:"#c8a96e"};
+    return m[k]||"#c8a96e";
+  }
+
+  // ── State ──────────────────────────────────────────────────────────────────
+  var GS=null,myId=0,rCode=null,rUnsub=null,isHost=false,isMulti=false;
+  var scale=1.2,JC={},paused=false;
+
+  function push(s){
+    if(isMulti&&rCode){
+      dbSet("rooms/"+rCode,s).catch(function(e){console.error("push failed",e);});
+    } else {
+      GS=s;
+      renderAll();
+    }
+  }
+
+  // ── Lobby ──────────────────────────────────────────────────────────────────
+  function genCode(){return String(Math.floor(1000+Math.random()*9000));}
+
+  function createRoom(){
+    var code=genCode();
+    rCode=code;isHost=true;myId=0;isMulti=true;
+    var p0=mkP(0,"Player 1",PC[0],false,null);
+    var s={players:[p0,null],curIdx:0,phase:"waiting",log:[],
+      swimDeck:mkSwim(),sinkDeck:mkSink(),swDeck:mkDeck(SWDEFS),winner:null};
+    dbSet("rooms/"+code,s).then(function(){
+      document.getElementById("cs").style.display="block";
+      document.getElementById("ccode").textContent=code;
+      rUnsub=dbOn("rooms/"+code,function(v){
+        if(!v)return;
+        updateSlots(v.players);
+        if(v.players&&v.players[1]&&v.phase==="waiting"){
+          var b=document.getElementById("cbadge");
+          b.className="badge bok";
+          b.textContent="Opponent joined! Starting...";
+          setTimeout(function(){enterGame(code);},1500);
+        }
+      });
+    }).catch(function(e){alert("Error creating room: "+e.message);});
+  }
+
+  function joinRoom(){
+    var code=document.getElementById("ji").value.trim().toUpperCase();
+    if(code.length!==4){setBadge("j","Enter 4-digit code","berr");return;}
+    dbGet("rooms/"+code).then(function(v){
+      if(!v){setBadge("j","Room not found","berr");return;}
+      if(v.players&&v.players[1]){setBadge("j","Room is full","berr");return;}
+      rCode=code;isHost=false;myId=1;isMulti=true;
+      var p1=mkP(1,"Player 2",PC[1],false,null);
+      dbSet("rooms/"+code+"/players/1",p1).then(function(){
+        setBadge("j","Joined! Starting...","bok");
+        setTimeout(function(){enterGame(code);},1500);
+      });
+    }).catch(function(e){setBadge("j","Error: "+e.message,"berr");});
+  }
+
+  function setBadge(w,msg,cls){
+    var id=w==="j"?"jbadge":"cbadge";
+    var el=document.getElementById(id);
+    el.style.display="inline-block";el.className="badge "+cls;el.textContent=msg;
+  }
+
+  function updateSlots(players){
+    var el=document.getElementById("lslots");if(!el||!players)return;
+    var h="";
+    for(var i=0;i<players.length;i++){
+      var pl=players[i];
+      h+='<div style="display:flex;align-items:center;gap:8px;padding:8px 12px;border-radius:8px;background:#071728;margin-bottom:6px;border:1px solid #1a3a55">'+
+        '<div style="width:11px;height:11px;border-radius:50%;background:'+PC[i]+'"></div>'+
+        '<div style="font-size:13px;font-weight:600">'+(pl?pl.name:"Waiting...")+'</div>'+
+        '<div style="font-size:11px;color:#4a7a9b;margin-left:auto">'+(pl?"Connected":"...")+'</div></div>';
+    }
+    el.innerHTML=h;
+  }
+
+  function enterGame(code){
+    if(rUnsub){rUnsub();rUnsub=null;}
+    document.getElementById("lobby").style.display="none";
+    document.getElementById("game").classList.add("on");
+    document.getElementById("rpill").textContent="ROOM "+code;
+    JC=buildJC();drawBoard();
+    rUnsub=dbOn("rooms/"+code,function(v){if(!v)return;GS=v;renderAll();});
+  }
+
+  function startSolo(){
+    isMulti=false;myId=0;isHost=true;
+    document.getElementById("lobby").style.display="none";
+    document.getElementById("game").classList.add("on");
+    document.getElementById("rpill").textContent="OFFLINE";
+    JC=buildJC();
+    GS={
+      players:[mkP(0,"Player 1",PC[0],false,null),mkP(1,"AI Skipper",PC[1],true,"medium")],
+      curIdx:0,phase:"transition",log:[],
+      swimDeck:mkSwim(),sinkDeck:mkSink(),swDeck:mkDeck(SWDEFS),winner:null
+    };
+    drawBoard();renderAll();showTrans();
+  }
+
+  function leaveGame(){
+    if(rUnsub){rUnsub();rUnsub=null;}
+    GS=null;isMulti=false;
+    document.getElementById("game").classList.remove("on");
+    document.getElementById("wo").classList.remove("on");
+    document.getElementById("tro").classList.remove("on");
+    document.getElementById("lobby").style.display="flex";
+    document.getElementById("cs").style.display="none";
+    document.getElementById("jbadge").style.display="none";
+    document.getElementById("ji").value="";
+    hideP();
+  }
+
+  // ── Render ─────────────────────────────────────────────────────────────────
+  function renderAll(){
+    if(!GS)return;
+    var s=GS,cur=s.players[s.curIdx];if(!cur)return;
+    document.getElementById("tinfo").textContent=(cur.isAI?"AI: ":"")+cur.name+"'s Turn";
+    document.getElementById("tinfo").style.color=cur.color;
+    renderPList(s);renderCur(s,cur);renderAct(s,cur);updateTok(s);
+    if(s.winner)showWin(s.winner);
+    if(s.log){
+      var arr=Array.isArray(s.log)?s.log:Object.values(s.log);
+      var h="";
+      for(var i=0;i<arr.length;i++)h+='<div style="margin-bottom:2px">'+arr[i]+'</div>';
+      document.getElementById("glog").innerHTML=h;
+    }
+  }
+
+  function renderPList(s){
+    var h="";
+    for(var i=0;i<s.players.length;i++){
+      var pl=s.players[i];if(!pl)continue;
+      var act=i===s.curIdx;
+      h+='<div class="pr'+(act?" act":"")+'" data-pi="'+i+'">'+
+        '<div style="width:9px;height:9px;border-radius:50%;background:'+pl.color+';flex-shrink:0"></div>'+
+        '<div style="flex:1;min-width:0">'+
+        '<div style="font-size:11px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+
+        (pl.isAI?"AI: ":"")+pl.name+(pl.eliminated?" X":pl.done?" WIN":act?" >":"")+
+        '</div><div style="font-size:9px;color:'+(pl.money<0?"#ff9999":"#7ecbe0")+'">'+
+        '$'+pl.money+(pl.money<0?" (!!)":"")+" | "+(pl.completedTasks||[]).length+"/4"+
+        (pl.frozen>0?" frozen:"+pl.frozen:"")+
+        '</div></div></div>';
+    }
+    document.getElementById("plist").innerHTML=h;
+    var rows=document.getElementById("plist").querySelectorAll("[data-pi]");
+    for(var i=0;i<rows.length;i++){
+      rows[i].addEventListener("click",(function(idx){return function(){inspP(idx);};})(parseInt(rows[i].getAttribute("data-pi"))));
+    }
+  }
+
+  function renderCur(s,cur){
+    document.getElementById("ctn").textContent=(cur.isAI?"AI: ":"")+cur.name;
+    document.getElementById("ctn").style.color=cur.color;
+    var pd=posD(cur);
+    document.getElementById("ctp").textContent=pd||"";
+    document.getElementById("ctp").style.display=pd?"":"none";
+    var id=cur.money<0;
+    document.getElementById("ctm").textContent="$"+cur.money+(id?" (!!)":"");
+    document.getElementById("ctm").style.color=id?"#ff6b6b":"#7dff9a";
+    var tks=["boat_school","boat","fish","rescue"],h="";
+    for(var i=0;i<tks.length;i++){var r=tLine(cur,tks[i]);h+='<div style="color:'+(r.g?"#4eff91":"#8aaccc")+'">'+r.t+'</div>';}
+    document.getElementById("ctt").innerHTML=h;
+    var br=cur.doubleRollsLeft||0;
+    document.getElementById("ctb").textContent=br>0?br+" bonus roll(s) left!":"";
+    renderCards(s,cur);
+  }
+
+  function renderCards(s,cur){
+    var el=document.getElementById("cds");
+    if(!cur.heldCards||!cur.heldCards.length){el.innerHTML="";return;}
+    var mine=!isMulti||s.curIdx===myId;
+    var h='<div class="sl">CARDS'+(cur.usedShipwreckThisTurn?" (1 played)":"")+"</div>";
+    for(var i=0;i<cur.heldCards.length;i++){
+      var c=cur.heldCards[i];
+      if(c.type==="fasttrack"){
+        h+='<div style="display:flex;align-items:center;gap:5px;padding:3px 7px;border-radius:5px;background:#0f3d1a;border:1.5px solid #2ecc71;color:#2ecc71;font-size:10px;margin-bottom:3px" data-cardactive="1">'+
+          c.icon+" "+c.label+'<span style="margin-left:auto;font-size:8px;background:#2ecc71;color:#0a1f0e;border-radius:3px;padding:1px 4px;font-weight:700">ACTIVE</span></div>';
+      } else {
+        var bn=(cur.cardsBoughtThisTurn||[]).indexOf(c.uid)>=0;
+        var dis=cur.usedShipwreckThisTurn||bn||!mine;
+        h+='<button class="cb2" data-cardidx="'+i+'"'+(dis?' disabled':'')+'>'+
+          c.icon+" "+c.label+(bn?" (next turn)":"")+'</button>';
+      }
+    }
+    el.innerHTML=h;
+    var btns=el.querySelectorAll("[data-cardidx]");
+    for(var i=0;i<btns.length;i++){
+      btns[i].addEventListener("click",(function(idx){return function(){openCard(idx);};})(parseInt(btns[i].getAttribute("data-cardidx"))));
+    }
+  }
+
+  function renderAct(s,cur){
+    var el=document.getElementById("aa");
+    var mine=!isMulti||s.curIdx===myId;
+    document.getElementById("phl").textContent=s.phase==="preturn"?"PRE-TURN":"ROLL PHASE";
+    if(cur.isAI||!mine){
+      el.innerHTML='<div style="text-align:center;padding:14px;color:#7ecbe0;font-size:12px">'+(cur.isAI?"AI is playing...":"Waiting for "+cur.name+"...")+'</div>';
+      return;
+    }
+    if(s.phase==="preturn"){
+      el.innerHTML="";
+      if(cur.money<0){
+        var db2=document.createElement("button");
+        db2.className="ab";db2.style.cssText="background:#1a0a0a;border:2px solid #c0392b;color:#ff9999;font-size:11px";
+        db2.innerHTML="Eliminate Debt<div style='font-size:9px;font-weight:400;margin-top:1px'>Sacrifice challenge to get $0</div>";
+        db2.addEventListener("click",debtR);
+        el.appendChild(db2);
+      }
+      var rb=document.createElement("button");
+      rb.className="ab";
+      rb.style.background=(cur.doubleRollsLeft||0)>0?"#d68910":"#1a7a3a";
+      rb.textContent="Roll the Dice!"+(((cur.doubleRollsLeft||0)>0)?" (+"+(cur.doubleRollsLeft||0)+")":"");
+      rb.addEventListener("click",doRoll);
+      el.appendChild(rb);
+      var bb=document.createElement("button");
+      bb.className="ab";bb.style.background=cur.boughtCardThisTurn?"#333":"#6a1b9a";
+      bb.textContent="Buy Shipwreck Card ($10)"+(cur.boughtCardThisTurn?" done":"");
+      if(cur.boughtCardThisTurn)bb.disabled=true;
+      bb.addEventListener("click",buyCard);
+      el.appendChild(bb);
+    } else {
+      el.innerHTML='<div style="text-align:center;padding:8px;color:#7ecbe0;font-size:12px">Rolling...</div>';
+    }
+  }
+
+  // ── Board SVG ──────────────────────────────────────────────────────────────
+  var NS="http://www.w3.org/2000/svg";
+  function mkEl(tag,attrs){var e=document.createElementNS(NS,tag);for(var k in attrs)e.setAttribute(k,attrs[k]);return e;}
+  function mkTxt(str,attrs){var e=mkEl("text",attrs);e.textContent=str;return e;}
+
+  function drawBoard(){
+    var svg=document.getElementById("bsvg");
+    svg.setAttribute("width",BW);svg.setAttribute("height",BH);svg.innerHTML="";
+    var defs=mkEl("defs",{});
+    var st=document.createElementNS(NS,"style");
+    st.textContent="@keyframes w1{0%{transform:translateX(0)}100%{transform:translateX(-140px)}}@keyframes w2{0%{transform:translateX(0)}100%{transform:translateX(140px)}}@keyframes w3{0%{transform:translateX(-70px)}100%{transform:translateX(70px)}}";
+    defs.appendChild(st);
+    var cl=mkEl("clipPath",{id:"bc"});cl.appendChild(mkEl("rect",{width:BW,height:BH}));defs.appendChild(cl);
+    svg.appendChild(defs);
+    svg.appendChild(mkEl("rect",{width:BW,height:BH,fill:"#4a9ebb"}));
+    var wst=["w1","w2","w3"];
+    for(var row=0;row<18;row++){
+      var g=mkEl("g",{style:"animation:"+wst[row%3]+" "+(2.5+row*0.3)+"s linear infinite","clip-path":"url(#bc)"});
+      var wxs=[-280,-140,0,140,280,420,560,700,840,980,1120,1260,1400];
+      for(var wi=0;wi<wxs.length;wi++){
+        g.appendChild(mkEl("path",{d:"M"+wxs[wi]+" "+(55+row*52)+" Q"+(wxs[wi]+17)+" "+(45+row*52)+" "+(wxs[wi]+35)+" "+(55+row*52)+" Q"+(wxs[wi]+52)+" "+(65+row*52)+" "+(wxs[wi]+70)+" "+(55+row*52),stroke:"#7ecbe0","stroke-width":2,fill:"none",opacity:0.5}));
+      }
+      svg.appendChild(g);
+    }
+    svg.appendChild(mkEl("rect",{x:OL-SW,y:OT-SW,width:OR-OL+SW*2,height:OB-OT+SW*2,rx:22,fill:"#d6b87a",opacity:0.9}));
+    svg.appendChild(mkEl("rect",{x:OL-SW/2,y:OT-SW/2,width:OR-OL+SW,height:OB-OT+SW,rx:16,fill:"#4a9ebb",opacity:0.9}));
+    svg.appendChild(mkTxt("Boat Ride 2.0",{x:(OL+OR)/2,y:(OT+OB)/2-14,"text-anchor":"middle","font-size":26,"font-weight":900,fill:"#fff",stroke:"#1a3a55","stroke-width":4,"paint-order":"stroke",opacity:0.45}));
+    svg.appendChild(mkTxt("An Online Adventure",{x:(OL+OR)/2,y:(OT+OB)/2+20,"text-anchor":"middle","font-size":20,"font-weight":700,fill:"#fff",stroke:"#1a3a55","stroke-width":4,"paint-order":"stroke",opacity:0.45}));
+    drawJuts(svg);drawOval(svg);
+    svg.appendChild(mkEl("g",{id:"tlayer"}));
+    applyScale();
+  }
+
+  function jLP(key){
+    if(key==="boat_school"){var b=oPos(5);return{x:b.x,y:b.y-3*SW-SW-10};}
+    if(key==="boat"){var b=oPos(12);return{x:b.x-2*SW,y:b.y-SW/2-SW-10};}
+    if(key==="fish"){var b=oPos(19);return{x:b.x,y:b.y+4*SW+SW+10};}
+    if(key==="rescue"){var b=oPos(26);return{x:b.x,y:b.y+SW/2+3*SW+10};}
+    if(key==="winner"){var b=oPos(33);return{x:b.x+2*SW,y:b.y-SW-10};}
+    return null;
+  }
+
+  function drawJuts(svg){
+    var jcols={boat_school:"#a855f7",boat:"#fb923c",fish:"#34d399",rescue:"#60a5fa",winner:"#fbbf24"};
+    var jlbls={boat_school:"Boat School",boat:"Boat Store",fish:"Catch a Fish",rescue:"Lets Rescue!"};
+    var wjd=JC.winner;
+    for(var i=0;i<wjd.pts.length-1;i++)
+      svg.appendChild(mkEl("line",{x1:wjd.pts[i].x,y1:wjd.pts[i].y,x2:wjd.pts[i+1].x,y2:wjd.pts[i+1].y,stroke:"#c47d0e","stroke-width":SW+1,"stroke-opacity":0.15}));
+    var wlbls=["Dock 1","Lose Turn","Back 1","WIN"];
+    for(var i=0;i<wjd.pts.length;i++){
+      var pt=wjd.pts[i],g=mkEl("g",{});
+      g.appendChild(mkEl("rect",{x:pt.x-SW/2,y:pt.y-SH/2,width:SW,height:SH,rx:6,fill:i===3?"#f5a623":"#c47d0e",stroke:"#ffffffa0","stroke-width":0.8}));
+      var pp=wlbls[i].split(" ");
+      g.appendChild(mkTxt(pp[0],{x:pt.x,y:pt.y-4,"text-anchor":"middle","dominant-baseline":"central","font-size":9,fill:"#fff","font-weight":"bold"}));
+      g.appendChild(mkTxt(pp.slice(1).join(" "),{x:pt.x,y:pt.y+8,"text-anchor":"middle","dominant-baseline":"central","font-size":9,fill:"#fff"}));
+      svg.appendChild(g);
+    }
+    var tkeys=Object.keys(TASKS);
+    for(var ki=0;ki<tkeys.length;ki++){
+      var key=tkeys[ki],t=TASKS[key],jd=JC[key];
+      for(var i=0;i<jd.pts.length-1;i++)
+        svg.appendChild(mkEl("line",{x1:jd.pts[i].x,y1:jd.pts[i].y,x2:jd.pts[i+1].x,y2:jd.pts[i+1].y,stroke:t.color,"stroke-width":SW+1,"stroke-opacity":0.15}));
+      for(var i=0;i<jd.pts.length;i++){
+        var pt2=jd.pts[i],g2=mkEl("g",{});
+        if(key==="boat"){
+          var boat=BOATS[i];
+          g2.appendChild(mkEl("rect",{x:pt2.x-SW/2,y:pt2.y-SH/2,width:SW,height:SH,rx:6,fill:t.color,stroke:"#ffffffa0","stroke-width":0.8}));
+          g2.appendChild(mkTxt(boat.name,{x:pt2.x,y:pt2.y-4,"text-anchor":"middle","dominant-baseline":"central","font-size":8,fill:"#fff","font-weight":"bold"}));
+          g2.appendChild(mkTxt("$"+boat.price,{x:pt2.x,y:pt2.y+9,"text-anchor":"middle","dominant-baseline":"central","font-size":9,fill:"#FFD700"}));
+        } else {
+          var sp=t.spaces[i],rw=sp?sp.reward:null;
+          g2.appendChild(mkEl("rect",{x:pt2.x-SW/2,y:pt2.y-SH/2,width:SW,height:SH,rx:6,fill:t.color,stroke:"#ffffffa0","stroke-width":0.8}));
+          if(rw!==null&&rw!==undefined&&rw!==0){
+            if(rw<0){
+              g2.appendChild(mkTxt(String(rw),{x:pt2.x,y:pt2.y,"text-anchor":"middle","dominant-baseline":"central","font-size":14,"font-weight":"bold",fill:"#ff4444"}));
+            } else {
+              var ic=key==="boat_school"?"*":key==="fish"?"~":"!";
+              var mpr=rw<=2?rw:rw<=4?2:3,rows2=Math.ceil(rw/mpr);
+              var fs=Math.max(6,Math.min(12,Math.floor((SW-6)/mpr)-1));
+              var lh=fs+2,th=rows2*lh;
+              for(var r2=0;r2<rows2;r2++){
+                var rc=Math.min(mpr,rw-r2*mpr),iw=fs+2,rx3=pt2.x-rc*iw/2+iw/2,ry=pt2.y-th/2+r2*lh+lh/2;
+                for(var ci=0;ci<rc;ci++)g2.appendChild(mkTxt(ic,{x:rx3+ci*iw,y:ry,"text-anchor":"middle","dominant-baseline":"central","font-size":fs,fill:"#fff"}));
+              }
+            }
+          }
+        }
+        svg.appendChild(g2);
+      }
+      if(jd.xp){
+        var xg=mkEl("g",{});
+        xg.appendChild(mkEl("rect",{x:jd.xp.x-SW/2,y:jd.xp.y-SH/2,width:SW,height:SH,rx:8,fill:sColor("entry_"+key),stroke:"#ffffffa0","stroke-width":0.8}));
+        xg.appendChild(mkTxt(key.charAt(0).toUpperCase(),{x:jd.xp.x,y:jd.xp.y,"text-anchor":"middle","dominant-baseline":"central","font-size":18,fill:"#fff","font-weight":"bold"}));
+        svg.appendChild(xg);
+      }
+      var lp=jLP(key);
+      if(lp){
+        var lg=mkEl("g",{});
+        lg.appendChild(mkEl("rect",{x:lp.x-58,y:lp.y-13,width:116,height:24,rx:7,fill:"rgba(7,23,40,0.92)",stroke:jcols[key]||"#fff","stroke-width":1.5}));
+        lg.appendChild(mkTxt(jlbls[key]||key,{x:lp.x,y:lp.y,"text-anchor":"middle","dominant-baseline":"central","font-size":11,"font-weight":"bold",fill:jcols[key]||"#fff"}));
+        svg.appendChild(lg);
+      }
+    }
+    var wlp=jLP("winner");
+    if(wlp){
+      var wlg=mkEl("g",{});
+      wlg.appendChild(mkEl("rect",{x:wlp.x-62,y:wlp.y-25,width:124,height:38,rx:7,fill:"rgba(7,23,40,0.92)",stroke:"#fbbf24","stroke-width":1.5}));
+      wlg.appendChild(mkTxt("Supreme Boat",{x:wlp.x,y:wlp.y-9,"text-anchor":"middle","dominant-baseline":"central","font-size":11,"font-weight":"bold",fill:"#fbbf24"}));
+      wlg.appendChild(mkTxt("Captain HQ",{x:wlp.x,y:wlp.y+9,"text-anchor":"middle","dominant-baseline":"central","font-size":11,"font-weight":"bold",fill:"#fbbf24"}));
+      svg.appendChild(wlg);
+    }
+  }
+
+  function drawOval(svg){
+    var exits={};
+    var tkeys=Object.keys(TASKS);
+    for(var ki=0;ki<tkeys.length;ki++)exits[TASKS[tkeys[ki]].exitIdx]=true;
+    for(var i=0;i<36;i++){
+      var pos=oPos(i),x=pos.x,y=pos.y;
+      var k=sKind(i),isEnt=k.indexOf("entry_")===0,isEx=exits[i];
+      for(var ki=0;ki<tkeys.length;ki++){
+        var t=TASKS[tkeys[ki]];
+        if(i===t.entryIdx){var p=jPerp(t.entryIdx);x-=p.x*(t.colGap||SW)/2;y-=p.y*(t.colGap||SW)/2;break;}
+      }
+      var fill=isEx?"#c8a96e":sColor(k);
+      var rx=(isEnt||k==="start")?8:5;
+      var g=mkEl("g",{id:"sp"+i});
+      g.appendChild(mkEl("rect",{x:x-SW/2,y:y-SH/2,width:SW,height:SH,rx:rx,fill:fill,stroke:k==="start"?"#7dff9a":"#ffffffa0","stroke-width":k==="start"?2:0.8}));
+      if(k==="start"){
+        g.appendChild(mkEl("rect",{x:x-SW/2+3,y:y-SH/2+3,width:SW-6,height:SH-6,rx:5,fill:"none",stroke:"#ffffff40","stroke-width":1}));
+        g.appendChild(mkTxt("START",{x:x,y:y,"text-anchor":"middle","dominant-baseline":"central","font-size":9,fill:"#7dff9a","font-weight":"bold"}));
+      } else if(k==="swim"){
+        g.appendChild(mkTxt("SWIM",{x:x,y:y,"text-anchor":"middle","dominant-baseline":"central","font-size":8,fill:"#fff"}));
+      } else if(k==="sink"){
+        g.appendChild(mkTxt("SINK",{x:x,y:y,"text-anchor":"middle","dominant-baseline":"central","font-size":8,fill:"#fff"}));
+      } else if(k==="entry_winner"){
+        g.appendChild(mkTxt("WIN",{x:x,y:y,"text-anchor":"middle","dominant-baseline":"central","font-size":11,fill:"#fff","font-weight":"bold"}));
+      }
+      svg.appendChild(g);
+    }
+  }
+
+  // ── Tokens ─────────────────────────────────────────────────────────────────
+  function pXY(pl){
+    if(pl.winPos>=0){var pts=JC.winner?JC.winner.pts:[];if(pts[pl.winPos])return pts[pl.winPos];}
+    if(pl.inTask){var jd=JC[pl.inTask];if(jd){if(pl.taskPos>=0&&jd.pts[pl.taskPos])return jd.pts[pl.taskPos];return jd.ep||oPos(TASKS[pl.inTask].entryIdx);}}
+    return oPos(pl.pos);
+  }
+
+  function updateTok(s){
+    var layer=document.getElementById("tlayer");if(!layer)return;
+    layer.innerHTML="";
+    var groups={};
+    for(var i=0;i<s.players.length;i++){
+      var pl=s.players[i];if(!pl||pl.eliminated)continue;
+      var xy=pXY(pl),k=Math.round(xy.x)+","+Math.round(xy.y);
+      if(!groups[k])groups[k]=[];
+      groups[k].push({pl:pl,pi:i});
+    }
+    var gkeys=Object.keys(groups);
+    for(var gi=0;gi<gkeys.length;gi++){
+      var grp=groups[gkeys[gi]],pts2=gkeys[gi].split(",");
+      var bx=parseFloat(pts2[0]),by=parseFloat(pts2[1]);
+      for(var oi=0;oi<grp.length;oi++){
+        var pl=grp[oi].pl,pi=grp[oi].pi,act=pi===s.curIdx;
+        var ox=grp.length>1?(oi-(grp.length-1)/2)*28:0;
+        var oy=grp.length>1?-oi*6:0;
+        var g=mkEl("g",{transform:"translate("+(bx+ox)+","+(by+oy)+")"});
+        if(act){
+          g.appendChild(mkEl("circle",{cx:0,cy:-14,r:18,fill:"none",stroke:"#FFD700","stroke-width":3,opacity:0.8}));
+          g.appendChild(mkEl("circle",{cx:0,cy:-14,r:22,fill:"none",stroke:"#FFD700","stroke-width":1.5,opacity:0.4}));
+        }
+        g.appendChild(mkEl("rect",{x:-8,y:-4,width:16,height:20,rx:4,fill:pl.color}));
+        g.appendChild(mkEl("circle",{cx:0,cy:-12,r:8,fill:"#FDDBB4"}));
+        g.appendChild(mkEl("rect",{x:-9,y:-22,width:18,height:8,rx:2,fill:"#1a2a4a"}));
+        g.appendChild(mkEl("rect",{x:-9,y:-16,width:18,height:2,fill:"#FFD700"}));
+        g.appendChild(mkEl("rect",{x:-7,y:16,width:6,height:10,rx:2,fill:"#1a2a4a"}));
+        g.appendChild(mkEl("rect",{x:1,y:16,width:6,height:10,rx:2,fill:"#1a2a4a"}));
+        var ws=pl.name.split(" ");
+        for(var wi=0;wi<ws.length;wi++){
+          g.appendChild(mkTxt(ws[wi],{x:0,y:30+wi*10,"text-anchor":"middle","dominant-baseline":"central","font-size":8,fill:"#fff","font-weight":"bold",stroke:"#000","stroke-width":0.6,"paint-order":"stroke"}));
+        }
+        layer.appendChild(g);
+      }
+    }
+  }
+
+  // ── Game logic ──────────────────────────────────────────────────────────────
+  function addL(s,m){
+    if(!s.log)s.log=[];
+    if(Array.isArray(s.log))s.log=[m].concat(s.log).slice(0,60);
+    else s.log=[m];
+  }
+
+  function posD(pl){
+    if(pl.winPos>=0){var l=["Dock 1","Lose Turn","Back 1","WIN"];return"Winners Dock: "+(l[pl.winPos]||"");}
+    if(pl.inTask==="boat")return"Boat Store: sp "+(pl.taskPos+1);
+    if(pl.inTask)return(TASKS[pl.inTask]?TASKS[pl.inTask].label:pl.inTask)+": sp "+(pl.taskPos+1);
+    return null;
+  }
+
+  function tLine(pl,tk){
+    var done=(pl.completedTasks||[]).indexOf(tk)>=0;
+    if(tk==="boat"){if(done)return{t:"Boat: "+(pl.boat?pl.boat.name:"?"),g:true};return{t:"No boat yet",g:false};}
+    var t=TASKS[tk];if(!t)return{t:"",g:false};
+    if(done)return{t:t.label+": done",g:true};
+    return{t:t.prog(pl),g:t.req(pl)};
+  }
+
+  function doRoll(){
+    if(!GS)return;
+    var s=dc(GS),pl=s.players[s.curIdx];
+    if((pl.doubleRollsLeft||0)>0)pl.doubleRollsLeft--;
+    s.phase="rolling";
+    var r=Math.ceil(Math.random()*6);
+    addL(s,pl.name+" rolls "+r);
+    s.players[s.curIdx]=pl;
+    push(s);
+    processRoll(r,s);
+  }
+
+  function processRoll(r,s){
+    var pl=s.players[s.curIdx];
+    if(pl.skip>0){s.players[s.curIdx]=mg(pl,{skip:pl.skip-1});addL(s,pl.name+" skips.");advTurn(s);return;}
+    if(pl.winPos>=0){doWin(pl,s,r);return;}
+    if(pl.inTask==="boat"){doBoat(pl,s,r);return;}
+    if(pl.inTask){doTask(pl,s,r);return;}
+    doMove(pl,s,r);
+  }
+
+  function doMove(pl,s,r){
+    var path=[];for(var i=1;i<=r;i++)path.push((pl.pos+i)%36);
+    var fc=pl.completedTasks||[];
+    var jes=[
+      {idx:TASKS.boat_school.entryIdx,key:"boat_school",need:fc.indexOf("boat_school")<0},
+      {idx:TASKS.boat.entryIdx,key:"boat",need:fc.indexOf("boat")<0},
+      {idx:TASKS.fish.entryIdx,key:"fish",need:fc.indexOf("fish")<0},
+      {idx:TASKS.rescue.entryIdx,key:"rescue",need:fc.indexOf("rescue")<0},
+      {idx:WIN_IDX,key:"winner",need:fc.length>=4}
+    ];
+    var ss=r,jh=null;
+    for(var i=0;i<path.length&&!jh;i++){
+      for(var j=0;j<jes.length;j++){
+        if(jes[j].need&&jes[j].idx===path[i]){ss=i+1;jh=jes[j];break;}
+      }
+    }
+    var sp=path[ss-1],extra=r-ss;
+    var u=mg(pl,{pos:sp});
+    var passed=false;
+    for(var i=0;i<ss;i++)if(path[i]===0&&pl.pos!==0){passed=true;break;}
+    if(passed){u=mg(u,{money:u.money+5});addL(s,"Passed START! +$5");}
+    s.players[s.curIdx]=u;
+    if(jh){if(extra>0)enterJutX(u,s,jh.key,extra);else enterJut(u,s,jh.key);}
+    else landOn(u,s);
+  }
+
+  function landOn(pl,s){
+    var k=sKind(pl.pos);
+    if(k==="swim"){
+      var deck=(s.swimDeck||[]).slice();if(!deck.length)deck=mkSwim();
+      var card=deck[0];deck=deck.slice(1);s.swimDeck=deck;
+      var u=mg(pl,{});
+      if(card.eff.money)u=mg(u,{money:u.money+card.eff.money});
+      if(card.eff.skip)u=mg(u,{skip:(u.skip||0)+card.eff.skip});
+      var mv=card.eff.move||0;
+      s.players[s.curIdx]=u;addL(s,u.name+": "+card.text);
+      var sc2=dc(s);
+      showP("Swim Card!","swim",card.text,[{l:"Woohoo!",c:"pp",fn:function(){
+        if(mv!==0){var fp=((u.pos+mv+360*10)%36);var um=mg(u,{pos:fp});sc2.players[sc2.curIdx]=um;push(sc2);landOn(um,sc2);}
+        else advTurn(sc2);
+      }}]);
+      push(s);return;
+    }
+    if(k==="sink"){
+      var deck2=(s.sinkDeck||[]).slice();if(!deck2.length)deck2=mkSink();
+      var card2=deck2[0];deck2=deck2.slice(1);s.sinkDeck=deck2;
+      var u2=mg(pl,{});
+      if(card2.eff.money)u2=mg(u2,{money:u2.money+card2.eff.money});
+      if(card2.eff.skip)u2=mg(u2,{skip:(u2.skip||0)+card2.eff.skip});
+      var mv2=card2.eff.move||0;
+      s.players[s.curIdx]=u2;addL(s,u2.name+": "+card2.text);
+      var sc3=dc(s);
+      showP("Sink Card!","sink",card2.text,[{l:"Yikes...",c:"pn",fn:function(){
+        if(mv2!==0){var fp2=((u2.pos+mv2+360*10)%36);var um2=mg(u2,{pos:fp2});sc3.players[sc3.curIdx]=um2;push(sc3);landOn(um2,sc3);}
+        else advTurn(sc3);
+      }}]);
+      push(s);return;
+    }
+    advTurn(s);
+  }
+
+  function enterJut(pl,s,key){
+    if(key==="winner"){
+      if(pl.money<0){showP("Wallet Too Low!","debt","Need $0+ to enter!\nBalance: $"+pl.money,[{l:"Dang!",c:"pp",fn:function(){advTurn(s);}}]);return;}
+      s.players[s.curIdx]=mg(pl,{winPos:-1});
+      showP("Winners Dock!","info","All 4 done!\nRoll exact number to reach WIN!",[{l:"Lets go!",c:"pp",fn:function(){advTurn(s);}}]);
+      push(s);return;
+    }
+    if(key==="boat"&&!pl.graduated){
+      if(pl.isAI){
+        if(Math.random()<0.3&&pl.money>-50){s.players[s.curIdx]=mg(pl,{money:pl.money-100,inTask:"boat",taskPos:-1});addL(s,"AI pays $100 bypass");push(s);advTurn(s);}
+        else{addL(s,"AI skips Boat Store");push(s);advTurn(s);}
+        return;
+      }
+      showP("The Boat Store!","info","Need to graduate first!\nPay $100 to bypass, or skip.\nBalance: $"+pl.money,[
+        {l:"Pay $100 and Shop",c:"pw",fn:function(){var s2=dc(GS);s2.players[s2.curIdx]=mg(s2.players[s2.curIdx],{money:s2.players[s2.curIdx].money-100,inTask:"boat",taskPos:-1});push(s2);advTurn(s2);}},
+        {l:"Skip",c:"pn",fn:function(){advTurn(dc(GS));}}
+      ]);
+      return;
+    }
+    s.players[s.curIdx]=mg(pl,{inTask:key,taskPos:-1});
+    addL(s,pl.name+" enters "+(TASKS[key]?TASKS[key].label:key)+"!");
+    push(s);advTurn(s);
+  }
+
+  function enterJutX(pl,s,key,extra){
+    if(key==="winner"){
+      if(pl.money<0){showP("Wallet Too Low!","debt","Need $0+ to enter!",[{l:"Dang!",c:"pp",fn:function(){advTurn(s);}}]);return;}
+      s.players[s.curIdx]=mg(pl,{winPos:-1});push(s);doWin(s.players[s.curIdx],s,extra);return;
+    }
+    if(key==="boat"&&!pl.graduated){enterJut(pl,s,"boat");return;}
+    s.players[s.curIdx]=mg(pl,{inTask:key,taskPos:-1});
+    addL(s,pl.name+" enters "+(TASKS[key]?TASKS[key].label:key)+"!");
+    push(s);doTask(s.players[s.curIdx],s,extra);
+  }
+
+  function doTask(pl,s,r){
+    var t=TASKS[pl.inTask],np=pl.taskPos+r;
+    if(np>=t.count){
+      var rem=r-(t.count-1-pl.taskPos)-1;
+      var u=mg(pl,{inTask:null,taskPos:-1,pos:t.exitIdx});
+      var comp=t.req(u)&&(u.completedTasks||[]).indexOf(t.key)<0;
+      if(comp){
+        u=mg(u,{completedTasks:(u.completedTasks||[]).concat([t.key])});
+        if(t.key==="boat_school")u=mg(u,{graduated:true});
+        addL(s,"Completed "+t.label+"!");
+      }
+      s.players[s.curIdx]=u;
+      var body=comp?(u.completedTasks.length+"/4 done!"):t.prog(u);
+      var sc4=dc(s),uc=dc(u);
+      showP(comp?"Done!":"Exited "+t.label,comp?"success":"info",body,[{l:comp?"Yes!":"Continue",c:"pp",fn:function(){
+        if(rem>0){var fp3=(t.exitIdx+rem)%36;var um3=mg(uc,{pos:fp3});sc4.players[sc4.curIdx]=um3;push(sc4);landOn(um3,sc4);}
+        else advTurn(sc4);
+      }}]);
+      push(s);return;
+    }
+    var u2=mg(pl,{taskPos:np}),space=t.spaces[np];
+    if(space)u2=space.eff(u2);
+    s.players[s.curIdx]=u2;
+    addL(s,pl.name+" -> "+t.label+" sp"+(np+1)+": "+(space?space.desc:""));
+    var sc5=dc(s);
+    showP(t.label,"info",space?(space.story+"\n\n"+space.desc):t.prog(u2),[{l:"Continue",c:"pp",fn:function(){advTurn(sc5);}}]);
+    push(s);
+  }
+
+  function doBoat(pl,s,r){
+    var np=pl.taskPos+r;
+    if(np>=BOATS.length){s.players[s.curIdx]=mg(pl,{inTask:null,taskPos:-1,pos:TASKS.boat.exitIdx});push(s);advTurn(s);return;}
+    var u=mg(pl,{taskPos:np}),boat=BOATS[np];
+    var sold=false;
+    for(var i=0;i<s.players.length;i++){
+      if(i!==s.curIdx&&s.players[i]&&s.players[i].boat&&s.players[i].boat.name===boat.name){sold=true;break;}
+    }
+    s.players[s.curIdx]=u;
+    if(sold){showP(boat.name+" Sold","info","Already sold!",[{l:"Continue",c:"pp",fn:function(){advTurn(s);}}]);push(s);return;}
+    if(pl.isAI){
+      if(pl.aiDiff==="easy"?Math.random()<0.5:true){
+        var nc=(u.completedTasks||[]).concat(["boat"]);
+        s.players[s.curIdx]=mg(u,{money:u.money-boat.price,boat:boat,inTask:null,taskPos:-1,pos:TASKS.boat.exitIdx,completedTasks:nc});
+        addL(s,"AI buys "+boat.name+"!");push(s);advTurn(s);
+      } else {push(s);advTurn(s);}
+      return;
+    }
+    var sc6=dc(s);
+    showP(boat.name+" $"+boat.price,"info","Price: $"+boat.price+" | Balance: $"+u.money,[
+      {l:"Buy $"+boat.price,c:"pp",fn:function(){
+        var s2=dc(GS),pu=s2.players[s2.curIdx];
+        var nc2=(pu.completedTasks||[]).filter(function(x){return x!=="boat";}).concat(["boat"]);
+        s2.players[s2.curIdx]=mg(pu,{money:pu.money-boat.price,boat:boat,inTask:null,taskPos:-1,pos:TASKS.boat.exitIdx,completedTasks:nc2});
+        addL(s2,pu.name+" buys "+boat.name+"!");push(s2);advTurn(s2);
+      }},
+      {l:"Pass",c:"pn",fn:function(){advTurn(dc(GS));}}
+    ]);
+    push(s);
+  }
+
+  function doWin(pl,s,r){
+    var cp=pl.winPos<0?-1:pl.winPos,MAX=3,tg=cp+r;
+    if(!pl.fasttrack&&tg>MAX){
+      showP("Overshot!","info","Need exactly "+(MAX-Math.max(cp,0))+" to reach WIN.\nStay put!",[{l:"OK",c:"pp",fn:function(){advTurn(s);}}]);return;
+    }
+    var nwp=Math.min(tg,MAX),u=WDOCK[nwp].eff(mg(pl,{winPos:nwp}));
+    if(WDOCK[nwp].win){
+      if(u.money<0){s.players[s.curIdx]=u;push(s);showP("Still in Debt!","debt","Cannot win with $"+u.money+"!",[{l:"Dang!",c:"pp",fn:function(){advTurn(s);}}]);return;}
+      u=mg(u,{done:true});s.players[s.curIdx]=u;s.winner=u;push(s);showWin(u);return;
+    }
+    var wl=["Dock 1","Lose Turn","Back 1"];
+    addL(s,pl.name+" Dock -> "+(wl[nwp]||""));
+    s.players[s.curIdx]=u;
+    var sc7=dc(s);
+    showP("Winners Dock","info",(wl[nwp]||"")+"!\n"+(nwp===1?"Lose next turn.":nwp===2?"Go back 1.":"At entrance."),[{l:"Continue",c:"pp",fn:function(){advTurn(sc7);}}]);
+    push(s);
+  }
+
+  function advTurn(s){
+    var np=[];
+    for(var i=0;i<s.players.length;i++){
+      var pl=s.players[i];if(!pl){np.push(pl);continue;}
+      if(pl.done||pl.eliminated){np.push(pl);continue;}
+      if(pl.money<=-1000){addL(s,pl.name+" eliminated!");np.push(mg(pl,{eliminated:true,done:true}));}
+      else np.push(pl);
+    }
+    s.players=np;
+    var active=np.filter(function(p){return p&&!p.done;});
+    if(active.length<=1){
+      var w=active[0]||np[0];var wi=np.indexOf(w);
+      if(wi>=0)np[wi]=mg(w,{done:true});
+      s.players=np;s.winner=w;push(s);showWin(w);return;
+    }
+    var next=(s.curIdx+1)%np.length,its=0;
+    while((!np[next]||np[next].done)&&its<np.length){next=(next+1)%np.length;its++;}
+    np[next]=mg(np[next],{boughtCardThisTurn:false,usedShipwreckThisTurn:false,cardsBoughtThisTurn:[]});
+    s.players=np;s.curIdx=next;s.phase="transition";
+    push(s);showTrans();
+  }
+
+  // ── AI ─────────────────────────────────────────────────────────────────────
+  function runAI(){
+    if(!GS)return;
+    var s=dc(GS),pl=s.players[s.curIdx];
+    if(!pl||!pl.isAI)return;
+    if(!pl.boughtCardThisTurn&&pl.money>20&&pl.heldCards.length<3){
+      var deck=(s.swDeck||[]).slice();if(!deck.length)deck=mkDeck(SWDEFS);
+      var card=deck[0],uid=Math.random().toString(36).slice(2);
+      deck=deck.slice(1);s.swDeck=deck;
+      pl.heldCards=(pl.heldCards||[]).concat([mg(card,{uid:uid})]);
+      pl.money-=10;pl.boughtCardThisTurn=true;
+      pl.cardsBoughtThisTurn=(pl.cardsBoughtThisTurn||[]).concat([uid]);
+      if(card.type==="fasttrack")pl.fasttrack=true;
+      addL(s,"AI buys "+card.label);
+    }
+    s.players[s.curIdx]=pl;
+    var r=Math.ceil(Math.random()*6);
+    addL(s,"AI rolls "+r);s.phase="rolling";
+    push(s);processRoll(r,s);
+  }
+
+  // ── Cards ───────────────────────────────────────────────────────────────────
+  function buyCard(){
+    if(!GS)return;
+    var s=dc(GS),pl=s.players[s.curIdx];
+    if(pl.boughtCardThisTurn)return;
+    var deck=(s.swDeck||[]).slice();if(!deck.length)deck=mkDeck(SWDEFS);
+    var card=deck[0],uid=Math.random().toString(36).slice(2);
+    deck=deck.slice(1);s.swDeck=deck;
+    pl.heldCards=(pl.heldCards||[]).concat([mg(card,{uid:uid})]);
+    pl.money-=10;pl.boughtCardThisTurn=true;
+    pl.cardsBoughtThisTurn=(pl.cardsBoughtThisTurn||[]).concat([uid]);
+    if(card.type==="fasttrack")pl.fasttrack=true;
+    s.players[s.curIdx]=pl;
+    addL(s,pl.name+" buys "+card.label);
+    push(s);
+    showP(card.icon+" "+card.label,"info",card.desc+(card.type==="fasttrack"?"\nAlready active!":"\nCan play next turn."),[{l:"Got it!",c:"pp",fn:hideP}]);
+  }
+
+  function openCard(idx){
+    if(!GS)return;
+    var pl=GS.players[GS.curIdx];
+    if(pl.usedShipwreckThisTurn){showP("One Per Turn","info","Only one card per turn.",[{l:"OK",c:"pp",fn:hideP}]);return;}
+    var card=pl.heldCards[idx];
+    if(!card)return;
+    if((pl.cardsBoughtThisTurn||[]).indexOf(card.uid)>=0){showP("Cannot Play Yet","info","Play next turn.",[{l:"OK",c:"pp",fn:hideP}]);return;}
+    if(card.type==="double"){execCard(card,idx);return;}
+    showP(card.icon+" "+card.label,"info",card.desc,[
+      {l:"Play Now",c:"pp",fn:function(){hideP();execCard(card,idx);}},
+      {l:"Save for Later",c:"pn",fn:hideP}
+    ]);
+  }
+
+  function execCard(card,idx){
+    var s=dc(GS),pl=s.players[s.curIdx];
+    pl.heldCards=pl.heldCards.filter(function(_,i){return i!==idx;});
+    pl.usedShipwreckThisTurn=true;
+    s.players[s.curIdx]=pl;
+    if(card.type==="double"){
+      pl.doubleRollsLeft=(pl.doubleRollsLeft||0)+2;s.players[s.curIdx]=pl;push(s);
+      showP("Double Time!","info","2 bonus rolls this turn!",[{l:"Roll!",c:"pp",fn:hideP}]);return;
+    }
+    if(card.type==="fasttrack"){pl.fasttrack=true;s.players[s.curIdx]=pl;push(s);return;}
+    if(card.type==="shortcut"){
+      push(s);
+      showP("Shortcut","info","Reduce which challenge?",[
+        {l:"Fish (10 to 6)",c:"pp",fn:function(){var s2=dc(GS);s2.players[s2.curIdx].shortcut.fish=true;push(s2);hideP();}},
+        {l:"Rescues (2 to 1)",c:"pp",fn:function(){var s2=dc(GS);s2.players[s2.curIdx].shortcut.rescues=true;push(s2);hideP();}},
+        {l:"Stars (3 to 2)",c:"pp",fn:function(){var s2=dc(GS);s2.players[s2.curIdx].shortcut.stars=true;push(s2);hideP();}}
+      ]);return;
+    }
+    if(card.type==="teleport"){push(s);doTeleport();return;}
+    if(card.type==="freeze"){
+      var others=s.players.filter(function(p,i){return i!==s.curIdx&&p&&!p.done;});
+      push(s);
+      showP("Freeze Frame","info","Choose a player to freeze:",others.map(function(op){
+        return {l:op.name,c:"pp",fn:(function(opid){return function(){
+          var s2=dc(GS);
+          for(var i=0;i<s2.players.length;i++){
+            if(s2.players[i]&&s2.players[i].id===opid){s2.players[i]=mg(s2.players[i],{frozen:2,frozenBy:pl.name});break;}
+          }
+          push(s2);hideP();
+        };})(op.id)};
+      }));return;
+    }
+    if(card.type==="robbery"){
+      var others2=s.players.filter(function(p,i){return i!==s.curIdx&&p&&!p.done;});
+      push(s);
+      showP("Highway Robbery","info","Steal ALL money from:",others2.map(function(op){
+        return {l:op.name+" ($"+op.money+")",c:"pp",fn:(function(opid){return function(){
+          var s2=dc(GS),stolen=0;
+          for(var i=0;i<s2.players.length;i++){
+            if(s2.players[i]&&s2.players[i].id===opid){stolen=s2.players[i].money;s2.players[i]=mg(s2.players[i],{money:0});break;}
+          }
+          s2.players[s2.curIdx]=mg(s2.players[s2.curIdx],{money:s2.players[s2.curIdx].money+stolen});
+          addL(s2,s2.players[s2.curIdx].name+" robs $"+stolen);push(s2);hideP();
+        };})(op.id)};
+      }));return;
+    }
+  }
+
+  function doTeleport(){
+    for(var i=0;i<36;i++){
+      var k=sKind(i);
+      if(k!=="entry_winner"&&i!==0){
+        (function(si){
+          var el=document.getElementById("sp"+si);
+          if(el){
+            el.style.cursor="pointer";
+            el.addEventListener("click",function h(){
+              el.removeEventListener("click",h);
+              var s=dc(GS);
+              s.players[s.curIdx]=mg(s.players[s.curIdx],{pos:si,inTask:null,taskPos:-1});
+              addL(s,s.players[s.curIdx].name+" teleports to space "+si);
+              push(s);advTurn(s);
+            });
+          }
+        })(i);
+      }
+    }
+  }
+
+  function debtR(){
+    if(!GS)return;
+    var pl=GS.players[GS.curIdx];
+    if(!pl.completedTasks||!pl.completedTasks.length){showP("Debt Relief","debt","No challenges to sacrifice.",[{l:"Close",c:"pp",fn:hideP}]);return;}
+    var lbls={boat_school:"Boat School",boat:"Boat Store",fish:"Catch a Fish",rescue:"Rescues"};
+    showP("Debt Relief","debt","Sacrifice a challenge to reset to $0:",
+      pl.completedTasks.map(function(tk){
+        return {l:lbls[tk]||tk,c:"pw",fn:(function(ttk){return function(){
+          var s=dc(GS);
+          var p2=mg(s.players[s.curIdx],{money:0,completedTasks:s.players[s.curIdx].completedTasks.filter(function(x){return x!==ttk;})});
+          if(ttk==="boat_school")p2=mg(p2,{graduated:false,stars:0});
+          if(ttk==="fish")p2=mg(p2,{fish:0});
+          if(ttk==="rescue")p2=mg(p2,{rescues:0});
+          if(ttk==="boat")p2=mg(p2,{boat:null});
+          s.players[s.curIdx]=p2;addL(s,p2.name+" debt relief: "+ttk);push(s);hideP();
+        };})(tk)};
+      }).concat([{l:"Cancel",c:"pn",fn:hideP}])
+    );
+  }
+
+  function inspP(i){
+    if(!GS)return;
+    var pl=GS.players[i];if(!pl)return;
+    var tks=["boat_school","boat","fish","rescue"],lines="$"+pl.money+(pl.money<0?" (in debt)":"")+"\n\n";
+    for(var j=0;j<tks.length;j++){
+      var tk=tks[j],done=(pl.completedTasks||[]).indexOf(tk)>=0,t=TASKS[tk];if(!t)continue;
+      lines+=(done?"[done] ":"[    ] ")+t.label+": "+(done?(tk==="boat"?(pl.boat?pl.boat.name:"?"):t.done||"done"):t.prog(pl))+"\n";
+    }
+    showP(pl.name,"info",lines,[{l:"Close",c:"pp",fn:hideP}]);
+  }
+
+  // ── Transition overlay ──────────────────────────────────────────────────────
+  function showTrans(){
+    if(!GS)return;
+    var cur=GS.players[GS.curIdx];if(!cur)return;
+    document.getElementById("trsub").textContent=cur.isAI?"AI TURN":"NEXT UP";
+    document.getElementById("trdot").style.background=cur.color;
+    document.getElementById("trdot").style.boxShadow="0 0 20px "+cur.color;
+    document.getElementById("trname").textContent=cur.name+"s Turn";
+    document.getElementById("trstats").textContent="$"+cur.money+" | "+(cur.completedTasks||[]).length+"/4";
+    var mine=!isMulti||GS.curIdx===myId;
+    document.getElementById("trBtn").style.display=(cur.isAI||!mine)?"none":"block";
+    document.getElementById("tro").classList.add("on");
+    if(cur.isAI){
+      setTimeout(function(){
+        document.getElementById("tro").classList.remove("on");
+        var s=dc(GS);s.phase="preturn";push(s);setTimeout(runAI,400);
+      },1800);
+    }
+  }
+
+  function disTrans(){
+    document.getElementById("tro").classList.remove("on");
+    if(GS&&GS.phase==="transition"){var s=dc(GS);s.phase="preturn";push(s);}
+  }
+
+  // ── Popup ───────────────────────────────────────────────────────────────────
+  var ACOLS={swim:"#1565c0",sink:"#b71c1c",debt:"#c0392b",info:"#1a3a55",success:"#1a7a3a"};
+  function showP(title,accent,body,btns){
+    document.getElementById("phd").style.background=ACOLS[accent]||"#1a3a55";
+    document.getElementById("phd").innerHTML='<div style="font-size:18px;font-weight:700;color:#fff">'+title+'</div>';
+    document.getElementById("pbd").textContent=body;
+    var f=document.getElementById("pft");f.innerHTML="";
+    (btns||[]).forEach(function(b){
+      var btn=document.createElement("button");
+      btn.textContent=b.l;btn.className=b.c||"pn";
+      btn.onclick=function(){hideP();if(b.fn)b.fn();};
+      f.appendChild(btn);
+    });
+    document.getElementById("po").classList.add("on");
+  }
+  function hideP(){document.getElementById("po").classList.remove("on");}
+
+  function showWin(player){
+    document.getElementById("wemoji").textContent=player.isAI?"AI WIN":"YOU WIN";
+    document.getElementById("wname").textContent=player.name;
+    document.getElementById("wname").style.color=player.color;
+    document.getElementById("wo").classList.add("on");
+  }
+
+  // ── Zoom / scroll ───────────────────────────────────────────────────────────
+  var ZL=[0.5,0.65,0.8,1.0,1.2,1.5,1.8];
+  function zoomIn(){scale=ZL[Math.min(ZL.indexOf(scale)+1,ZL.length-1)];applyScale();}
+  function zoomOut(){scale=ZL[Math.max(ZL.indexOf(scale)-1,0)];applyScale();}
+  function applyScale(){
+    var w=document.getElementById("bwrap"),s=document.getElementById("bs");
+    w.style.transform="scale("+scale+")";w.style.width=BW+"px";w.style.height=BH+"px";
+    s.style.minWidth=(BW*scale)+"px";s.style.minHeight=(BH*scale)+"px";
+    document.getElementById("zlbl").textContent=Math.round(scale*100)+"%";
+  }
+  function ctrOn(){
+    if(!GS)return;
+    var pl=GS.players[GS.curIdx];if(!pl)return;
+    var xy=pXY(pl);
+    var s=document.getElementById("bs");
+    s.scrollLeft=xy.x*scale-s.clientWidth/2;
+    s.scrollTop=xy.y*scale-s.clientHeight/2;
+  }
+
+  // ── Wire up buttons ─────────────────────────────────────────────────────────
+  document.getElementById("btnCreate").addEventListener("click",createRoom);
+  document.getElementById("btnJoin").addEventListener("click",joinRoom);
+  document.getElementById("btnSolo").addEventListener("click",startSolo);
+  document.getElementById("btnLeave").addEventListener("click",leaveGame);
+  document.getElementById("btnPause").addEventListener("click",function(){paused=!paused;document.getElementById("btnPause").textContent=paused?"Resume":"Pause";});
+  document.getElementById("btnZI").addEventListener("click",zoomIn);
+  document.getElementById("btnZO").addEventListener("click",zoomOut);
+  document.getElementById("btnCtr").addEventListener("click",ctrOn);
+  document.getElementById("btnWL").addEventListener("click",leaveGame);
+  document.getElementById("trBtn").addEventListener("click",disTrans);
+  document.getElementById("ji").addEventListener("keydown",function(e){if(e.key==="Enter")joinRoom();});
+
+  console.log("Boat Ride 2.0 ready!");
+
+} // end boot()
+
+// Firebase is already loaded via script tags above
+window.addEventListener("DOMContentLoaded", function(){
+  boot(dbSet, dbGet, dbOn);
+});
+</script>
+</body>
+</html>

@@ -599,8 +599,10 @@ function openResumePicker(){
   });
 }
 
-document.getElementById("btnResume").addEventListener("click",function(){
-  if(this.onclick) this.onclick();
+// Resume button — handler delegates to openResumePicker if enabled
+document.getElementById("btnResume").addEventListener("click", function(){
+  if(this.style.pointerEvents === 'none') return;
+  openResumePicker();
 });
 
 function loadSaveSlot(slot){
@@ -1136,6 +1138,7 @@ function doMove(pl,s,r){
 }
 
 function landOn(pl,s){
+  if(isOnlineMultiplayer && !isMine(s)) return;
   var k=sKind(pl.pos);
   if(k==="swim"){var deck=(s.swimDeck||[]).slice();if(!deck.length)deck=mkSwim();var card=deck[0];deck=deck.slice(1);s.swimDeck=deck;var u=mg(pl,{});if(card.eff.money)u=mg(u,{money:u.money+card.eff.money});if(card.eff.skip)u=mg(u,{skip:(u.skip||0)+card.eff.skip});var mv=card.eff.move||0;s.players[s.curIdx]=u;addL(s,"🏊 SWIM: "+card.text);var sc2=dc(s);showP("🏊 Swim Card!","swim",card.text,[{l:"Woohoo!",c:"pp",fn:function(){if(mv!==0){var fp=((u.pos+mv+360)%36);var um=mg(u,{pos:fp});sc2.players[sc2.curIdx]=um;push(sc2);landOn(um,sc2);}else advTurn(sc2);}}]);push(s);return;}
   if(k==="sink"){var deck2=(s.sinkDeck||[]).slice();if(!deck2.length)deck2=mkSink();var card2=deck2[0];deck2=deck2.slice(1);s.sinkDeck=deck2;var u2=mg(pl,{});if(card2.eff.money)u2=mg(u2,{money:u2.money+card2.eff.money});if(card2.eff.skip)u2=mg(u2,{skip:(u2.skip||0)+card2.eff.skip});var mv2=card2.eff.move||0;s.players[s.curIdx]=u2;addL(s,"🌊 SINK: "+card2.text);var sc3=dc(s);showP("🌊 Sink Card!","sink",card2.text,[{l:"Yikes!",c:"pn",fn:function(){if(mv2!==0){var fp2=((u2.pos+mv2+360)%36);var um2=mg(u2,{pos:fp2});sc3.players[sc3.curIdx]=um2;push(sc3);landOn(um2,sc3);}else advTurn(sc3);}}]);push(s);return;}
@@ -1143,12 +1146,14 @@ function landOn(pl,s){
 }
 
 function enterJut(pl,s,key){
+  if(isOnlineMultiplayer && !isMine(s)) return;
   if(key==="winner"){if(pl.money<0){showP("💸 Wallet Too Low!","debt","Need $0+ to enter!\n$"+pl.money,[{l:"Dang!",c:"pn",fn:function(){advTurn(s);}}]);return;}s.players[s.curIdx]=mg(pl,{winPos:-1});showP("🏆 Winner's Dock!","info","All 4 done! 🎉\nRoll to reach ⭐ WIN!",[{l:"Let's go!",c:"pp",fn:function(){advTurn(s);}}]);push(s);return;}
   if(key==="boat"&&!pl.graduated){if(pl.isAI){if(Math.random()<0.3&&pl.money>-50){s.players[s.curIdx]=mg(pl,{money:pl.money-100,inTask:"boat",taskPos:-1});addL(s,"🤖 AI pays $100 bypass");push(s);advTurn(s);}else{addL(s,"🤖 AI skips Boat Store");push(s);advTurn(s);}return;}showP("🛥️ The Boat Store!","info","Need to graduate!\nPay $100 to bypass, or skip.\n$"+pl.money,[{l:"Pay $100",c:"pw",fn:function(){var s2=dc(GS);s2.players[s2.curIdx]=mg(s2.players[s2.curIdx],{money:s2.players[s2.curIdx].money-100,inTask:"boat",taskPos:-1});push(s2);advTurn(s2);}},{l:"Skip",c:"pn",fn:function(){advTurn(dc(GS));}}]);return;}
   s.players[s.curIdx]=mg(pl,{inTask:key,taskPos:-1});addL(s,pl.name+" enters "+(TASKS[key]?TASKS[key].label:key)+"!");push(s);advTurn(s);
 }
 
 function enterJutX(pl,s,key,extra){
+  if(isOnlineMultiplayer && !isMine(s)) return;
   if(key==="winner"){if(pl.money<0){showP("💸 Wallet Too Low!","debt","Need $0+ to enter!",[{l:"Dang!",c:"pn",fn:function(){advTurn(s);}}]);return;}s.players[s.curIdx]=mg(pl,{winPos:-1});push(s);doWin(s.players[s.curIdx],s,extra);return;}
   if(key==="boat"&&!pl.graduated){enterJut(pl,s,"boat");return;}
   s.players[s.curIdx]=mg(pl,{inTask:key,taskPos:-1});addL(s,pl.name+" enters "+(TASKS[key]?TASKS[key].label:key)+"!");push(s);doTask(s.players[s.curIdx],s,extra);
@@ -1428,18 +1433,7 @@ function disTrans(){
 // ── Popup ─────────────────────────────────────────────────────────────────────
 var ACOLS={swim:"#1565c0",sink:"#b71c1c",debt:"#c0392b",info:"#1a3a55",success:"#1a7a3a"};
 function showP(title,accent,body,btns,isSpectator){
-  document.getElementById("phd").style.background=ACOLS[accent]||"#1a3a55";
-  document.getElementById("phd").innerHTML='<div style="font-size:18px;font-weight:700;color:#fff">'+title+'</div>';
-  document.getElementById("pbd").textContent=body;
-  var f=document.getElementById("pft");f.innerHTML="";
-  if(isSpectator){
-    var note=document.createElement("div");note.style.cssText="font-size:11px;color:#888;text-align:center;padding:4px 0";
-    note.textContent="⏳ Waiting for "+(GS&&GS.players&&GS.players[GS.curIdx]?GS.players[GS.curIdx].name:"other player")+"...";
-    f.appendChild(note);
-  }else{
-    for(var i=0;i<(btns||[]).length;i++){(function(b){var btn=document.createElement("button");btn.textContent=b.l;btn.className=b.c||"pn";btn.onclick=function(){hideP();if(b.fn)b.fn();};f.appendChild(btn);})(btns[i]);}
-  }
-  document.getElementById("po").classList.add("on");
+  showPWithAIPause(title,accent,body,btns,isSpectator);
 }
 function hideP(){document.getElementById("po").classList.remove("on");}
 

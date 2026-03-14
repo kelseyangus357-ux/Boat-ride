@@ -297,6 +297,7 @@ hr.div{border:none;border-top:1px solid #1a3a55;margin:18px 0}
         <div id="ctm" style="font-size:11px;font-weight:600;margin-bottom:3px"></div>
         <div id="ctt" style="font-size:10px;margin-bottom:4px;line-height:1.8"></div>
         <div id="ctb" style="font-size:10px;color:#FFD700;font-weight:700;margin-bottom:3px"></div>
+        <div id="dieDisplay" style="display:none;text-align:center;margin:6px 0 4px"></div>
         <div id="cds"></div>
         <hr style="border:none;border-top:1px solid #1a3a55;margin:5px 0"/>
         <div class="sl">ACTIONS</div><div id="aa"></div>
@@ -666,8 +667,16 @@ document.getElementById("btnStartAI").addEventListener("click",function(){
 function doStartAI(){
   var name=document.getElementById("aiName").value.trim()||"Player 1";
   var uid=currentUser?currentUser.uid:null;
-  var players=[mkP(0,name,PC[0],false,null,selAITok,uid)];
-  for(var i=0;i<selCnt;i++)players.push(mkP(i+1,AI_NAMES[i],PC[i+1],true,selDiff,TOKEN_KEYS[(i+1)%TOKEN_KEYS.length],null));
+  var humanTok=selAITok;
+  // Ensure AI players get distinct tokens from the human and from each other
+  var usedToks=[humanTok];
+  var players=[mkP(0,name,PC[0],false,null,humanTok,uid)];
+  for(var i=0;i<selCnt;i++){
+    var aiTok=TOKEN_KEYS.find(function(k){return usedToks.indexOf(k)<0;});
+    if(!aiTok) aiTok=TOKEN_KEYS[(i+1)%TOKEN_KEYS.length]; // fallback
+    usedToks.push(aiTok);
+    players.push(mkP(i+1,AI_NAMES[i],PC[i+1],true,selDiff,aiTok,null));
+  }
   startGame(players,selSpd);
 }
 
@@ -794,6 +803,7 @@ function startGame(players,spd){
   document.getElementById("rpill").textContent="OFFLINE";
   JC=buildJC();
   GS={players:players,curIdx:0,phase:"transition",log:[],swimDeck:mkSwim(),sinkDeck:mkSink(),swDeck:mkDeck(SWDEFS),winner:null};
+  if(currentUser) saveGame(GS); // create save slot immediately
   drawBoard(); renderAll();
   setTimeout(function(){centerOn(0);},100);
   showTrans();
@@ -877,7 +887,7 @@ function renderAct(s,cur){
   if(s.phase==="rolling"){el.innerHTML='<div style="text-align:center;padding:8px;color:#7ecbe0;font-size:12px">🎲 Rolling...</div>';return;}
   el.innerHTML="";
   if(cur.money<0){var db2=document.createElement("button");db2.className="ab";db2.style.cssText="background:#1a0a0a;border:2px solid #c0392b;color:#ff9999;font-size:11px";db2.innerHTML="🆘 Eliminate Debt<div style='font-size:9px;font-weight:400;margin-top:1px'>Sacrifice challenge → reset to $0</div>";db2.addEventListener("click",debtR);el.appendChild(db2);}
-  var rb=document.createElement("button");rb.className="ab";rb.style.background=(cur.doubleRollsLeft||0)>0?"#d68910":"#1a7a3a";rb.innerHTML="🎲 Roll the Dice!"+(((cur.doubleRollsLeft||0)>0)?" (+"+(cur.doubleRollsLeft||0)+")":"");rb.addEventListener("click",doRoll);el.appendChild(rb);
+  var rb=document.createElement("button");rb.className="ab";rb.style.background=(cur.doubleRollsLeft||0)>0?"#d68910":"#1a7a3a";rb.innerHTML="🎲 Roll the Die!"+(((cur.doubleRollsLeft||0)>0)?" (+"+(cur.doubleRollsLeft||0)+")":"");rb.addEventListener("click",doRoll);el.appendChild(rb);
   var bb=document.createElement("button");bb.className="ab";bb.style.background=cur.boughtCardThisTurn?"#333":"#6a1b9a";bb.innerHTML="🃏 Buy Shipwreck Card ($10)"+(cur.boughtCardThisTurn?" ✓":"");if(cur.boughtCardThisTurn)bb.disabled=true;bb.addEventListener("click",buyCard);el.appendChild(bb);
   var tb=document.createElement("button");tb.className="ab";tb.style.background="#1a5a8a";tb.innerHTML="🤝 Propose a Trade";tb.addEventListener("click",toggleTradePanel);el.appendChild(tb);
   var tp=document.createElement("div");tp.id="tradePanel";el.appendChild(tp);
@@ -911,9 +921,32 @@ function centerOn(playerIdx){
 }
 function ctrOn(){centerOn(GS?GS.curIdx:0);}
 
-// ─────────────────────────────────────────────────────────────────────────────
-// GAME LOGIC
-// ─────────────────────────────────────────────────────────────────────────────
+// Die face SVG paths (dots)
+var DIE_DOTS={
+  1:[[0,0]],
+  2:[[-10,-10],[10,10]],
+  3:[[-10,-10],[0,0],[10,10]],
+  4:[[-10,-10],[10,-10],[-10,10],[10,10]],
+  5:[[-10,-10],[10,-10],[0,0],[-10,10],[10,10]],
+  6:[[-10,-10],[10,-10],[-10,0],[10,0],[-10,10],[10,10]]
+};
+function showDie(n){
+  var el=document.getElementById("dieDisplay");
+  if(!el)return;
+  var dots=DIE_DOTS[n]||[];
+  var svg='<svg width="52" height="52" viewBox="-28 -28 56 56" xmlns="http://www.w3.org/2000/svg">'
+    +'<rect x="-26" y="-26" width="52" height="52" rx="8" fill="#fff" stroke="#1a4a64" stroke-width="2"/>';
+  for(var i=0;i<dots.length;i++){
+    svg+='<circle cx="'+dots[i][0]+'" cy="'+dots[i][1]+'" r="4.5" fill="#1a4a64"/>';
+  }
+  svg+='</svg>';
+  el.innerHTML=svg;
+  el.style.display='block';
+}
+function hideDie(){
+  var el=document.getElementById("dieDisplay");
+  if(el){el.innerHTML='';el.style.display='none';}
+}
 function posD(pl){if(pl.winPos>=0){var l=["Dock 1","Lose Turn","Back 1","⭐ WIN"];return"Winner's Dock: "+l[pl.winPos];}if(pl.inTask==="boat")return"🛥️ Boat Store: sp "+(pl.taskPos+1);if(pl.inTask)return(TASKS[pl.inTask]?TASKS[pl.inTask].label:pl.inTask)+": sp "+(pl.taskPos+1);return null;}
 function tLine(pl,tk){var done=(pl.completedTasks||[]).indexOf(tk)>=0;if(tk==="boat"){if(done)return{t:(pl.boat?BOAT_EMOJIS[pl.boat.name]||"🛥️":"🛥️")+" "+(pl.boat?pl.boat.name:"owned"),g:true};return{t:"⛵ No boat yet",g:false};}var t=TASKS[tk];if(!t)return{t:"",g:false};if(done)return{t:t.done||t.label,g:true};return{t:t.prog(pl),g:t.req(pl)};}
 
@@ -1429,13 +1462,18 @@ function showP(title,accent,body,btns,isSpectator){
     f.appendChild(note);
   } else {
     var isAITurn=GS&&GS.players[GS.curIdx]&&GS.players[GS.curIdx].isAI;
-    if(isAITurn&&aiSpeed==="show"){
-      // AI watch mode: show popup then auto-dismiss after pause
-      var note2=document.createElement("div");note2.style.cssText="font-size:11px;color:#aaa;text-align:center;padding:4px 0";
-      note2.textContent="⏳ Continuing...";f.appendChild(note2);
+    if(isAITurn && aiSpeed==="show"){
+      // Show popup, auto-dismiss after 2s then fire callback
+      var note2=document.createElement("div");
+      note2.style.cssText="font-size:11px;color:#aaa;text-align:center;padding:4px 0";
+      note2.textContent="⏳ Continuing in 2s...";
+      f.appendChild(note2);
       document.getElementById("po").classList.add("on");
-      var savedFn=btns&&btns.length&&btns[0].fn?btns[0].fn:null;
-      setTimeout(function(){hideP();if(savedFn)savedFn();},1400);
+      var cb0=btns&&btns.length&&btns[0]&&btns[0].fn?btns[0].fn:null;
+      setTimeout(function(){
+        hideP();
+        if(cb0) cb0();
+      }, 2000);
       return;
     }
     for(var i=0;i<(btns||[]).length;i++){(function(b){var btn=document.createElement("button");btn.textContent=b.l;btn.className=b.c||"pn";btn.onclick=function(){hideP();if(b.fn)b.fn();};f.appendChild(btn);})(btns[i]);}

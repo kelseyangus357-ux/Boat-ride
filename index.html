@@ -205,7 +205,7 @@ hr.div{border:none;border-top:1px solid #1a3a55;margin:18px 0}
       <div style="font-weight:700;color:#1a7a3a;font-size:13px;margin:10px 0 5px">🤝 Trading</div>
       <div class="htp-rule" style="background:#f0fff4;border-color:#1a7a3a">Propose trades before rolling: money, fish, rescues, stars, or cards. Recipients can Accept, Decline, or Counter-offer.</div>
       <div style="font-weight:700;color:#1565c0;font-size:13px;margin:10px 0 5px">📧 Online Multiplayer</div>
-      <div class="htp-rule">When it's your turn in an online game, you'll receive an <b>email notification</b> so you never miss your turn!</div>
+      <div class="htp-rule">When it's your turn in an online game, you'll receive an <b>email notification</b> — but only if you're not already active in the game tab. If you have the game open and visible, no email is sent. Step away or close the tab and we'll send you a reminder with a direct link back to your room. Make sure to sign in with your email to enable notifications!</div>
     </div>
     <div class="htp-ft"><button class="btn btn-blue" style="max-width:280px;margin:0 auto" id="btnHTPClose">Got it — Let's Play! ⛵</button></div>
   </div>
@@ -381,11 +381,21 @@ function dbUpdate(path, val) { return _db ? _db.ref(path).update(val) : Promise.
 // Firestore mail trigger (for email notifications)
 function sendTurnEmail(toEmail, toName, fromName, roomCode) {
   if(!_fs || !toEmail) return;
+  var gameUrl = "https://kelseysboatride.netlify.app/";
   _fs.collection("mail").add({
     to: toEmail,
     message: {
       subject: "⛵ It's your turn in Boat Ride 2.0!",
-      html: "<p>Hi <b>" + toName + "</b>!</p><p><b>" + fromName + "</b> just finished their turn.</p><p>It's now <b>your turn</b> in room <b>" + roomCode + "</b>.</p><p>Head back to the game to roll!</p><p>🚢 <em>Boat Ride 2.0</em></p>"
+      html: "<div style='font-family:sans-serif;max-width:480px;margin:0 auto;background:#071728;color:#fff;border-radius:16px;padding:32px;text-align:center'>"
+        + "<div style='font-size:48px;margin-bottom:8px'>⛵</div>"
+        + "<h2 style='color:#7ecbe0;margin-bottom:4px'>Boat Ride 2.0</h2>"
+        + "<p style='color:#4a7a9b;margin-bottom:24px'>Supreme Boat Captain Race</p>"
+        + "<p style='font-size:16px;margin-bottom:8px'>Hi <b>" + toName + "</b>!</p>"
+        + "<p style='font-size:15px;color:#aaa;margin-bottom:24px'><b style='color:#fff'>" + fromName + "</b> just finished their turn in room <b style='color:#FFD700'>" + roomCode + "</b>.</p>"
+        + "<p style='font-size:18px;font-weight:bold;color:#4eff91;margin-bottom:24px'>It's your turn — time to roll! 🎲</p>"
+        + "<a href='" + gameUrl + "' style='display:inline-block;background:#1565c0;color:#fff;text-decoration:none;padding:14px 32px;border-radius:10px;font-weight:700;font-size:16px;margin-bottom:24px'>▶ Play Now</a>"
+        + "<p style='font-size:12px;color:#4a7a9b'>Room code: <b style='color:#FFD700;letter-spacing:4px'>" + roomCode + "</b></p>"
+        + "</div>"
     }
   }).catch(function(e){ console.warn("Mail send error:", e.message); });
 }
@@ -605,6 +615,13 @@ function sColor(k){var m={start:"#1a7a3a",swim:"#1565c0",sink:"#b71c1c",entry_bo
 // ─────────────────────────────────────────────────────────────────────────────
 var GS=null, myId=0, rCode=null, rUnsub=null;
 var scale=1.2, JC={}, aiSpeed="show", tradeOpen=false;
+var pageIsVisible = !document.hidden;
+document.addEventListener("visibilitychange", function(){
+  pageIsVisible = !document.hidden;
+  if(rCode && currentUser){
+    dbSet("rooms/"+rCode+"/presence/"+myId, pageIsVisible);
+  }
+});
 var selRoomSize=2, selOnlineTok="captain", selAITok="captain", selDiff="easy", selCnt=1, selSpd="show";
 
 function push(s){
@@ -751,8 +768,17 @@ function enterGame(code){
   document.getElementById("game").classList.add("on");
   document.getElementById("rpill").textContent="ROOM "+code;
   JC=buildJC(); drawBoard();
+  // Write own presence as active
+  if(currentUser) dbSet("rooms/"+code+"/presence/"+myId, true);
   rUnsub=dbOn("rooms/"+code,function(v){
     if(!v)return;
+    if(currentUser && v.players){
+      var pl=v.players;
+      for(var i=0;i<(v.roomSize||6);i++){
+        var p=pl[i];
+        if(p&&p.uid&&p.uid===currentUser.uid){myId=i;break;}
+      }
+    }
     GS=v; renderAll();
     if(v.pendingTrade&&v.pendingTrade.toIdx===myId&&!v.pendingTrade.responded)
       showTradeOffer(v.pendingTrade,v);
@@ -782,6 +808,7 @@ function startGame(players,spd){
 }
 
 function leaveGame(){
+  if(rCode && currentUser) dbSet("rooms/"+rCode+"/presence/"+myId, false);
   if(rUnsub){rUnsub();rUnsub=null;}
   GS=null;isOnlineMultiplayer=false;tradeOpen=false;rCode=null;
   document.getElementById("game").classList.remove("on");
@@ -800,10 +827,15 @@ async function notifyNextPlayer(s, prevPlayerIdx, nextPlayerIdx) {
   if(!isOnlineMultiplayer) return;
   var nextPl = s.players[nextPlayerIdx];
   if(!nextPl || nextPl.isAI || !nextPl.uid) return;
-  // Don't email if it's our own turn coming back
   if(nextPl.uid === (currentUser?currentUser.uid:null)) return;
   try {
-    var snap = await dbGet("users/" + nextPl.uid);
+    // Check if next player's tab is currently active (present in game)
+    var presenceSnap = await dbGet("rooms/"+rCode+"/presence/"+nextPlayerIdx);
+    if(presenceSnap === true){
+      console.log("Next player is active — skipping email.");
+      return;
+    }
+    var snap = await dbGet("users/"+nextPl.uid);
     if(!snap || !snap.email) return;
     var prevPl = s.players[prevPlayerIdx];
     sendTurnEmail(snap.email, nextPl.name, prevPl?prevPl.name:"Someone", rCode||"?");
@@ -864,11 +896,14 @@ function renderAct(s,cur){
   if(s.phase==="rolling"){el.innerHTML='<div style="text-align:center;padding:8px;color:#7ecbe0;font-size:12px">🎲 Rolling...</div>';return;}
   el.innerHTML="";
   if(cur.money<0){var db2=document.createElement("button");db2.className="ab";db2.style.cssText="background:#1a0a0a;border:2px solid #c0392b;color:#ff9999;font-size:11px";db2.innerHTML="🆘 Eliminate Debt<div style='font-size:9px;font-weight:400;margin-top:1px'>Sacrifice challenge → reset to $0</div>";db2.addEventListener("click",debtR);el.appendChild(db2);}
+  // 1. Roll
+  var rb=document.createElement("button");rb.className="ab";rb.style.background=(cur.doubleRollsLeft||0)>0?"#d68910":"#1a7a3a";rb.innerHTML="🎲 Roll the Dice!"+(((cur.doubleRollsLeft||0)>0)?" (+"+(cur.doubleRollsLeft||0)+")":"");rb.addEventListener("click",doRoll);el.appendChild(rb);
+  // 2. Shipwreck
+  var bb=document.createElement("button");bb.className="ab";bb.style.background=cur.boughtCardThisTurn?"#333":"#6a1b9a";bb.innerHTML="🃏 Buy Shipwreck Card ($10)"+(cur.boughtCardThisTurn?" ✓":"");if(cur.boughtCardThisTurn)bb.disabled=true;bb.addEventListener("click",buyCard);el.appendChild(bb);
+  // 3. Trade
   var tb=document.createElement("button");tb.className="ab";tb.style.background="#1a5a8a";tb.innerHTML="🤝 Propose a Trade";tb.addEventListener("click",toggleTradePanel);el.appendChild(tb);
   var tp=document.createElement("div");tp.id="tradePanel";el.appendChild(tp);
   if(tradeOpen)buildTradePanel(s,cur);
-  var rb=document.createElement("button");rb.className="ab";rb.style.background=(cur.doubleRollsLeft||0)>0?"#d68910":"#1a7a3a";rb.innerHTML="🎲 Roll the Dice!"+(((cur.doubleRollsLeft||0)>0)?" (+"+(cur.doubleRollsLeft||0)+")":"");rb.addEventListener("click",doRoll);el.appendChild(rb);
-  var bb=document.createElement("button");bb.className="ab";bb.style.background=cur.boughtCardThisTurn?"#333":"#6a1b9a";bb.innerHTML="🃏 Buy Shipwreck Card ($10)"+(cur.boughtCardThisTurn?" ✓":"");if(cur.boughtCardThisTurn)bb.disabled=true;bb.addEventListener("click",buyCard);el.appendChild(bb);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

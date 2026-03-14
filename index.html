@@ -4,25 +4,32 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Boat Ride 2.0</title>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js" onload="fbAppLoaded=true;tryInitFB()"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js" onload="fbDbLoaded=true;tryInitFB()"></script>
 <script>
-  var firebaseApp = firebase.initializeApp({
-    apiKey:"AIzaSyB_fBqYhfr061UY2xSYrBxO9UW1T16B5Jc",
-    authDomain:"boat-ride-629a8.firebaseapp.com",
-    databaseURL:"https://boat-ride-629a8-default-rtdb.firebaseio.com",
-    projectId:"boat-ride-629a8",
-    storageBucket:"boat-ride-629a8.firebasestorage.app",
-    messagingSenderId:"529814761740",
-    appId:"1:529814761740:web:04a5491c6e91a064cdd929"
-  });
-  var firebaseDB = firebase.database();
-  function dbSet(path,val){return firebaseDB.ref(path).set(val);}
-  function dbGet(path){return firebaseDB.ref(path).once("value").then(function(s){return s.val();});}
-  function dbOn(path,cb){
-    var r=firebaseDB.ref(path);
-    r.on("value",function(s){cb(s.val());});
-    return function(){r.off();};
+  var fbAppLoaded=false, fbDbLoaded=false, fbReady=false;
+  function tryInitFB(){
+    if(!fbAppLoaded||!fbDbLoaded||fbReady)return;
+    fbReady=true;
+    var firebaseApp=firebase.initializeApp({
+      apiKey:"AIzaSyB_fBqYhfr061UY2xSYrBxO9UW1T16B5Jc",
+      authDomain:"boat-ride-629a8.firebaseapp.com",
+      databaseURL:"https://boat-ride-629a8-default-rtdb.firebaseio.com",
+      projectId:"boat-ride-629a8",
+      storageBucket:"boat-ride-629a8.firebasestorage.app",
+      messagingSenderId:"529814761740",
+      appId:"1:529814761740:web:04a5491c6e91a064cdd929"
+    });
+    var firebaseDB=firebase.database();
+    function dbSet(path,val){return firebaseDB.ref(path).set(val);}
+    function dbGet(path){return firebaseDB.ref(path).once("value").then(function(s){return s.val();});}
+    function dbOn(path,cb){var r=firebaseDB.ref(path);r.on("value",function(s){cb(s.val());});return function(){r.off();};}
+    // Boot when DOM is also ready
+    if(document.readyState==="loading"){
+      document.addEventListener("DOMContentLoaded",function(){boot(dbSet,dbGet,dbOn);});
+    } else {
+      boot(dbSet,dbGet,dbOn);
+    }
   }
 </script>
 <style>
@@ -362,7 +369,7 @@ hr.div{border:none;border-top:1px solid #1a3a55;margin:18px 0}
 </div>
 
 <script>
-window.addEventListener("DOMContentLoaded", function(){ boot(dbSet,dbGet,dbOn); });
+// boot() is called by tryInitFB() once both Firebase scripts and DOM are ready
 
 function boot(dbSet, dbGet, dbOn) {
 

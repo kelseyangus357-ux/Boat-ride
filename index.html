@@ -297,7 +297,7 @@ hr.div{border:none;border-top:1px solid #1a3a55;margin:18px 0}
         <div id="ctm" style="font-size:11px;font-weight:600;margin-bottom:3px"></div>
         <div id="ctt" style="font-size:10px;margin-bottom:4px;line-height:1.8"></div>
         <div id="ctb" style="font-size:10px;color:#FFD700;font-weight:700;margin-bottom:3px"></div>
-        <div id="dieDisplay" style="display:none;text-align:center;margin:6px 0 4px"></div>
+        <div id="dieDisplay" style="text-align:center;margin:4px 0;min-height:0"></div>
         <div id="cds"></div>
         <hr style="border:none;border-top:1px solid #1a3a55;margin:5px 0"/>
         <div class="sl">ACTIONS</div><div id="aa"></div>
@@ -543,11 +543,16 @@ var STEP_MS=320, LAND_PAUSE_MS=1000;
 // AI/turn guards
 var aiRunning=false;
 var showTransActive=false;
+var turnInProgress=false; // blocks renderAll from triggering showTrans mid-turn
 
 function resetGameState(){
   aiRunning=false;
   showTransActive=false;
+  turnInProgress=false;
   tradeOpen=false;
+  currentSaveSlot=null; // new game gets a new slot
+  if(aiPopupTimer){clearTimeout(aiPopupTimer);aiPopupTimer=null;}
+  hideDie();
 }
 
 document.addEventListener("visibilitychange",function(){
@@ -667,13 +672,15 @@ document.getElementById("btnStartAI").addEventListener("click",function(){
 function doStartAI(){
   var name=document.getElementById("aiName").value.trim()||"Player 1";
   var uid=currentUser?currentUser.uid:null;
-  var humanTok=selAITok;
-  // Ensure AI players get distinct tokens from the human and from each other
-  var usedToks=[humanTok];
-  var players=[mkP(0,name,PC[0],false,null,humanTok,uid)];
+  var usedToks=[selAITok];
+  var players=[mkP(0,name,PC[0],false,null,selAITok,uid)];
   for(var i=0;i<selCnt;i++){
-    var aiTok=TOKEN_KEYS.find(function(k){return usedToks.indexOf(k)<0;});
-    if(!aiTok) aiTok=TOKEN_KEYS[(i+1)%TOKEN_KEYS.length]; // fallback
+    // Pick first token not already used
+    var aiTok=null;
+    for(var j=0;j<TOKEN_KEYS.length;j++){
+      if(usedToks.indexOf(TOKEN_KEYS[j])<0){aiTok=TOKEN_KEYS[j];break;}
+    }
+    if(!aiTok) aiTok=TOKEN_KEYS[(i+1)%TOKEN_KEYS.length];
     usedToks.push(aiTok);
     players.push(mkP(i+1,AI_NAMES[i],PC[i+1],true,selDiff,aiTok,null));
   }
@@ -887,7 +894,12 @@ function renderAct(s,cur){
   if(s.phase==="rolling"){el.innerHTML='<div style="text-align:center;padding:8px;color:#7ecbe0;font-size:12px">🎲 Rolling...</div>';return;}
   el.innerHTML="";
   if(cur.money<0){var db2=document.createElement("button");db2.className="ab";db2.style.cssText="background:#1a0a0a;border:2px solid #c0392b;color:#ff9999;font-size:11px";db2.innerHTML="🆘 Eliminate Debt<div style='font-size:9px;font-weight:400;margin-top:1px'>Sacrifice challenge → reset to $0</div>";db2.addEventListener("click",debtR);el.appendChild(db2);}
-  var rb=document.createElement("button");rb.className="ab";rb.style.background=(cur.doubleRollsLeft||0)>0?"#d68910":"#1a7a3a";rb.innerHTML="🎲 Roll the Die!"+(((cur.doubleRollsLeft||0)>0)?" (+"+(cur.doubleRollsLeft||0)+")":"");rb.addEventListener("click",doRoll);el.appendChild(rb);
+  var rb=document.createElement("button");
+  rb.className="ab";
+  rb.style.background=(cur.doubleRollsLeft||0)>0?"#d68910":"#1a7a3a";
+  rb.innerHTML="🎲 Roll the Die!"+(((cur.doubleRollsLeft||0)>0)?" (+"+(cur.doubleRollsLeft||0)+")":"");
+  rb.addEventListener("click",doRoll);
+  el.appendChild(rb);
   var bb=document.createElement("button");bb.className="ab";bb.style.background=cur.boughtCardThisTurn?"#333":"#6a1b9a";bb.innerHTML="🃏 Buy Shipwreck Card ($10)"+(cur.boughtCardThisTurn?" ✓":"");if(cur.boughtCardThisTurn)bb.disabled=true;bb.addEventListener("click",buyCard);el.appendChild(bb);
   var tb=document.createElement("button");tb.className="ab";tb.style.background="#1a5a8a";tb.innerHTML="🤝 Propose a Trade";tb.addEventListener("click",toggleTradePanel);el.appendChild(tb);
   var tp=document.createElement("div");tp.id="tradePanel";el.appendChild(tp);
@@ -1141,16 +1153,18 @@ function doWin(pl,s,r){
 }
 
 function advTurn(s){
-  aiRunning=false; // always release AI guard
+  aiRunning=false; // release AI guard
   var prevIdx=s.curIdx;tradeOpen=false;
   var np=[];for(var i=0;i<s.players.length;i++){var pl=s.players[i];if(!pl){np.push(pl);continue;}if(pl.done||pl.eliminated){np.push(pl);continue;}if(pl.money<=-1000){addL(s,pl.name+" eliminated! 💀");np.push(mg(pl,{eliminated:true,done:true}));}else np.push(pl);}
   s.players=np;
   var cur2=np[prevIdx];if(cur2&&cur2.money<0&&!cur2.done&&!cur2.eliminated){var interest=Math.floor(cur2.money*0.05);np[prevIdx]=mg(cur2,{money:cur2.money+interest});addL(s,cur2.name+" 💸 interest: "+(cur2.money+interest));}
   var active=np.filter(function(p){return p&&!p.done;});
-  if(active.length<=1){var w=active[0]||np[0];var wi=np.indexOf(w);if(wi>=0)np[wi]=mg(w,{done:true});s.players=np;s.winner=w;commitTurn(s);showWin(w);return;}
+  if(active.length<=1){var w=active[0]||np[0];var wi=np.indexOf(w);if(wi>=0)np[wi]=mg(w,{done:true});s.players=np;s.winner=w;turnInProgress=false;commitTurn(s);showWin(w);return;}
   var next=(s.curIdx+1)%np.length,its=0;while((!np[next]||np[next].done)&&its<np.length){next=(next+1)%np.length;its++;}
   np[next]=mg(np[next],{boughtCardThisTurn:false,usedShipwreckThisTurn:false,cardsBoughtThisTurn:[],pendingTrade:null});
   s.players=np;s.curIdx=next;s.phase="transition";s.pendingTrade=null;
+  // Release lock BEFORE committing so showTrans can fire correctly
+  turnInProgress=false;
   commitTurn(s);
   if(!isOnlineMultiplayer) showTrans();
   else notifyNextPlayer(s,prevIdx,next);

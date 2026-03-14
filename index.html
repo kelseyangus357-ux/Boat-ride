@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Boat Ride 2.0</title>
 <!-- Firebase v9 compat (for ease of use alongside modular) -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Segoe UI',sans-serif;background:#071728;color:#fff;min-height:100vh}
@@ -662,8 +662,10 @@ var selRoomSize=2, selOnlineTok="captain", selAITok="captain", selDiff="easy", s
 
 function push(s){
   if(isOnlineMultiplayer && rCode){
-    if(!amIActivePlayer()){
-      // Spectator — just update local state and re-render, never write to Firebase
+    var cur = s.players && s.players[s.curIdx];
+    var isMine = cur && cur.uid === (currentUser?currentUser.uid:null);
+    if(!isMine){
+      // Not our turn — update local view only, never write to Firebase
       GS=s; renderAll(); return;
     }
     dbSet("rooms/"+rCode, cleanForFB(s)).catch(function(e){console.error(e);});
@@ -907,37 +909,48 @@ function enterGame(code){
   document.getElementById("rpill").textContent="ROOM "+code;
   JC=buildJC(); drawBoard();
   if(currentUser) dbSet("rooms/"+code+"/presence/"+myId, true);
-  var lastPhase = null, lastCurIdx = null, lastLogLen = 0;
+  var lastCurIdx = null, lastLogLen = 0;
   rUnsub=dbOn("rooms/"+code,function(v){
     if(!v)return;
-    // Re-sync myId from UID
     if(currentUser && v.players){
       for(var i=0;i<(v.roomSize||6);i++){
         var p=v.players[i];
         if(p&&p.uid&&p.uid===currentUser.uid){myId=i;break;}
       }
     }
+    var prevGS = GS;
     GS=v;
 
-    // Auto-dismiss spectator popup when game state advances
-    var isSpectator = v.curIdx !== myId;
-    if(isSpectator && document.getElementById("po").classList.contains("on")){
-      var logArr = Array.isArray(v.log) ? v.log : Object.values(v.log||{});
-      if(logArr.length !== lastLogLen){
-        hideP();
-      }
-      lastLogLen = logArr.length;
+    var logArr = Array.isArray(v.log)?v.log:Object.values(v.log||{});
+    var logLen = logArr.length;
+    var logChanged = logLen !== lastLogLen;
+    lastLogLen = logLen;
+
+    var isMyTurn = (v.players[v.curIdx] && v.players[v.curIdx].uid === (currentUser?currentUser.uid:null));
+
+    // Auto-dismiss spectator popup when game log advances (active player clicked through)
+    if(!isMyTurn && logChanged && document.getElementById("po").classList.contains("on")){
+      hideP();
     }
 
-    // Detect turn change — if it's now our turn and it just changed, show transition
+    // If it's NOT my turn and the log just changed, show a spectator popup mirroring what happened
+    if(!isMyTurn && logChanged && logArr.length > 0){
+      var latest = logArr[0];
+      // Only pop up for meaningful game events, not turn transitions
+      if(latest && latest.indexOf("rolls") === -1 && latest.indexOf("enters") === -1 && latest.indexOf("interest") === -1 && latest.indexOf("transition") === -1){
+        var cur = v.players[v.curIdx];
+        var title = cur ? cur.name+"'s Turn" : "Game Update";
+        showP(title, "info", latest, [], true);
+      }
+    }
+
     var turnChanged = (lastCurIdx !== null && lastCurIdx !== v.curIdx);
-    var nowMyTurn = (v.curIdx === myId);
+    var nowMyTurn = isMyTurn;
     lastCurIdx = v.curIdx;
-    lastPhase = v.phase;
 
     renderAll();
 
-    if(turnChanged && nowMyTurn && v.phase === "transition"){
+    if(turnChanged && nowMyTurn && v.phase==="transition"){
       showTrans();
     }
 
@@ -1427,14 +1440,13 @@ function disTrans(){document.getElementById("tro").classList.remove("on");if(GS&
 // POPUP
 // ─────────────────────────────────────────────────────────────────────────────
 var ACOLS={swim:"#1565c0",sink:"#b71c1c",debt:"#c0392b",info:"#1a3a55",success:"#1a7a3a"};
-function showP(title,accent,body,btns){
+// isSpectator: true = watching only (no buttons), false/undefined = active (buttons shown)
+function showP(title,accent,body,btns,isSpectator){
   document.getElementById("phd").style.background=ACOLS[accent]||"#1a3a55";
   document.getElementById("phd").innerHTML='<div style="font-size:18px;font-weight:700;color:#fff">'+title+'</div>';
   document.getElementById("pbd").textContent=body;
   var f=document.getElementById("pft");f.innerHTML="";
-  // A player is a spectator only when: it's an online game AND it's not their turn
-  // We use the dedicated `amIActivePlayer()` check so mid-action pushes don't misfire
-  if(isOnlineMultiplayer && !amIActivePlayer()){
+  if(isSpectator){
     var note=document.createElement("div");
     note.style.cssText="font-size:11px;color:#888;text-align:center;padding:4px 0";
     note.textContent="⏳ Waiting for "+(GS&&GS.players&&GS.players[GS.curIdx]?GS.players[GS.curIdx].name:"other player")+"...";

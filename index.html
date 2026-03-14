@@ -297,8 +297,8 @@ hr.div{border:none;border-top:1px solid #1a3a55;margin:18px 0}
         <div id="ctm" style="font-size:11px;font-weight:600;margin-bottom:3px"></div>
         <div id="ctt" style="font-size:10px;margin-bottom:4px;line-height:1.8"></div>
         <div id="ctb" style="font-size:10px;color:#FFD700;font-weight:700;margin-bottom:3px"></div>
-        <div id="dieDisplay" style="text-align:center;margin:4px 0;min-height:0"></div>
         <div id="cds"></div>
+        <div id="dieDisplay" style="text-align:center;margin:8px 0 4px"></div>
         <hr style="border:none;border-top:1px solid #1a3a55;margin:5px 0"/>
         <div class="sl">ACTIONS</div><div id="aa"></div>
         <hr style="border:none;border-top:1px solid #1a3a55;margin:6px 0"/>
@@ -818,7 +818,10 @@ function startGame(players,spd){
 
 function leaveGame(){
   // Save before leaving
-  if(GS && currentUser) saveGame(GS);
+  if(GS && currentUser){
+    console.log('leaveGame: saving before leave');
+    saveGame(GS);
+  }
   resetGameState();
   if(rCode&&currentUser) dbSet("rooms/"+rCode+"/presence/"+myId,false);
   if(rUnsub){rUnsub();rUnsub=null;}
@@ -829,7 +832,10 @@ function leaveGame(){
   document.getElementById("createSection").style.display="none";
   document.getElementById("jbadge").style.display="none";
   document.getElementById("ji").value="";
-  hideP(); showScreen("scHome");
+  hideP();
+  showScreen("scHome");
+  // Give Firebase a moment to complete the save write before reading back
+  setTimeout(function(){ refreshResumeBtn(); }, 1500);
 }
 
 function notifyNextPlayer(s,prevIdx,nextIdx){
@@ -900,8 +906,15 @@ function renderAct(s,cur){
   rb.innerHTML="🎲 Roll the Die!"+(((cur.doubleRollsLeft||0)>0)?" (+"+(cur.doubleRollsLeft||0)+")":"");
   rb.addEventListener("click",doRoll);
   el.appendChild(rb);
-  var bb=document.createElement("button");bb.className="ab";bb.style.background=cur.boughtCardThisTurn?"#333":"#6a1b9a";bb.innerHTML="🃏 Buy Shipwreck Card ($10)"+(cur.boughtCardThisTurn?" ✓":"");if(cur.boughtCardThisTurn)bb.disabled=true;bb.addEventListener("click",buyCard);el.appendChild(bb);
-  var tb=document.createElement("button");tb.className="ab";tb.style.background="#1a5a8a";tb.innerHTML="🤝 Propose a Trade";tb.addEventListener("click",toggleTradePanel);el.appendChild(tb);
+  var bb=document.createElement("button");
+  bb.className="ab";bb.style.background=cur.boughtCardThisTurn?"#333":"#6a1b9a";
+  bb.innerHTML="🃏 Buy Shipwreck Card ($10)"+(cur.boughtCardThisTurn?" ✓":"");
+  if(cur.boughtCardThisTurn)bb.disabled=true;
+  bb.addEventListener("click",buyCard);el.appendChild(bb);
+  var tb=document.createElement("button");
+  tb.className="ab";tb.style.background="#1a5a8a";
+  tb.innerHTML="🤝 Propose a Trade";
+  tb.addEventListener("click",toggleTradePanel);el.appendChild(tb);
   var tp=document.createElement("div");tp.id="tradePanel";el.appendChild(tp);
   if(tradeOpen)buildTradePanel(s,cur);
 }

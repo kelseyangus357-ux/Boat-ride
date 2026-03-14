@@ -942,7 +942,7 @@ function renderCards(s,cur){
       var bn=(cur.cardsBoughtThisTurn||[]).indexOf(c.uid)>=0;
       var dis=cur.usedShipwreckThisTurn||bn||!mine;
       h+='<button class="cb2" data-cardidx="'+i+'"'+(dis?' disabled':'')+'>'+
-        c.icon+" "+c.label+(bn?" (next turn)")+'</button>';
+        c.icon+" "+c.label+(bn?" (next turn)":"")+'</button>';
     }
   }
   el.innerHTML=h;

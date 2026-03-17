@@ -277,7 +277,12 @@ hr.div{border:none;border-top:1px solid #1a3a55;margin:18px 0}
   </div>
   <div id="main">
     <div id="boardcol">
-      <div id="bs"><div id="bwrap" style="transform-origin:top left;display:inline-block"><svg id="bsvg" xmlns="http://www.w3.org/2000/svg"></svg></div></div>
+      <div id="bs">
+        <div style="position:relative;display:inline-block" id="boardContainer">
+          <div id="bwrap" style="transform-origin:top left;display:inline-block"><svg id="bsvg" xmlns="http://www.w3.org/2000/svg"></svg></div>
+          <div id="jutOverlay" style="position:absolute;top:0;left:0;pointer-events:none"></div>
+        </div>
+      </div>
       <div id="ctrlbar">
         <button id="btnLeave" style="background:#e67e22;color:#fff">🏠 Leave</button>
         <button id="btnZO" style="background:#1a3a55;color:#fff;font-size:17px;width:30px;height:30px;padding:0;border-radius:7px">−</button>
@@ -592,12 +597,17 @@ function writeToFirebase(s){
 // localUpdate: update GS and re-render WITHOUT writing to Firebase
 function localUpdate(s){GS=s;renderAll();}
 
-// commitTurn: save state locally + write to Firebase if online
 function commitTurn(s){
   GS=s;
-  saveGame(s); // always save — local AND online
   renderAll();
   if(isOnlineMultiplayer) writeToFirebase(s);
+  // Save only at natural turn boundaries (when phase changes or winner set)
+  // to avoid excessive writes
+}
+
+// Call this explicitly at actual turn-end points
+function saveAtTurnEnd(s){
+  if(currentUser) saveGame(s);
 }
 
 function addL(s,m){if(!s.log)s.log=[];s.log=[m].concat(s.log).slice(0,60);}
@@ -666,8 +676,17 @@ document.getElementById("btnAIBack").addEventListener("click",function(){showScr
 // ─────────────────────────────────────────────────────────────────────────────
 document.getElementById("btnStartAI").addEventListener("click",function(){
   if(currentUser){
-    getAllSaves().then(function(saves){var slots=Object.values(saves).filter(function(s){return s&&s.meta;});if(slots.length>=MAX_SAVES){showSaveFullPopup(slots,"ai");return;}doStartAI();});
-  } else doStartAI();
+    getAllSaves().then(function(saves){
+      var slots=Object.values(saves).filter(function(s){return s&&s.meta;});
+      if(slots.length>=MAX_SAVES){showSaveFullPopup(slots,"ai");return;}
+      doStartAI();
+    }).catch(function(){
+      // If save check fails, start anyway
+      doStartAI();
+    });
+  } else {
+    doStartAI();
+  }
 });
 function doStartAI(){
   var name=document.getElementById("aiName").value.trim()||"Player 1";
@@ -675,7 +694,6 @@ function doStartAI(){
   var usedToks=[selAITok];
   var players=[mkP(0,name,PC[0],false,null,selAITok,uid)];
   for(var i=0;i<selCnt;i++){
-    // Pick first token not already used
     var aiTok=null;
     for(var j=0;j<TOKEN_KEYS.length;j++){
       if(usedToks.indexOf(TOKEN_KEYS[j])<0){aiTok=TOKEN_KEYS[j];break;}
@@ -817,11 +835,7 @@ function startGame(players,spd){
 }
 
 function leaveGame(){
-  // Save before leaving
-  if(GS && currentUser){
-    console.log('leaveGame: saving before leave');
-    saveGame(GS);
-  }
+  if(GS&&currentUser) saveGame(GS);
   resetGameState();
   if(rCode&&currentUser) dbSet("rooms/"+rCode+"/presence/"+myId,false);
   if(rUnsub){rUnsub();rUnsub=null;}
@@ -834,8 +848,7 @@ function leaveGame(){
   document.getElementById("ji").value="";
   hideP();
   showScreen("scHome");
-  // Give Firebase a moment to complete the save write before reading back
-  setTimeout(function(){ refreshResumeBtn(); }, 1500);
+  setTimeout(refreshResumeBtn, 2000);
 }
 
 function notifyNextPlayer(s,prevIdx,nextIdx){
@@ -1520,7 +1533,53 @@ function showWin(player){
 var ZL=[0.4,0.55,0.7,0.85,1.0,1.2,1.5,1.8,2.0,2.2];
 function zoomIn(){var idx=ZL.indexOf(scale);if(idx<0)idx=8;scale=ZL[Math.min(idx+1,ZL.length-1)];applyScale();}
 function zoomOut(){var idx=ZL.indexOf(scale);if(idx<0)idx=8;scale=ZL[Math.max(idx-1,0)];applyScale();}
-function applyScale(){var w=document.getElementById("bwrap");w.style.transform="scale("+scale+")";w.style.width=BW+"px";w.style.height=BH+"px";w.style.minWidth=Math.ceil(BW*scale)+"px";w.style.minHeight=Math.ceil(BH*scale)+"px";document.getElementById("zlbl").textContent=Math.round(scale*100)+"%";}
+function buildJutOverlay(){
+  var overlay=document.getElementById("jutOverlay");
+  if(!overlay) return;
+  overlay.innerHTML="";
+  // Find all jut space groups that have icon data
+  var groups=document.querySelectorAll("[data-juticon]");
+  for(var i=0;i<groups.length;i++){
+    var g=groups[i];
+    var ic=g.getAttribute("data-juticon");
+    var count=parseInt(g.getAttribute("data-jutcount")||"0");
+    var cx=parseFloat(g.getAttribute("data-jutx"));
+    var cy=parseFloat(g.getAttribute("data-juty"));
+    if(!ic||!count||isNaN(cx)||isNaN(cy)) continue;
+
+    var cols=count===1?1:count<=4?2:3;
+    var rows=Math.ceil(count/cols);
+    var fSize=count===1?22:count===2?18:count<=4?14:11;
+    var cellW=fSize+6, cellH=fSize+6;
+    var totalW=cols*cellW, totalH=rows*cellH;
+
+    var div=document.createElement("div");
+    div.style.cssText="position:absolute;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;pointer-events:none;";
+    div.style.width=totalW*scale+"px";
+    div.style.height=totalH*scale+"px";
+    div.style.left=(cx*scale - (totalW*scale)/2)+"px";
+    div.style.top=(cy*scale - (totalH*scale)/2)+"px";
+    div.style.fontSize=(fSize*scale)+"px";
+    div.style.lineHeight="1";
+
+    for(var j=0;j<count;j++){
+      var sp=document.createElement("span");
+      sp.textContent=ic;
+      sp.style.cssText="display:inline-block;width:"+(cellW*scale)+"px;text-align:center;";
+      div.appendChild(sp);
+    }
+    overlay.appendChild(div);
+  }
+}
+
+function applyScale(){
+  var w=document.getElementById("bwrap");
+  w.style.transform="scale("+scale+")";
+  w.style.width=BW+"px"; w.style.height=BH+"px";
+  w.style.minWidth=Math.ceil(BW*scale)+"px"; w.style.minHeight=Math.ceil(BH*scale)+"px";
+  document.getElementById("zlbl").textContent=Math.round(scale*100)+"%";
+  buildJutOverlay();
+}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // CONTROLS

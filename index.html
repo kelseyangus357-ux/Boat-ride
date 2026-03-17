@@ -377,24 +377,84 @@ var MAX_SAVES=3;
 
 // ── FIREBASE ──
 var _auth=null,_db=null,_fs=null,currentUser=null,isGuest=false,isOnlineMultiplayer=false;
-window.addEventListener('load',function(){
-  try{
-    firebase.initializeApp({apiKey:"AIzaSyB_fBqYhfr061UY2xSYrBxO9UW1T16B5Jc",authDomain:"boat-ride-629a8.firebaseapp.com",databaseURL:"https://boat-ride-629a8-default-rtdb.firebaseio.com",projectId:"boat-ride-629a8",storageBucket:"boat-ride-629a8.firebasestorage.app",messagingSenderId:"529814761740",appId:"1:529814761740:web:04a5491c6e91a064cdd929"});
-    _auth=firebase.auth();_db=firebase.database();_fs=firebase.firestore();
+function initFirebase(){
+  // Check Firebase SDKs loaded
+  if(typeof firebase==='undefined'){
     document.getElementById('authLoading').textContent='';
+    document.getElementById('authErr').textContent='Could not load Firebase. Check your connection and refresh.';
+    return;
+  }
+  try{
+    firebase.initializeApp({
+      apiKey:"AIzaSyB_fBqYhfr061UY2xSYrBxO9UW1T16B5Jc",
+      authDomain:"boat-ride-629a8.firebaseapp.com",
+      databaseURL:"https://boat-ride-629a8-default-rtdb.firebaseio.com",
+      projectId:"boat-ride-629a8",
+      storageBucket:"boat-ride-629a8.firebasestorage.app",
+      messagingSenderId:"529814761740",
+      appId:"1:529814761740:web:04a5491c6e91a064cdd929"
+    });
+    _auth=firebase.auth();
+    _db=firebase.database();
+    _fs=firebase.firestore();
+    document.getElementById('authLoading').textContent='';
+
+    // Timeout fallback — if onAuthStateChanged never fires within 8s, unblock the UI
+    var authResolved=false;
+    var authTimeout=setTimeout(function(){
+      if(!authResolved){
+        authResolved=true;
+        document.getElementById('authLoading').textContent='';
+        document.getElementById('authErr').textContent='Connection timed out. You can still play as Guest.';
+      }
+    },8000);
+
     _auth.onAuthStateChanged(function(u){
-      if(u){currentUser=u;isGuest=false;dbUpdate('users/'+u.uid,{email:u.email||'',displayName:u.displayName||u.email||'Player',lastSeen:Date.now()});
+      if(!authResolved){authResolved=true;clearTimeout(authTimeout);}
+      document.getElementById('authLoading').textContent='';
+      document.getElementById('authErr').textContent='';
+      if(u){
+        currentUser=u;isGuest=false;
+        // Update user record — non-blocking
+        if(_db)_db.ref('users/'+u.uid).update({email:u.email||'',displayName:u.displayName||u.email||'Player',lastSeen:Date.now()}).catch(function(){});
         document.getElementById('userBar').style.display='flex';
         document.getElementById('userBar').innerHTML='👤 <span style="flex:1">'+(u.displayName||u.email||'User')+'</span><span style="color:#4a7a9b">'+(u.email||'')+'</span>';
         document.getElementById('topUser').textContent=u.email||'';
         var dn=u.displayName||(u.email?u.email.split('@')[0]:'Player');
-        document.getElementById('onlineName').value=dn;document.getElementById('aiName').value=dn;
+        document.getElementById('onlineName').value=dn;
+        document.getElementById('aiName').value=dn;
         if(document.getElementById('scAuth').classList.contains('on'))showScreen('scHome');
-        // Slight delay so _db is fully ready before checking saves
-        setTimeout(refreshResumeBtn, 500);
-      } else {currentUser=null;refreshResumeBtn();}
+        setTimeout(refreshResumeBtn,500);
+      } else {
+        currentUser=null;
+        refreshResumeBtn();
+      }
     });
-  }catch(e){document.getElementById('authErr').textContent='Firebase error: '+e.message;}
+  }catch(e){
+    document.getElementById('authLoading').textContent='';
+    document.getElementById('authErr').textContent='Firebase error: '+e.message;
+  }
+}
+
+// Try to init immediately, retry if SDKs not yet loaded
+window.addEventListener('load',function(){
+  if(typeof firebase!=='undefined'){
+    initFirebase();
+  } else {
+    // SDKs may still be loading — wait up to 5s
+    var attempts=0;
+    var checkInterval=setInterval(function(){
+      attempts++;
+      if(typeof firebase!=='undefined'){
+        clearInterval(checkInterval);
+        initFirebase();
+      } else if(attempts>=10){
+        clearInterval(checkInterval);
+        document.getElementById('authLoading').textContent='';
+        document.getElementById('authErr').textContent='Firebase failed to load. Please refresh the page.';
+      }
+    },500);
+  }
 });
 function dbSet(p,v){return _db?_db.ref(p).set(v):Promise.resolve();}
 function dbGet(p){return _db?_db.ref(p).once('value').then(function(s){return s.val();}):Promise.resolve(null);}
@@ -702,11 +762,27 @@ buildLocalNames();
 // ── AUTH ──
 var authMode="signin";
 document.getElementById("btnAuthSubmit").addEventListener("click",function(){
-  var email=document.getElementById("authEmail").value.trim(),pass=document.getElementById("authPass").value,name=document.getElementById("authName").value.trim(),errEl=document.getElementById("authErr");errEl.textContent="";
+  var email=document.getElementById("authEmail").value.trim(),
+      pass=document.getElementById("authPass").value,
+      name=document.getElementById("authName").value.trim(),
+      errEl=document.getElementById("authErr");
+  errEl.textContent="";
   if(!email||!pass){errEl.textContent="Email and password required.";return;}
-  if(!_auth){errEl.textContent="Still connecting...";return;}
-  if(authMode==="signup"){_auth.createUserWithEmailAndPassword(email,pass).then(function(c){return c.user.updateProfile({displayName:name||email.split("@")[0]}).then(function(){dbUpdate('users/'+c.user.uid,{email:c.user.email,displayName:c.user.displayName,lastSeen:Date.now()});});}).catch(function(e){errEl.textContent=e.message;});}
-  else{_auth.signInWithEmailAndPassword(email,pass).catch(function(e){errEl.textContent=e.message;});}
+  if(!_auth){
+    errEl.textContent="Still connecting to Firebase — please wait a moment and try again.";
+    return;
+  }
+  if(authMode==="signup"){
+    _auth.createUserWithEmailAndPassword(email,pass)
+      .then(function(c){
+        return c.user.updateProfile({displayName:name||email.split("@")[0]})
+          .then(function(){
+            if(_db)_db.ref('users/'+c.user.uid).update({email:c.user.email,displayName:c.user.displayName,lastSeen:Date.now()}).catch(function(){});
+          });
+      }).catch(function(e){errEl.textContent=e.message;});
+  } else {
+    _auth.signInWithEmailAndPassword(email,pass).catch(function(e){errEl.textContent=e.message;});
+  }
 });
 document.getElementById("btnAuthGuest").addEventListener("click",function(){isGuest=true;currentUser=null;document.getElementById("userBar").style.display="none";showScreen("scHome");refreshResumeBtn();});
 document.getElementById("authToggleLink").addEventListener("click",function(){authMode=authMode==="signin"?"signup":"signin";var up=authMode==="signup";document.getElementById("btnAuthSubmit").textContent=up?"📝 Sign Up":"🚀 Sign In";document.getElementById("authSubtitle").textContent=up?"Create your account":"Sign in to set sail!";document.getElementById("authToggleLink").textContent=up?"Sign in instead":"Sign up instead";document.getElementById("authName").style.display=up?"block":"none";document.getElementById("authErr").textContent="";});

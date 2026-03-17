@@ -4,10 +4,10 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Boat Ride 2.0</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-app-compat.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-auth-compat.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-database-compat.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/firebase/9.23.0/firebase-firestore-compat.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Segoe UI',sans-serif;background:#4a9ebb;color:#fff;min-height:100vh;overflow-x:hidden}
@@ -206,13 +206,6 @@ hr.div{border:none;border-top:1px solid #1a3a55;margin:16px 0}
       <div class="cnt-btn sel" data-sz="2">2</div><div class="cnt-btn" data-sz="3">3</div><div class="cnt-btn" data-sz="4">4</div><div class="cnt-btn" data-sz="5">5</div><div class="cnt-btn" data-sz="6">6</div>
     </div>
     <button class="btn btn-green" id="btnGoCreate">Create Room</button>
-    <!-- Room code shown here after creation, before token selection -->
-    <div id="createRoomCodeSection" style="display:none;margin-top:8px;text-align:center;background:#071728;border:1px solid #1a3a55;border-radius:10px;padding:12px">
-      <p style="font-size:12px;color:#7ecbe0;margin-bottom:4px">Share this code with friends:</p>
-      <div class="room-code" id="onlineCreateCode">----</div>
-      <p style="font-size:11px;color:#4a7a9b;margin-top:4px">Players can join while you choose your token</p>
-      <button class="btn btn-blue" id="btnGoCreateToken" style="margin-top:10px;padding:10px">Choose Your Token →</button>
-    </div>
     <hr class="div"/>
     <div style="font-weight:700;color:#7ecbe0;font-size:13px;margin-bottom:10px">🚀 JOIN A ROOM</div>
     <input class="inp inp-code" id="ji" maxlength="4" placeholder="ENTER CODE"/>
@@ -377,84 +370,23 @@ var MAX_SAVES=3;
 
 // ── FIREBASE ──
 var _auth=null,_db=null,_fs=null,currentUser=null,isGuest=false,isOnlineMultiplayer=false;
-function initFirebase(){
-  // Check Firebase SDKs loaded
-  if(typeof firebase==='undefined'){
-    document.getElementById('authLoading').textContent='';
-    document.getElementById('authErr').textContent='Could not load Firebase. Check your connection and refresh.';
-    return;
-  }
+window.addEventListener('load',function(){
   try{
-    firebase.initializeApp({
-      apiKey:"AIzaSyB_fBqYhfr061UY2xSYrBxO9UW1T16B5Jc",
-      authDomain:"boat-ride-629a8.firebaseapp.com",
-      databaseURL:"https://boat-ride-629a8-default-rtdb.firebaseio.com",
-      projectId:"boat-ride-629a8",
-      storageBucket:"boat-ride-629a8.firebasestorage.app",
-      messagingSenderId:"529814761740",
-      appId:"1:529814761740:web:04a5491c6e91a064cdd929"
-    });
-    _auth=firebase.auth();
-    _db=firebase.database();
-    _fs=firebase.firestore();
+    firebase.initializeApp({apiKey:"AIzaSyB_fBqYhfr061UY2xSYrBxO9UW1T16B5Jc",authDomain:"boat-ride-629a8.firebaseapp.com",databaseURL:"https://boat-ride-629a8-default-rtdb.firebaseio.com",projectId:"boat-ride-629a8",storageBucket:"boat-ride-629a8.firebasestorage.app",messagingSenderId:"529814761740",appId:"1:529814761740:web:04a5491c6e91a064cdd929"});
+    _auth=firebase.auth();_db=firebase.database();_fs=firebase.firestore();
     document.getElementById('authLoading').textContent='';
-
-    // Timeout fallback — if onAuthStateChanged never fires within 8s, unblock the UI
-    var authResolved=false;
-    var authTimeout=setTimeout(function(){
-      if(!authResolved){
-        authResolved=true;
-        document.getElementById('authLoading').textContent='';
-        document.getElementById('authErr').textContent='Connection timed out. You can still play as Guest.';
-      }
-    },8000);
-
     _auth.onAuthStateChanged(function(u){
-      if(!authResolved){authResolved=true;clearTimeout(authTimeout);}
-      document.getElementById('authLoading').textContent='';
-      document.getElementById('authErr').textContent='';
-      if(u){
-        currentUser=u;isGuest=false;
-        // Update user record — non-blocking
-        if(_db)_db.ref('users/'+u.uid).update({email:u.email||'',displayName:u.displayName||u.email||'Player',lastSeen:Date.now()}).catch(function(){});
+      if(u){currentUser=u;isGuest=false;dbUpdate('users/'+u.uid,{email:u.email||'',displayName:u.displayName||u.email||'Player',lastSeen:Date.now()});
         document.getElementById('userBar').style.display='flex';
         document.getElementById('userBar').innerHTML='👤 <span style="flex:1">'+(u.displayName||u.email||'User')+'</span><span style="color:#4a7a9b">'+(u.email||'')+'</span>';
         document.getElementById('topUser').textContent=u.email||'';
         var dn=u.displayName||(u.email?u.email.split('@')[0]:'Player');
-        document.getElementById('onlineName').value=dn;
-        document.getElementById('aiName').value=dn;
+        document.getElementById('onlineName').value=dn;document.getElementById('aiName').value=dn;
         if(document.getElementById('scAuth').classList.contains('on'))showScreen('scHome');
-        setTimeout(refreshResumeBtn,500);
-      } else {
-        currentUser=null;
         refreshResumeBtn();
-      }
+      } else {currentUser=null;refreshResumeBtn();}
     });
-  }catch(e){
-    document.getElementById('authLoading').textContent='';
-    document.getElementById('authErr').textContent='Firebase error: '+e.message;
-  }
-}
-
-// Try to init immediately, retry if SDKs not yet loaded
-window.addEventListener('load',function(){
-  if(typeof firebase!=='undefined'){
-    initFirebase();
-  } else {
-    // SDKs may still be loading — wait up to 5s
-    var attempts=0;
-    var checkInterval=setInterval(function(){
-      attempts++;
-      if(typeof firebase!=='undefined'){
-        clearInterval(checkInterval);
-        initFirebase();
-      } else if(attempts>=10){
-        clearInterval(checkInterval);
-        document.getElementById('authLoading').textContent='';
-        document.getElementById('authErr').textContent='Firebase failed to load. Please refresh the page.';
-      }
-    },500);
-  }
+  }catch(e){document.getElementById('authErr').textContent='Firebase error: '+e.message;}
 });
 function dbSet(p,v){return _db?_db.ref(p).set(v):Promise.resolve();}
 function dbGet(p){return _db?_db.ref(p).once('value').then(function(s){return s.val();}):Promise.resolve(null);}
@@ -470,38 +402,11 @@ function sendTurnEmail(toEmail,toName,fromName,roomCode){
 // ── SAVE SYSTEM ──
 function saveSlotKey(id){return currentUser?'savedGames/'+currentUser.uid+'/'+id:null;}
 function saveGame(s){
-  if(!s)return;
-  if(isOnlineMultiplayer)return;
-  if(!currentUser||!_db){console.log('saveGame: no user or db, skipping');return;}
-  if(s.winner){console.log('saveGame: game has winner, skipping');return;}
-  var slotId=s._saveSlot;
-  if(!slotId){slotId='slot_'+Date.now();s._saveSlot=slotId;}
+  if(!currentUser||!_db||isOnlineMultiplayer||!s||s.winner)return;
+  var slotId=s._saveSlot||('slot_'+Date.now());s._saveSlot=slotId;
   var opps=(s.players||[]).filter(function(p,i){return i!==0&&p;});
-  var isAIGame=opps.some(function(p){return p&&p.isAI;});
-  var meta={
-    slotId:slotId,
-    savedAt:Date.now(),
-    gameType:isAIGame?'vs AI':'Local Multiplayer',
-    opponents:opps.map(function(p){return(p&&p.isAI?'🤖 ':'')+( p?p.name:'');}).join(', '),
-    currentTurn:(s.players&&s.players[s.curIdx]?s.players[s.curIdx].name:'?'),
-    completedCount:s.players&&s.players[0]?(s.players[0].completedTasks||[]).length:0
-  };
-  var key='savedGames/'+currentUser.uid+'/'+slotId;
-  var payload={state:cleanForFB(s),meta:meta};
-  console.log('saveGame: saving to',key,'type:',meta.gameType,'opponents:',meta.opponents);
-  _db.ref(key).set(payload)
-    .then(function(){console.log('saveGame: success');refreshResumeBtn();})
-    .catch(function(e){console.warn('saveGame error:',e);});
-}
-
-function commitTurn(s){
-  GS=s;
-  renderAll();
-  if(isOnlineMultiplayer){
-    writeToFirebase(s);
-  } else if(currentUser&&_db){
-    saveGame(s);
-  }
+  var meta={slotId:slotId,savedAt:Date.now(),gameType:opps.some(function(p){return p&&p.isAI;})?'vs AI':'Local Multiplayer',opponents:opps.map(function(p){return(p&&p.isAI?'🤖 ':'')+( p?p.name:'');}).join(', '),currentTurn:(s.players[s.curIdx]?s.players[s.curIdx].name:'?'),completedCount:s.players[0]?(s.players[0].completedTasks||[]).length:0};
+  dbSet(saveSlotKey(slotId),{state:cleanForFB(s),meta:meta}).catch(function(e){console.warn('Save:',e);});
 }
 function getAllSaves(){
   if(!currentUser||!_db)return Promise.resolve({});
@@ -509,78 +414,24 @@ function getAllSaves(){
 }
 function deleteSaveSlot(id){if(!currentUser||!_db)return Promise.resolve();return dbSet(saveSlotKey(id),null).catch(function(){});}
 function deleteSavedGame(){if(!GS||!GS._saveSlot)return;deleteSaveSlot(GS._saveSlot);}
-// ── ONLINE ROOM SAVE/RESUME ──
-function saveOnlineRoom(code,slot){
-  if(!currentUser||!_db||!code)return;
-  var key='onlineRooms/'+currentUser.uid;
-  _db.ref(key).set({code:String(code),mySlot:Number(slot||0),savedAt:Date.now()})
-    .then(function(){console.log('Online room saved:',code,slot);})
-    .catch(function(e){console.warn('Online room save error:',e);});
-}
-function clearOnlineRoom(){
-  if(!currentUser||!_db)return;
-  _db.ref('onlineRooms/'+currentUser.uid).remove()
-    .then(function(){refreshResumeBtn();})
-    .catch(function(){});
-}
-function getOnlineRoom(){
-  if(!currentUser||!_db)return Promise.resolve(null);
-  return _db.ref('onlineRooms/'+currentUser.uid).once('value')
-    .then(function(snap){
-      var v=snap.val();
-      console.log('getOnlineRoom result:',v);
-      return v;
-    })
-    .catch(function(e){console.warn('getOnlineRoom error:',e);return null;});
-}
-
 function refreshResumeBtn(){
   var btn=document.getElementById('btnResume'),sub=document.getElementById('btnResumeSub');if(!btn||!sub)return;
   if(!currentUser){btn.classList.add('btn-disabled');sub.textContent=isGuest?'Not available for guests':'Sign in to resume';return;}
   sub.textContent='Loading...';
-  Promise.all([getAllSaves(),getOnlineRoom()]).then(function(results){
-    var saves=results[0]||{},onlineRoom=results[1];
-    var slots=Object.values(saves).filter(function(s){return s&&s.meta;});
-    var total=slots.length+(onlineRoom?1:0);
-    if(total>0){btn.classList.remove('btn-disabled');sub.textContent=total+' game'+(total!==1?'s':'')+' available';}
-    else{btn.classList.add('btn-disabled');sub.textContent='No saved games';}
-  }).catch(function(){btn.classList.add('btn-disabled');sub.textContent='Could not load';});
+  getAllSaves().then(function(saves){var slots=Object.values(saves).filter(function(s){return s&&s.meta;});if(slots.length>0){btn.classList.remove('btn-disabled');sub.textContent=slots.length+' game'+(slots.length!==1?'s':'')+' available';}else{btn.classList.add('btn-disabled');sub.textContent='No saved games';}}).catch(function(){btn.classList.add('btn-disabled');sub.textContent='Could not load';});
 }
 document.getElementById('btnResume').addEventListener('click',function(){if(this.classList.contains('btn-disabled'))return;openResumePicker();});
 function openResumePicker(){
-  if(!currentUser||!_db)return;
-  var savesPromise=getAllSaves();
-  var onlinePromise=_db.ref('onlineRooms/'+currentUser.uid).once('value')
-    .then(function(s){return s.val();}).catch(function(){return null;});
-  Promise.all([savesPromise,onlinePromise]).then(function(results){
-    var saves=results[0]||{},onlineRoom=results[1];
+  if(!currentUser)return;
+  getAllSaves().then(function(saves){
     var slots=Object.values(saves).filter(function(s){return s&&s.meta&&s.state;});
+    if(!slots.length){refreshResumeBtn();return;}
+    if(slots.length===1){loadSaveSlot(slots[0]);return;}
     slots.sort(function(a,b){return b.meta.savedAt-a.meta.savedAt;});
-    var hasOnline=!!(onlineRoom&&onlineRoom.code);
-    var total=slots.length+(hasOnline?1:0);
-    if(total===0){refreshResumeBtn();return;}
-    // If only one item total, jump straight to it
-    if(total===1){
-      if(hasOnline)tryRejoinOnline(onlineRoom);
-      else loadSaveSlot(slots[0]);
-      return;
-    }
-    // Show picker
     document.getElementById('phd').style.background='#1a3a55';
     document.getElementById('phd').innerHTML='<div style="font-size:18px;font-weight:700;color:#fff">▶ Resume Which Game?</div>';
     document.getElementById('pbd').innerHTML='<div style="font-size:13px;color:#555;margin-bottom:4px">Select a saved game:</div>';
     var ft=document.getElementById('pft');ft.innerHTML='';
-    // Online room entry at top if exists
-    if(hasOnline){
-      var d=new Date(onlineRoom.savedAt),ts=d.toLocaleDateString()+' '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-      var wrap=document.createElement('div');wrap.style.cssText='width:100%;margin-bottom:8px';
-      var b=document.createElement('button');b.style.cssText='display:block;width:100%;padding:10px 14px;border-radius:9px;border:2px solid #2471a3;background:#071728;color:#fff;font-size:12px;cursor:pointer;text-align:left;margin-bottom:3px';
-      b.innerHTML='<div style="font-weight:700;color:#7ecbe0">🌐 Online Multiplayer</div><div>Room code: <b style="color:#FFD700">'+onlineRoom.code+'</b></div><div style="color:#4eff91">Will attempt to rejoin</div><div style="color:#4a7a9b;font-size:10px">Left at: '+ts+'</div>';
-      b.onclick=function(){hideP();tryRejoinOnline(onlineRoom);};
-      var del=document.createElement('button');del.textContent='🗑 Remove';del.style.cssText='font-size:11px;padding:4px 10px;background:#c0392b;color:#fff;border:none;border-radius:5px;cursor:pointer';
-      del.onclick=function(e){e.stopPropagation();clearOnlineRoom();hideP();refreshResumeBtn();};
-      wrap.appendChild(b);wrap.appendChild(del);ft.appendChild(wrap);
-    }
     slots.forEach(function(slot){
       var m=slot.meta,d=new Date(m.savedAt),ts=d.toLocaleDateString()+' '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
       var wrap=document.createElement('div');wrap.style.cssText='width:100%;margin-bottom:8px';
@@ -595,64 +446,14 @@ function openResumePicker(){
     document.getElementById('po').classList.add('on');
   });
 }
-
-function tryRejoinOnline(onlineRoom){
-  var code=String(onlineRoom.code||""),slot=Number(onlineRoom.mySlot||0);
-  if(!code||code.length!==4){clearOnlineRoom();refreshResumeBtn();return;}
-  showP("🌐 Rejoining...","info","Checking room "+code+"...",[]);
-  _db.ref("rooms/"+code).once('value').then(function(snap){
-    var v=snap.val();
-    hideP();
-    if(!v){
-      clearOnlineRoom();refreshResumeBtn();
-      showP("Room Gone","info","Room "+code+" no longer exists.\nThe game may have ended or expired.",[{l:"OK",c:"pn",fn:hideP}]);
-      return;
-    }
-    if(v.winner){
-      clearOnlineRoom();refreshResumeBtn();
-      showP("Game Over","info","The game in room "+code+" has already ended.",[{l:"OK",c:"pn",fn:hideP}]);
-      return;
-    }
-    // Find this player's slot by matching uid
-    var foundSlot=slot;
-    if(v.players&&currentUser){
-      for(var i=0;i<(v.roomSize||6);i++){
-        var p=v.players[i];
-        if(p&&p.uid&&p.uid===currentUser.uid){foundSlot=i;break;}
-      }
-    }
-    rCode=code;
-    myId=foundSlot;
-    isOnlineMultiplayer=true;
-    enterGame(code);
-  }).catch(function(e){
-    hideP();
-    showP("Rejoin Failed","info","Could not connect to room "+code+".\nCheck your connection and try again.",[{l:"OK",c:"pn",fn:hideP}]);
-    console.error('Rejoin error:',e);
-  });
-}
 function loadSaveSlot(slot){
   aiRunning=false;showTransActive=false;tradeOpen=false;isOnlineMultiplayer=false;myId=0;aiSpeed=slot.state.aiSpeed||'show';
   showScreen(null);document.getElementById('waveBg').style.display='none';document.getElementById('game').classList.add('on');document.getElementById('rpill').textContent='LOCAL';
   JC=buildJC();GS=slot.state;drawBoard();renderAll();document.getElementById('tro').classList.remove('on');setTimeout(function(){centerOn(GS.curIdx);},100);
 }
 setInterval(function(){if(GS&&!isOnlineMultiplayer&&currentUser)saveGame(GS);},30000);
-document.addEventListener('visibilitychange',function(){
-  if(document.hidden){
-    if(GS&&!isOnlineMultiplayer&&currentUser)saveGame(GS);
-    if(isOnlineMultiplayer&&rCode&&currentUser)_db.ref("rooms/"+rCode+"/presence/"+myId).set(false).catch(function(){});
-  } else {
-    if(isOnlineMultiplayer&&rCode&&currentUser)_db.ref("rooms/"+rCode+"/presence/"+myId).set(true).catch(function(){});
-  }
-});
-window.addEventListener('beforeunload',function(){
-  // Save local/AI game state
-  if(GS&&!isOnlineMultiplayer&&currentUser)saveGame(GS);
-  // For online: presence goes offline — onlineRooms record stays so they can rejoin
-  if(isOnlineMultiplayer&&rCode&&currentUser){
-    _db.ref("rooms/"+rCode+"/presence/"+myId).set(false).catch(function(){});
-  }
-});
+document.addEventListener('visibilitychange',function(){if(document.hidden&&GS&&!isOnlineMultiplayer&&currentUser)saveGame(GS);if(rCode&&currentUser)dbSet('rooms/'+rCode+'/presence/'+myId,!document.hidden);});
+window.addEventListener('beforeunload',function(){if(GS&&!isOnlineMultiplayer&&currentUser)saveGame(GS);});
 
 // ── CONSTANTS ──
 var PC=["#c0392b","#2471a3","#1e8449","#d68910","#6c3483","#117a65"];
@@ -669,7 +470,6 @@ var localTokenSelections=[],localTokStep=0;
 var tradeOpen=false,aiRunning=false,showTransActive=false;
 var GS=null,myId=0,rCode=null,rUnsub=null,aiSpeed="show",scale=2.0,JC={};
 var onlineJoining=false,takenTokens=[];
-var lastSpectatorEvent="";
 var STEP_MS=320,LAND_PAUSE_MS=900;
 
 function mg(a,b){var r={};for(var k in a)r[k]=a[k];for(var k in b)r[k]=b[k];return r;}
@@ -684,20 +484,7 @@ var SWDEFS=[{type:"robbery",icon:"💰",label:"Highway Robbery",desc:"Take ALL m
 function mkSwim(){return shuf(SCARDS.concat(SCARDS).concat(SCARDS));}
 function mkSink(){return shuf(KCARDS.concat(KCARDS).concat(KCARDS));}
 function mkDeck(defs){var d=[];for(var i=0;i<defs.length;i++)for(var j=0;j<defs[i].copies;j++)d.push(mg(defs[i],{uid:Math.random().toString(36).slice(2)}));return shuf(d);}
-function mkP(id,name,color,isAI,diff,tok,uid){
-  return {
-    id:id, name:name, color:color,
-    isAI:isAI===true,          // enforce boolean — no accidental truthy string
-    aiDiff:diff||null,
-    tokenKey:tok||"captain",
-    uid:uid||null,
-    pos:0, money:35, stars:0, graduated:false, rescues:0, fish:0, boat:null,
-    skip:0, inTask:null, taskPos:-1, winPos:-1, done:false, eliminated:false,
-    heldCards:[], shortcut:{fish:false,rescues:false,stars:false},
-    fasttrack:false, doubleRollsLeft:0, completedTasks:[], frozen:0,
-    boughtCardThisTurn:false, usedShipwreckThisTurn:false, cardsBoughtThisTurn:[]
-  };
-}
+function mkP(id,name,color,isAI,diff,tok,uid){return{id:id,name:name,color:color,isAI:!!isAI,aiDiff:diff||null,tokenKey:tok||"captain",uid:uid||null,pos:0,money:35,stars:0,graduated:false,rescues:0,fish:0,boat:null,skip:0,inTask:null,taskPos:-1,winPos:-1,done:false,eliminated:false,heldCards:[],shortcut:{fish:false,rescues:false,stars:false},fasttrack:false,doubleRollsLeft:0,completedTasks:[],frozen:0,boughtCardThisTurn:false,usedShipwreckThisTurn:false,cardsBoughtThisTurn:[]};}
 
 var TASKS={
   boat_school:{key:"boat_school",label:"Boat School",entryIdx:5,exitIdx:6,count:6,colGap:SW,color:"#5b2c8c",
@@ -762,27 +549,11 @@ buildLocalNames();
 // ── AUTH ──
 var authMode="signin";
 document.getElementById("btnAuthSubmit").addEventListener("click",function(){
-  var email=document.getElementById("authEmail").value.trim(),
-      pass=document.getElementById("authPass").value,
-      name=document.getElementById("authName").value.trim(),
-      errEl=document.getElementById("authErr");
-  errEl.textContent="";
+  var email=document.getElementById("authEmail").value.trim(),pass=document.getElementById("authPass").value,name=document.getElementById("authName").value.trim(),errEl=document.getElementById("authErr");errEl.textContent="";
   if(!email||!pass){errEl.textContent="Email and password required.";return;}
-  if(!_auth){
-    errEl.textContent="Still connecting to Firebase — please wait a moment and try again.";
-    return;
-  }
-  if(authMode==="signup"){
-    _auth.createUserWithEmailAndPassword(email,pass)
-      .then(function(c){
-        return c.user.updateProfile({displayName:name||email.split("@")[0]})
-          .then(function(){
-            if(_db)_db.ref('users/'+c.user.uid).update({email:c.user.email,displayName:c.user.displayName,lastSeen:Date.now()}).catch(function(){});
-          });
-      }).catch(function(e){errEl.textContent=e.message;});
-  } else {
-    _auth.signInWithEmailAndPassword(email,pass).catch(function(e){errEl.textContent=e.message;});
-  }
+  if(!_auth){errEl.textContent="Still connecting...";return;}
+  if(authMode==="signup"){_auth.createUserWithEmailAndPassword(email,pass).then(function(c){return c.user.updateProfile({displayName:name||email.split("@")[0]}).then(function(){dbUpdate('users/'+c.user.uid,{email:c.user.email,displayName:c.user.displayName,lastSeen:Date.now()});});}).catch(function(e){errEl.textContent=e.message;});}
+  else{_auth.signInWithEmailAndPassword(email,pass).catch(function(e){errEl.textContent=e.message;});}
 });
 document.getElementById("btnAuthGuest").addEventListener("click",function(){isGuest=true;currentUser=null;document.getElementById("userBar").style.display="none";showScreen("scHome");refreshResumeBtn();});
 document.getElementById("authToggleLink").addEventListener("click",function(){authMode=authMode==="signin"?"signup":"signin";var up=authMode==="signup";document.getElementById("btnAuthSubmit").textContent=up?"📝 Sign Up":"🚀 Sign In";document.getElementById("authSubtitle").textContent=up?"Create your account":"Sign in to set sail!";document.getElementById("authToggleLink").textContent=up?"Sign in instead":"Sign up instead";document.getElementById("authName").style.display=up?"block":"none";document.getElementById("authErr").textContent="";});
@@ -803,18 +574,12 @@ document.getElementById("btnOnlineBack").addEventListener("click",function(){sho
 document.getElementById("btnAIBack").addEventListener("click",function(){showScreen("scHome");});
 document.getElementById("btnLocalBack").addEventListener("click",function(){showScreen("scHome");});
 document.getElementById("btnOnlineTokenBack").addEventListener("click",function(){
+  // Reset waiting lobby state
   document.getElementById("waitingLobby").style.display="none";
   document.getElementById("btnJoinGame").style.display="none";
   document.getElementById("btnConfirmCreate").style.display="block";
   if(rUnsub){rUnsub();rUnsub=null;}
-  if(rCode&&!onlineJoining){
-    // Delete the pre-created room if creator backs out before confirming token
-    dbSet("rooms/"+rCode,null).catch(function(){});
-  }
   rCode=null;isOnlineMultiplayer=false;
-  // Reset create section on online screen
-  document.getElementById("createRoomCodeSection").style.display="none";
-  document.getElementById("btnGoCreate").style.display="block";
   showScreen("scOnline");
 });
 document.getElementById("btnAITokenBack").addEventListener("click",function(){showScreen("scAI");});
@@ -828,26 +593,10 @@ function resetOnlineTokenScreen(isJoining){
 
 document.getElementById("btnGoCreate").addEventListener("click",function(){
   if(!currentUser){alert("Sign in required.");return;}
-  var name=document.getElementById("onlineName").value.trim()||currentUser.displayName||"Player 1";
-  if(!name){alert("Please enter your name.");return;}
-  // Generate room code and show it immediately on this screen
-  var code=String(Math.floor(1000+Math.random()*9000));
-  rCode=code;myId=0;isOnlineMultiplayer=true;
-  document.getElementById("onlineCreateCode").textContent=code;
-  document.getElementById("createRoomCodeSection").style.display="block";
-  document.getElementById("btnGoCreate").style.display="none";
-  // Pre-create room in Firebase so others can see the code exists
-  var tempState={players:[null],curIdx:0,phase:"waiting",log:[],roomSize:selRoomSize,swimDeck:mkSwim(),sinkDeck:mkSink(),swDeck:mkDeck(SWDEFS),winner:null,takenTokens:[],roomName:name};
-  var tempPlayers=[];for(var i=0;i<selRoomSize;i++)tempPlayers.push(null);
-  tempState.players=tempPlayers;
-  dbSet("rooms/"+code,tempState).catch(function(e){console.warn("Pre-create room:",e);});
-});
-
-document.getElementById("btnGoCreateToken").addEventListener("click",function(){
   onlineJoining=false;takenTokens=[];selOnlineTok=null;
   document.getElementById("onlineTokTitle").textContent="Choose Your Token";
-  document.getElementById("onlineTokSub").textContent="Pick a token before entering the game";
-  document.getElementById("onlineTokNote").textContent="Room code: "+rCode;
+  document.getElementById("onlineTokSub").textContent="Pick a token before creating your room";
+  document.getElementById("onlineTokNote").textContent="";
   resetOnlineTokenScreen(false);
   buildTokenGrid("onlineTokenGrid",null,"#2471a3",function(k){selOnlineTok=k;},[]);
   showScreen("scOnlineToken");
@@ -885,9 +634,9 @@ document.getElementById("btnJoinGame").addEventListener("click",function(){
 });
 
 function doCreateRoom(){
-  // rCode already set by btnGoCreate; update with player info and token
   var name=document.getElementById("onlineName").value.trim()||currentUser.displayName||"Player 1";
-  var code=rCode;
+  var code=String(Math.floor(1000+Math.random()*9000));
+  rCode=code;myId=0;isOnlineMultiplayer=true;
   var players=[];for(var i=0;i<selRoomSize;i++)players.push(null);
   players[0]=mkP(0,name,PC[0],false,null,selOnlineTok,currentUser.uid);
   var s={players:players,curIdx:0,phase:"waiting",log:[],roomSize:selRoomSize,swimDeck:mkSwim(),sinkDeck:mkSink(),swDeck:mkDeck(SWDEFS),winner:null,takenTokens:[selOnlineTok]};
@@ -938,27 +687,9 @@ function updateSlots(players,total){
 document.getElementById("btnAIToToken").addEventListener("click",function(){selAITok=null;buildTokenGrid("aiTokenGrid",null,"#c0392b",function(k){selAITok=k;},[]);showScreen("scAIToken");});
 document.getElementById("btnStartAI").addEventListener("click",function(){
   if(!selAITok){alert("Please choose a token first!");return;}
-  var name=document.getElementById("aiName").value.trim()||"Player 1";
-  var uid=currentUser?currentUser.uid:null;
-
-  // Build player list: index 0 = human, indices 1..selCnt = AI
-  var usedToks=[selAITok];
-  var players=[mkP(0,name,PC[0],false,null,selAITok,uid)];
-
-  for(var i=0;i<selCnt;i++){
-    // Pick first token not already used
-    var aiTok=null;
-    for(var j=0;j<TOKEN_KEYS.length;j++){
-      if(usedToks.indexOf(TOKEN_KEYS[j])<0){aiTok=TOKEN_KEYS[j];break;}
-    }
-    if(!aiTok)aiTok=TOKEN_KEYS[(i+1)%TOKEN_KEYS.length];
-    usedToks.push(aiTok);
-    var aiPlayer=mkP(i+1, AI_NAMES[i], PC[i+1], true, selDiff, aiTok, null);
-    players.push(aiPlayer);
-    console.log('Created AI player',i,':', aiPlayer.name, 'isAI='+aiPlayer.isAI, 'diff='+aiPlayer.aiDiff);
-  }
-
-  console.log('Starting AI game with',players.length,'players, selCnt='+selCnt);
+  var name=document.getElementById("aiName").value.trim()||"Player 1",uid=currentUser?currentUser.uid:null;
+  var usedToks=[selAITok],players=[mkP(0,name,PC[0],false,null,selAITok,uid)];
+  for(var i=0;i<selCnt;i++){var aiTok=null;for(var j=0;j<TOKEN_KEYS.length;j++){if(usedToks.indexOf(TOKEN_KEYS[j])<0){aiTok=TOKEN_KEYS[j];break;}}if(!aiTok)aiTok=TOKEN_KEYS[(i+1)%TOKEN_KEYS.length];usedToks.push(aiTok);players.push(mkP(i+1,AI_NAMES[i],PC[i+1],true,selDiff,aiTok,null));}
   startGame(players,selSpd);
 });
 
@@ -985,103 +716,30 @@ document.getElementById("btnLocalTokNext").addEventListener("click",function(){i
 function enterGame(code){
   if(rUnsub){rUnsub();rUnsub=null;}
   showScreen(null);document.getElementById("waveBg").style.display="none";document.getElementById("game").classList.add("on");document.getElementById("rpill").textContent="ROOM "+code;
-  JC=buildJC();drawBoard();
-  if(currentUser){
-    _db.ref("rooms/"+code+"/presence/"+myId).set(true);
-    // Save room for rejoin — use direct _db call to ensure it fires
-    _db.ref('onlineRooms/'+currentUser.uid).set({
-      code:String(code),
-      mySlot:Number(myId),
-      savedAt:Date.now()
-    }).then(function(){
-      console.log('Saved online room for rejoin:',code,'slot',myId);
-      refreshResumeBtn();
-    }).catch(function(e){console.warn('Save room error:',e);});
-  }
+  JC=buildJC();drawBoard();if(currentUser)dbSet("rooms/"+code+"/presence/"+myId,true);
   var shownTransFor=-1;
-  var lastLogLen=0;
-  var lastPhase="";
-  var lastCurIdx=-1;
   rUnsub=dbOn("rooms/"+code,function(v){
     if(!v)return;
     if(currentUser&&v.players){for(var i=0;i<(v.roomSize||6);i++){var p=v.players[i];if(p&&p.uid&&p.uid===currentUser.uid){myId=i;break;}}}
-    var curPl=v.players&&v.players[v.curIdx];
-    var nowMyTurn=!!(curPl&&curPl.uid&&currentUser&&curPl.uid===currentUser.uid);
-
-    // When it becomes MY turn, dismiss any spectator popup
-    if(nowMyTurn&&document.getElementById("po").classList.contains("on")){
-      hideP();lastSpectatorEvent="";
-    }
-
-    var prevGS=GS;
+    var curPl=v.players&&v.players[v.curIdx];var nowMyTurn=!!(curPl&&curPl.uid&&currentUser&&curPl.uid===currentUser.uid);
+    if(!nowMyTurn&&document.getElementById("po").classList.contains("on"))hideP();
     GS=v;renderAll();
-
-    // Show spectator popups for non-active players
-    if(!nowMyTurn&&v.phase==="preturn"||!nowMyTurn&&v.phase==="transition"){
-      var logArr=Array.isArray(v.log)?v.log:Object.values(v.log||{});
-      var curLogLen=logArr.length;
-      if(curLogLen>lastLogLen&&logArr.length>0){
-        // New log entry — show it as spectator popup
-        var latestEntry=logArr[0];
-        // Don't show card details — filter out shipwreck card content
-        var isCardMsg=latestEntry.indexOf("Shipwreck card")>=0||latestEntry.indexOf("plays a Shipwreck")>=0;
-        var isRollMsg=latestEntry.indexOf("rolls")>=0;
-        var isPassMsg=latestEntry.indexOf("passed START")>=0;
-        var isTaskMsg=latestEntry.indexOf("completed")>=0||latestEntry.indexOf("enters")>=0||latestEntry.indexOf("SWIM")>=0||latestEntry.indexOf("SINK")>=0||latestEntry.indexOf("sp")>=0;
-        var playerName=curPl?curPl.name:"";
-        if(isRollMsg){
-          var rollNum=latestEntry.match(/rolls (\d)/);showSpectatorPopup("🎲 "+playerName+" rolled",(rollNum?"Rolled a "+rollNum[1]+"!":"Rolling..."));}
-        else if(isPassMsg){showSpectatorPopup("💰 Passed START!",playerName+" passed START and collected $5!");}
-        else if(isCardMsg&&latestEntry.indexOf("bought")>=0){showSpectatorPopup("🃏 Shipwreck Card",playerName+" bought a Shipwreck card.");}
-        else if(isCardMsg&&latestEntry.indexOf("plays")>=0){showSpectatorPopup("🃏 Shipwreck Card Played!",playerName+" played a Shipwreck card!");}
-        else if(isTaskMsg){showSpectatorPopup("📍 "+playerName,latestEntry.replace(/🤖 /g,"").replace(/🎲/g,"").replace(/💰/g,"").replace(/🎉/g,""));}
-      }
-      lastLogLen=curLogLen;
-    }
-
     if(nowMyTurn&&v.phase==="transition"&&shownTransFor!==v.curIdx){shownTransFor=v.curIdx;showTransActive=false;showTrans();}
     if(v.pendingTrade&&v.pendingTrade.toIdx===myId&&!v.pendingTrade.responded)showTradeOffer(v.pendingTrade,v);
   });
 }
 
 function startGame(players,spd){
-  // Verify players array is correct before starting
-  console.log('startGame players:',players.map(function(p){return p.name+' isAI='+p.isAI;}));
-  aiRunning=false;showTransActive=false;tradeOpen=false;
-  isOnlineMultiplayer=false;myId=0;aiSpeed=spd||"show";
-  showScreen(null);document.getElementById("waveBg").style.display="none";
-  document.getElementById("game").classList.add("on");
-  document.getElementById("rpill").textContent="LOCAL";
-  JC=buildJC();
-  GS={
-    players:players,
-    curIdx:0,
-    phase:"transition",
-    log:[],
-    swimDeck:mkSwim(),
-    sinkDeck:mkSink(),
-    swDeck:mkDeck(SWDEFS),
-    winner:null,
-    aiSpeed:spd
-  };
-  // Save immediately so the slot exists
-  if(currentUser){
-    var slotId='slot_'+Date.now();
-    GS._saveSlot=slotId;
-    saveGame(GS);
-  }
-  drawBoard();renderAll();
-  setTimeout(function(){centerOn(0);},100);
-  showTrans();
+  aiRunning=false;showTransActive=false;tradeOpen=false;isOnlineMultiplayer=false;myId=0;aiSpeed=spd||"show";
+  showScreen(null);document.getElementById("waveBg").style.display="none";document.getElementById("game").classList.add("on");document.getElementById("rpill").textContent="LOCAL";
+  JC=buildJC();GS={players:players,curIdx:0,phase:"transition",log:[],swimDeck:mkSwim(),sinkDeck:mkSink(),swDeck:mkDeck(SWDEFS),winner:null,aiSpeed:spd};
+  if(currentUser)saveGame(GS);drawBoard();renderAll();setTimeout(function(){centerOn(0);},100);showTrans();
 }
 
 function leaveGame(){
   if(GS&&!isOnlineMultiplayer&&currentUser)saveGame(GS);
-  // For online: mark presence offline but keep onlineRooms record so player can rejoin
-  if(isOnlineMultiplayer&&currentUser&&rCode){
-    _db.ref("rooms/"+rCode+"/presence/"+myId).set(false).catch(function(){});
-  }
-  aiRunning=false;showTransActive=false;tradeOpen=false;lastSpectatorEvent="";
+  aiRunning=false;showTransActive=false;tradeOpen=false;
+  if(rCode&&currentUser)dbSet("rooms/"+rCode+"/presence/"+myId,false);
   if(rUnsub){rUnsub();rUnsub=null;}
   GS=null;isOnlineMultiplayer=false;rCode=null;
   document.getElementById("game").classList.remove("on");document.getElementById("wo").classList.remove("on");document.getElementById("tro").classList.remove("on");
@@ -1092,6 +750,7 @@ function leaveGame(){
 
 function isMyTurnNow(){if(!isOnlineMultiplayer)return true;if(!GS||!currentUser)return false;var cur=GS.players&&GS.players[GS.curIdx];return !!(cur&&cur.uid&&cur.uid===currentUser.uid);}
 function writeToFirebase(s){if(isOnlineMultiplayer&&rCode)dbSet("rooms/"+rCode,cleanForFB(s)).catch(function(e){console.error(e);});}
+function commitTurn(s){GS=s;renderAll();if(isOnlineMultiplayer)writeToFirebase(s);}
 
 function notifyNextPlayer(s,prevIdx,nextIdx){
   if(!isOnlineMultiplayer||!rCode)return;var nextPl=s.players[nextIdx];if(!nextPl||nextPl.isAI||!nextPl.uid||(nextPl.uid===(currentUser?currentUser.uid:null)))return;
@@ -1115,427 +774,9 @@ function renderAll(){
 }
 
 function renderPList(s){
-  var h="";
-  for(var i=0;i<s.players.length;i++){
-    var pl=s.players[i];if(!pl)continue;
-    var act=i===s.curIdx;
-    var plIsAI=(pl.isAI===true);
-    h+='<div class="prow'+(act?" act":"")+'" data-pi="'+i+'">'
-      +'<div style="width:9px;height:9px;border-radius:50%;background:'+pl.color+';flex-shrink:0"></div>'
-      +'<div style="flex:1;min-width:0">'
-      +'<div style="font-size:11px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(plIsAI?"🤖 ":"")+pl.name+(pl.eliminated?" ❌":pl.done?" 🏆":act?" ▶":"")+'</div>'
-      +'<div style="font-size:9px;color:'+(pl.money<0?"#ff9999":"#7ecbe0")+'">💰
-
-function renderCur(s,cur){
-  document.getElementById("ctn").textContent=(cur.isAI?"🤖 ":"")+cur.name;document.getElementById("ctn").style.color=cur.color;
-  var pd=posD(cur);document.getElementById("ctp").textContent=pd||"";document.getElementById("ctp").style.display=pd?"":"none";
-  var id=cur.money<0;document.getElementById("ctm").innerHTML="💰 $"+cur.money+(id?" ⚠️ IN DEBT":"");document.getElementById("ctm").style.color=id?"#ff6b6b":"#7dff9a";
-  var tks=["boat_school","boat","fish","rescue"],h="";for(var i=0;i<tks.length;i++){var r=tLine(cur,tks[i]);h+='<div style="color:'+(r.g?"#4eff91":"#8aaccc")+'">'+r.t+'</div>';}document.getElementById("ctt").innerHTML=h;
-  document.getElementById("ctb").textContent=(cur.doubleRollsLeft||0)>0?"🎲 "+(cur.doubleRollsLeft||0)+" bonus roll(s)!":"";
-  renderCards(s,cur);
-}
-
-function isCardOwner(s,playerIdx){
-  // Show card details only to the actual player on this device
-  if(!isOnlineMultiplayer&&!s.players.some(function(p){return p&&p.isAI;})){return true;} // local multiplayer — show all
-  if(!isOnlineMultiplayer)return(playerIdx===0); // vs AI — only show player 0's cards (the human)
-  // Online: show only if this player's uid matches ours
-  var pl=s.players[playerIdx];return !!(pl&&pl.uid&&currentUser&&pl.uid===currentUser.uid);
-}
-
-function renderCards(s,cur){
-  var el=document.getElementById("cds");if(!cur.heldCards){el.innerHTML="";return;}
-  var showDetails=isCardOwner(s,s.curIdx);
-  if(!cur.heldCards.length){el.innerHTML="";return;}
-  if(!showDetails){
-    // Just show count — include fasttrack in count but don't name it
-    el.innerHTML='<div class="sl">CARDS</div><div style="font-size:11px;color:#7ecbe0;padding:3px 6px;background:#1a3a55;border-radius:5px;margin-bottom:3px">🃏 '+cur.heldCards.length+' Shipwreck card'+(cur.heldCards.length!==1?'s':'')+' available</div>';
-    return;
-  }
-  var mine=isMyTurnNow();
-  var h='<div class="sl">CARDS'+(cur.usedShipwreckThisTurn?" (1 played)":"")+"</div>";
-  for(var i=0;i<cur.heldCards.length;i++){var c=cur.heldCards[i];if(c.type==="fasttrack"){h+='<div style="display:flex;align-items:center;gap:5px;padding:3px 7px;border-radius:5px;background:#0f3d1a;border:1.5px solid #2ecc71;color:#2ecc71;font-size:10px;margin-bottom:3px">'+c.icon+" "+c.label+'<span style="margin-left:auto;font-size:8px;background:#2ecc71;color:#0a1f0e;border-radius:3px;padding:1px 4px;font-weight:700">ACTIVE</span></div>';}else{var bn=(cur.cardsBoughtThisTurn||[]).indexOf(c.uid)>=0;var dis=cur.usedShipwreckThisTurn||bn||!mine;h+='<button class="cb2" data-cardidx="'+i+'"'+(dis?" disabled":"")+">"+c.icon+" "+c.label+(bn?" — available next turn":"")+"</button>";}}
-  el.innerHTML=h;
-  el.querySelectorAll("[data-cardidx]").forEach(function(btn){btn.addEventListener("click",function(){openCard(parseInt(btn.getAttribute("data-cardidx")));});});
-}
-
-function renderAct(s,cur){
-  var el=document.getElementById("aa"),mine=isMyTurnNow();
-  var curIsAI=(cur.isAI===true);
-  if(!mine){
-    var pd=posD(cur)||("Space "+cur.pos);
-    var prog=["boat_school","boat","fish","rescue"].map(function(tk){var r=tLine(cur,tk);return'<div style="color:'+(r.g?"#4eff91":"#8aaccc")+'">'+r.t+'</div>';}).join("");
-    el.innerHTML='<div style="background:#0d2137;border-radius:8px;padding:10px;border:1px solid #1a3a55">'
-      +'<div style="font-size:11px;color:#f5a623;font-weight:700;margin-bottom:6px">👁 Watching '+cur.name+'\'s turn...</div>'
-      +'<div style="font-size:10px;color:#7ecbe0;margin-bottom:4px">📍 '+pd+'</div>'
-      +'<div style="font-size:10px;margin-bottom:4px">💰 
-
-// ── DIE ──
-var DIE_DOTS={1:[[0,0]],2:[[-10,-10],[10,10]],3:[[-10,-10],[0,0],[10,10]],4:[[-10,-10],[10,-10],[-10,10],[10,10]],5:[[-10,-10],[10,-10],[0,0],[-10,10],[10,10]],6:[[-10,-10],[10,-10],[-10,0],[10,0],[-10,10],[10,10]]};
-function showDie(n){var el=document.getElementById("dieDisplay");if(!el)return;var dots=DIE_DOTS[n]||[];var svg='<svg width="52" height="52" viewBox="-28 -28 56 56"><rect x="-26" y="-26" width="52" height="52" rx="8" fill="#fff" stroke="#1a4a64" stroke-width="2"/>';for(var i=0;i<dots.length;i++)svg+='<circle cx="'+dots[i][0]+'" cy="'+dots[i][1]+'" r="4.5" fill="#1a4a64"/>';svg+='</svg>';el.innerHTML=svg;el.style.display='block';}
-function hideDie(){var el=document.getElementById("dieDisplay");if(el){el.innerHTML='';el.style.display='none';}}
-function posD(pl){if(pl.winPos>=0){var l=["Dock 1","Lose Turn","Back 1","⭐ WIN"];return"Winner's Dock: "+l[pl.winPos];}if(pl.inTask==="boat")return"🛥️ Boat Store: sp "+(pl.taskPos+1);if(pl.inTask)return(TASKS[pl.inTask]?TASKS[pl.inTask].label:pl.inTask)+": sp "+(pl.taskPos+1);return null;}
-function tLine(pl,tk){var done=(pl.completedTasks||[]).indexOf(tk)>=0;if(tk==="boat"){if(done)return{t:(pl.boat?BOAT_EMOJIS[pl.boat.name]||"🛥️":"🛥️")+" "+(pl.boat?pl.boat.name:"owned"),g:true};return{t:"⛵ No boat yet",g:false};}var t=TASKS[tk];if(!t)return{t:"",g:false};if(done)return{t:t.done||t.label,g:true};return{t:t.prog(pl),g:t.req(pl)};}
-
-// ── ANIMATION ──
-function animateSteps(playerIdx,steps,onDone){
-  if(!steps||!steps.length){onDone();return;}var i=0;
-  function next(){if(i>=steps.length){onDone();return;}var step=steps[i],isLast=(i===steps.length-1);i++;var pl=GS.players[playerIdx];if(!pl){onDone();return;}if(step.type==="oval")GS.players[playerIdx]=mg(pl,{pos:step.pos,inTask:null,taskPos:-1});else if(step.type==="task")GS.players[playerIdx]=mg(pl,{inTask:step.task,taskPos:step.taskPos});else if(step.type==="win")GS.players[playerIdx]=mg(pl,{winPos:step.winPos});updateTok(GS);centerOn(playerIdx);setTimeout(next,isLast?STEP_MS+LAND_PAUSE_MS:STEP_MS);}
-  next();
-}
-function centerOn(pi){if(!GS||!GS.players[pi])return;var xy=pXY(GS.players[pi]),bs=document.getElementById("bs");bs.scrollLeft=Math.max(0,xy.x*scale-bs.clientWidth/2);bs.scrollTop=Math.max(0,xy.y*scale-bs.clientHeight/2);}
-
-// ── GAME LOGIC ──
-function doRoll(){
-  if(!GS||!isMyTurnNow())return;var s=dc(GS),pl=s.players[s.curIdx];
-  if((pl.doubleRollsLeft||0)>0)pl.doubleRollsLeft--;
-  var r=Math.ceil(Math.random()*6);showDie(r);addL(s,pl.name+" 🎲 rolls "+r);s.players[s.curIdx]=pl;
-  if(isOnlineMultiplayer)writeToFirebase(s);else GS=s;renderAll();processRoll(r,s);
-}
-function processRoll(r,s){
-  var pl=s.players[s.curIdx];
-  if(pl.frozen>0){var nf=pl.frozen-1;s.players[s.curIdx]=mg(pl,{frozen:nf});addL(s,pl.name+" ❄️ frozen "+(nf>0?nf+" left.":"free!"));commitTurn(s);showP("❄️ Frozen!","info",pl.name+" is frozen!\n"+(nf>0?nf+" turn(s) left.":"Free next turn!"),[{l:"OK",c:"pn",fn:function(){advTurn(dc(GS));}}]);return;}
-  if(pl.skip>0){s.players[s.curIdx]=mg(pl,{skip:pl.skip-1});addL(s,pl.name+" skips turn.");commitTurn(s);advTurn(dc(GS));return;}
-  if(pl.winPos>=0){doWin(pl,s,r);return;}
-  if(pl.inTask==="boat"){doBoat(pl,s,r);return;}
-  if(pl.inTask){doTask(pl,s,r);return;}
-  doMove(pl,s,r);
-}
-function doMove(pl,s,r){
-  var path=[];for(var i=1;i<=r;i++)path.push((pl.pos+i)%36);
-  var fc=pl.completedTasks||[];
-  var jes=[{idx:TASKS.boat_school.entryIdx,key:"boat_school",need:fc.indexOf("boat_school")<0},{idx:TASKS.boat.entryIdx,key:"boat",need:fc.indexOf("boat")<0},{idx:TASKS.fish.entryIdx,key:"fish",need:fc.indexOf("fish")<0},{idx:TASKS.rescue.entryIdx,key:"rescue",need:fc.indexOf("rescue")<0},{idx:WIN_IDX,key:"winner",need:fc.length>=4}];
-  var ss=r,jh=null;
-  outer:for(var i=0;i<path.length;i++){for(var j=0;j<jes.length;j++){if(jes[j].need&&jes[j].idx===path[i]){ss=i+1;jh=jes[j];break outer;}}}
-  var extra=r-ss,steps=[];for(var i=0;i<ss;i++)steps.push({type:"oval",pos:path[i]});
-  var passed=false;for(var i=0;i<ss;i++)if(path[i]===0&&pl.pos!==0){passed=true;break;}
-  var finalPos=path[ss-1],u=mg(pl,{pos:finalPos});
-  if(passed){u=mg(u,{money:u.money+5});addL(s,"💰 "+pl.name+" passed START and collected $5!");}
-  s.players[s.curIdx]=u;commitTurn(s);
-  animateSteps(s.curIdx,steps,function(){
-    GS.players[GS.curIdx]=u;updateTok(GS);centerOn(GS.curIdx);
-    if(passed){
-      showP("💰 Passed START!","success","You passed START and collected $5!\nBalance: $"+u.money,[{l:"Nice!",c:"pp",fn:function(){if(jh){if(extra>0)enterJutX(u,dc(GS),jh.key,extra);else enterJut(u,dc(GS),jh.key);}else landOn(u,dc(GS));}}]);
-    } else {
-      if(jh){if(extra>0)enterJutX(u,dc(GS),jh.key,extra);else enterJut(u,dc(GS),jh.key);}else landOn(u,dc(GS));
-    }
-  });
-}
-function landOn(pl,s){
-  var k=sKind(pl.pos);
-  if(k==="swim"){var deck=(s.swimDeck||[]).slice();if(!deck.length)deck=mkSwim();var card=deck[0];deck=deck.slice(1);s.swimDeck=deck;var u=mg(pl,{});if(card.eff.money)u=mg(u,{money:u.money+card.eff.money});if(card.eff.skip)u=mg(u,{skip:(u.skip||0)+card.eff.skip});var mv=card.eff.move||0;s.players[s.curIdx]=u;addL(s,"🏊 SWIM: "+card.text);commitTurn(s);showP("🏊 Swim Card!","swim",card.text,[{l:"Woohoo!",c:"pp",fn:function(){if(mv!==0){var cur=dc(GS),curPl=cur.players[cur.curIdx];var swimSteps=[];var pos=curPl.pos;for(var i=0;i<Math.abs(mv);i++){pos=(pos+(mv>0?1:-1)+36)%36;swimSteps.push({type:"oval",pos:pos});}animateSteps(cur.curIdx,swimSteps,function(){var fp=((curPl.pos+mv)+3600)%36;var um=mg(curPl,{pos:fp});var s2=dc(GS);s2.players[s2.curIdx]=um;commitTurn(s2);landOn(um,dc(GS));});}else advTurn(dc(GS));}}]);return;}
-  if(k==="sink"){var deck2=(s.sinkDeck||[]).slice();if(!deck2.length)deck2=mkSink();var card2=deck2[0];deck2=deck2.slice(1);s.sinkDeck=deck2;var u2=mg(pl,{});if(card2.eff.money)u2=mg(u2,{money:u2.money+card2.eff.money});if(card2.eff.skip)u2=mg(u2,{skip:(u2.skip||0)+card2.eff.skip});var mv2=card2.eff.move||0;s.players[s.curIdx]=u2;addL(s,"🌊 SINK: "+card2.text);commitTurn(s);showP("🌊 Sink Card!","sink",card2.text,[{l:"Yikes!",c:"pn",fn:function(){if(mv2!==0){var cur=dc(GS),curPl=cur.players[cur.curIdx];var sinkSteps=[];var pos=curPl.pos;for(var i=0;i<Math.abs(mv2);i++){pos=(pos+(mv2>0?1:-1)+36)%36;sinkSteps.push({type:"oval",pos:pos});}animateSteps(cur.curIdx,sinkSteps,function(){var fp=((curPl.pos+mv2)+3600)%36;var um2=mg(curPl,{pos:fp});var s3=dc(GS);s3.players[s3.curIdx]=um2;commitTurn(s3);landOn(um2,dc(GS));});}else advTurn(dc(GS));}}]);return;}
-  advTurn(s);
-}
-function enterJut(pl,s,key){
-  // All juts work the same — no special bypass logic
-  if(key==="winner"){
-    if(pl.money<0){showP("💸 Wallet Too Low!","debt","Need $0+ to enter!\nCurrent balance: $"+pl.money,[{l:"Dang!",c:"pn",fn:function(){advTurn(dc(GS));}}]);return;}
-    s.players[s.curIdx]=mg(pl,{winPos:-1});addL(s,pl.name+" entered Winner's Dock!");commitTurn(s);showP("🏆 Winner's Dock!","info","All 4 challenges done! 🎉\nRoll to reach ⭐ WIN!",[{l:"Let's go!",c:"pp",fn:function(){advTurn(dc(GS));}}]);return;
-  }
-  if(key==="boat"&&!pl.graduated){
-    // Skip the boat store — not graduated
-    if(pl.isAI){addL(s,"🤖 AI skips Boat Store (not graduated)");commitTurn(s);advTurn(dc(GS));return;}
-    showP("🛥️ The Boat Store","info","You need to graduate from Boat School first!\n\nCome back after you've earned your stars.",[{l:"OK",c:"pn",fn:function(){advTurn(dc(GS));}}]);return;
-  }
-  s.players[s.curIdx]=mg(pl,{inTask:key,taskPos:-1});addL(s,pl.name+" enters "+(TASKS[key]?TASKS[key].label:key)+"!");commitTurn(s);advTurn(dc(GS));
-}
-function enterJutX(pl,s,key,extra){
-  if(key==="winner"){if(pl.money<0){showP("💸 Wallet Too Low!","debt","Need $0+ to enter!",[{l:"Dang!",c:"pn",fn:function(){advTurn(dc(GS));}}]);return;}s.players[s.curIdx]=mg(pl,{winPos:-1});commitTurn(s);doWin(s.players[s.curIdx],dc(GS),extra);return;}
-  if(key==="boat"&&!pl.graduated){
-    if(pl.isAI){addL(s,"🤖 AI skips Boat Store (not graduated)");commitTurn(s);var exitSteps=[];for(var i=1;i<=extra;i++)exitSteps.push({type:"oval",pos:(TASKS.boat.entryIdx+i)%36});animateSteps(s.curIdx,exitSteps,function(){var s2=dc(GS);s2.players[s2.curIdx]=mg(s2.players[s2.curIdx],{pos:(TASKS.boat.entryIdx+extra)%36});commitTurn(s2);landOn(s2.players[s2.curIdx],dc(GS));});return;}
-    showP("🛥️ The Boat Store","info","You need to graduate first!",[{l:"OK",c:"pn",fn:function(){advTurn(dc(GS));}}]);return;
-  }
-  s.players[s.curIdx]=mg(pl,{inTask:key,taskPos:-1});addL(s,pl.name+" enters "+(TASKS[key]?TASKS[key].label:key)+"!");commitTurn(s);doTask(s.players[s.curIdx],dc(GS),extra);
-}
-function doTask(pl,s,r){
-  var t=TASKS[pl.inTask],np=pl.taskPos+r;
-  if(np>=t.count){var stepsT=[];for(var i=pl.taskPos+1;i<t.count;i++)stepsT.push({type:"task",task:pl.inTask,taskPos:i});animateSteps(s.curIdx,stepsT,function(){var s2=dc(GS),pl2=s2.players[s2.curIdx];var rem=r-(t.count-1-pl.taskPos)-1;var u=mg(pl2,{inTask:null,taskPos:-1,pos:t.exitIdx});var comp=t.req(u)&&(u.completedTasks||[]).indexOf(t.key)<0;if(comp){u=mg(u,{completedTasks:(u.completedTasks||[]).concat([t.key])});if(t.key==="boat_school")u=mg(u,{graduated:true});addL(s2,"🎉 "+pl2.name+" completed "+t.label+"!");}s2.players[s2.curIdx]=u;commitTurn(s2);showP(comp?"✅ Done!":"Exited "+t.label,comp?"success":"info",comp?(u.completedTasks.length+"/4 done! 🎊"):t.prog(u),[{l:comp?"Yes! 🎉":"Continue",c:"pp",fn:function(){if(rem>0){var exitSteps=[];for(var i=1;i<=rem;i++)exitSteps.push({type:"oval",pos:(t.exitIdx+i)%36});animateSteps(GS.curIdx,exitSteps,function(){var s3=dc(GS);var fp3=(t.exitIdx+rem)%36;s3.players[s3.curIdx]=mg(s3.players[s3.curIdx],{pos:fp3});commitTurn(s3);landOn(s3.players[s3.curIdx],dc(GS));});}else advTurn(dc(GS));}}]);});return;}
-  var stepsT2=[];for(var i=pl.taskPos+1;i<=np;i++)stepsT2.push({type:"task",task:pl.inTask,taskPos:i});
-  animateSteps(s.curIdx,stepsT2,function(){var s2=dc(GS),pl2=s2.players[s2.curIdx];var u2=mg(pl2,{taskPos:np}),space=t.spaces[np];if(space)u2=space.eff(u2);s2.players[s2.curIdx]=u2;addL(s2,pl2.name+" sp"+(np+1)+": "+(space?space.desc:""));commitTurn(s2);showP(t.label,"info",space?(space.story+"\n\n"+space.desc):t.prog(u2),[{l:"Continue",c:"pp",fn:function(){advTurn(dc(GS));}}]);});
-}
-function doBoat(pl,s,r){
-  var np=pl.taskPos+r;
-  if(np>=BOATS.length){var s2=dc(GS);s2.players[s2.curIdx]=mg(s2.players[s2.curIdx],{inTask:null,taskPos:-1,pos:TASKS.boat.exitIdx});commitTurn(s2);advTurn(dc(GS));return;}
-  var stepsB=[];for(var i=pl.taskPos+1;i<=np;i++)stepsB.push({type:"task",task:"boat",taskPos:i});
-  animateSteps(s.curIdx,stepsB,function(){var s2=dc(GS),pl2=s2.players[s2.curIdx];var u=mg(pl2,{taskPos:np}),boat=BOATS[np];var sold=false;for(var i=0;i<s2.players.length;i++)if(i!==s2.curIdx&&s2.players[i]&&s2.players[i].boat&&s2.players[i].boat.name===boat.name){sold=true;break;}s2.players[s2.curIdx]=u;commitTurn(s2);if(sold){showP(boat.icon+" Sold Out","info","That boat was already purchased!",[{l:"Continue",c:"pp",fn:function(){advTurn(dc(GS));}}]);return;}
-  if(pl2.isAI){
-    // AI boat buying: only buy if they have enough money (don't go into debt for a boat)
-    if(u.money>=boat.price){var nc=(u.completedTasks||[]).concat(["boat"]);s2.players[s2.curIdx]=mg(u,{money:u.money-boat.price,boat:boat,inTask:null,taskPos:-1,pos:TASKS.boat.exitIdx,completedTasks:nc});addL(s2,"🤖 AI buys "+boat.icon+" "+boat.name);commitTurn(s2);advTurn(dc(GS));}
-    else{addL(s2,"🤖 AI passes on "+boat.icon+" "+boat.name+" (can't afford)");commitTurn(s2);advTurn(dc(GS));}
-    return;
-  }
-  showP(boat.icon+" "+boat.name+" — $"+boat.price,"info","Price: $"+boat.price+"\nYour balance: $"+u.money+(u.money<boat.price?"\n⚠️ This will put you in debt!":""),[{l:"Buy "+boat.icon+" $"+boat.price,c:"pp",fn:function(){var s3=dc(GS),pu=s3.players[s3.curIdx];var nc2=(pu.completedTasks||[]).filter(function(x){return x!=="boat";}).concat(["boat"]);s3.players[s3.curIdx]=mg(pu,{money:pu.money-boat.price,boat:boat,inTask:null,taskPos:-1,pos:TASKS.boat.exitIdx,completedTasks:nc2});addL(s3,pu.name+" buys "+boat.icon+" "+boat.name);commitTurn(s3);advTurn(dc(GS));}},{l:"Pass",c:"pn",fn:function(){advTurn(dc(GS));}}]);});
-}
-function doWin(pl,s,r){
-  var cp=pl.winPos<0?-1:pl.winPos,MAX=3,tg=cp+r;
-  if(!pl.fasttrack&&tg>MAX){showP("🎯 Overshot!","info","Need exactly "+(MAX-Math.max(cp,0))+" to reach ⭐ WIN.",[{l:"OK",c:"pn",fn:function(){advTurn(dc(GS));}}]);return;}
-  var nwp=Math.min(tg,MAX),stepsW=[];for(var i=cp+1;i<=nwp;i++)stepsW.push({type:"win",winPos:i});
-  animateSteps(s.curIdx,stepsW,function(){var s2=dc(GS),pl2=s2.players[s2.curIdx];var u=WDOCK[nwp].eff(mg(pl2,{winPos:nwp}));if(WDOCK[nwp].win){if(u.money<0){s2.players[s2.curIdx]=u;commitTurn(s2);showP("💸 Still in Debt!","debt","Cannot win with $"+u.money+"!",[{l:"Dang!",c:"pn",fn:function(){advTurn(dc(GS));}}]);return;}u=mg(u,{done:true});s2.players[s2.curIdx]=u;s2.winner=u;commitTurn(s2);if(!isOnlineMultiplayer&&currentUser)deleteSavedGame();showWin(u);return;}var wl=["⚓ Dock 1","😴 Lose Turn","↩️ Back 1"];addL(s2,pl2.name+": "+wl[nwp]);s2.players[s2.curIdx]=u;commitTurn(s2);showP("🏅 Winner's Dock","info",wl[nwp]+"!",[{l:"Continue",c:"pp",fn:function(){advTurn(dc(GS));}}]);});
-}
-function advTurn(s){
-  aiRunning=false;tradeOpen=false;var prevIdx=s.curIdx;
-  var np=[];for(var i=0;i<s.players.length;i++){var pl=s.players[i];if(!pl){np.push(pl);continue;}if(pl.done||pl.eliminated){np.push(pl);continue;}if(pl.money<=-1000){addL(s,pl.name+" eliminated! 💀");np.push(mg(pl,{eliminated:true,done:true}));}else np.push(pl);}
-  s.players=np;var cur2=np[prevIdx];if(cur2&&cur2.money<0&&!cur2.done&&!cur2.eliminated){var interest=Math.floor(cur2.money*0.05);np[prevIdx]=mg(cur2,{money:cur2.money+interest});addL(s,cur2.name+" 💸 debt interest: "+interest);}
-  var active=np.filter(function(p){return p&&!p.done;});
-  if(active.length<=1){var w=active[0]||np[0];var wi=np.indexOf(w);if(wi>=0)np[wi]=mg(w,{done:true});s.players=np;s.winner=w;commitTurn(s);if(!isOnlineMultiplayer&&currentUser)deleteSavedGame();showWin(w);return;}
-  var next=(s.curIdx+1)%np.length,its=0;while((!np[next]||np[next].done)&&its<np.length){next=(next+1)%np.length;its++;}
-  np[next]=mg(np[next],{boughtCardThisTurn:false,usedShipwreckThisTurn:false,cardsBoughtThisTurn:[],pendingTrade:null});
-  s.players=np;s.curIdx=next;s.phase="transition";s.pendingTrade=null;
-  commitTurn(s);hideDie();if(!isOnlineMultiplayer){saveGame(s);showTrans();}else notifyNextPlayer(s,prevIdx,next);
-}
-
-// ── AI LOGIC ──
-function runAI(){
-  if(!GS)return;
-  if(aiRunning){console.log('runAI: already running, skip');return;}
-  var cur=GS.players[GS.curIdx];
-  if(!cur){console.log('runAI: no current player');return;}
-  if(!cur.isAI){console.log('runAI: current player is not AI:',cur.name,'isAI='+cur.isAI);return;}
-  aiRunning=true;
-  console.log('runAI: AI',cur.name,'taking turn');
-  var s=dc(GS),pl=s.players[s.curIdx];
-  // AI card buying: only if healthy balance and not too many cards
-  if(!pl.boughtCardThisTurn&&pl.money>=25&&(pl.heldCards||[]).length<3&&Math.random()<0.6){
-    var deck=(s.swDeck||[]).slice();if(!deck.length)deck=mkDeck(SWDEFS);
-    var card=deck[0],uid2=Math.random().toString(36).slice(2);deck=deck.slice(1);s.swDeck=deck;
-    pl.heldCards=(pl.heldCards||[]).concat([mg(card,{uid:uid2})]);
-    pl.money-=10;pl.boughtCardThisTurn=true;
-    pl.cardsBoughtThisTurn=(pl.cardsBoughtThisTurn||[]).concat([uid2]);
-    if(card.type==="fasttrack")pl.fasttrack=true;
-    addL(s,"🤖 "+pl.name+" got a Shipwreck card");
-  }
-  s.players[s.curIdx]=pl;
-  var r=Math.ceil(Math.random()*6);
-  showDie(r);
-  addL(s,"🤖 "+pl.name+" rolls "+r);
-  GS=s;renderAll();
-  processRoll(r,s);
-}
-
-// ── CARDS ──
-function buyCard(){
-  if(!GS||!isMyTurnNow())return;var s=dc(GS),pl=s.players[s.curIdx];if(pl.boughtCardThisTurn)return;
-  var deck=(s.swDeck||[]).slice();if(!deck.length)deck=mkDeck(SWDEFS);var card=deck[0],uid2=Math.random().toString(36).slice(2);deck=deck.slice(1);s.swDeck=deck;
-  pl.heldCards=(pl.heldCards||[]).concat([mg(card,{uid:uid2})]);pl.money-=10;pl.boughtCardThisTurn=true;pl.cardsBoughtThisTurn=(pl.cardsBoughtThisTurn||[]).concat([uid2]);if(card.type==="fasttrack")pl.fasttrack=true;
-  s.players[s.curIdx]=pl;addL(s,pl.name+" 🃏 bought a Shipwreck card");commitTurn(s);
-  showP(card.icon+" "+card.label,"info",card.desc+(card.type==="fasttrack"?"\n🚀 Already active!":"\n⏳ Available next turn.\n\n🔒 Only you can see your cards!"),[{l:"Got it!",c:"pp",fn:hideP}]);
-}
-function openCard(idx){
-  if(!GS||!isMyTurnNow())return;var pl=GS.players[GS.curIdx];
-  if(pl.usedShipwreckThisTurn){showP("One Per Turn","info","You can only play 1 Shipwreck card per turn.",[{l:"OK",c:"pn",fn:hideP}]);return;}
-  var card=pl.heldCards[idx];if(!card)return;
-  if((pl.cardsBoughtThisTurn||[]).indexOf(card.uid)>=0){showP("⏳ Not Yet","info","This card is available next turn.",[{l:"OK",c:"pn",fn:hideP}]);return;}
-  if(card.type==="double"){execCard(card,idx);return;}
-  showP(card.icon+" "+card.label,"info",card.desc,[{l:"▶ Play Now",c:"pp",fn:function(){hideP();execCard(card,idx);}},{l:"Save for later",c:"pn",fn:hideP}]);
-}
-function execCard(card,idx){
-  var s=dc(GS),pl=s.players[s.curIdx];pl.heldCards=pl.heldCards.filter(function(_,i){return i!==idx;});pl.usedShipwreckThisTurn=true;s.players[s.curIdx]=pl;addL(s,pl.name+" plays a Shipwreck card!");
-  if(card.type==="double"){pl.doubleRollsLeft=(pl.doubleRollsLeft||0)+2;s.players[s.curIdx]=pl;commitTurn(s);showP("🎲 Double Time!","info","You get 2 bonus rolls this turn!",[{l:"Roll!",c:"pp",fn:hideP}]);return;}
-  if(card.type==="fasttrack"){pl.fasttrack=true;s.players[s.curIdx]=pl;commitTurn(s);showP("🚀 Fast Track","info","No exact roll needed to WIN!",[{l:"Awesome!",c:"pp",fn:hideP}]);return;}
-  if(card.type==="shortcut"){commitTurn(s);showP("⚡ Shortcut","info","Reduce which challenge?",[{l:"🐟 Fish: 10→6",c:"pp",fn:function(){var s2=dc(GS);s2.players[s2.curIdx].shortcut.fish=true;commitTurn(s2);hideP();}},{l:"🆘 Rescues: 2→1",c:"pp",fn:function(){var s2=dc(GS);s2.players[s2.curIdx].shortcut.rescues=true;commitTurn(s2);hideP();}},{l:"⭐ Stars: 3→2",c:"pp",fn:function(){var s2=dc(GS);s2.players[s2.curIdx].shortcut.stars=true;commitTurn(s2);hideP();}}]);return;}
-  if(card.type==="teleport"){commitTurn(s);showP("🌀 Teleportation","info","Click any space on the board to jump there!",[{l:"Cancel",c:"pn",fn:hideP}]);setTimeout(function(){for(var i=1;i<36;i++){if(sKind(i)==="entry_winner")continue;(function(si){var el=document.getElementById("sp"+si);if(!el)return;el.style.cursor="pointer";var rect=el.querySelector("rect");if(rect){rect.setAttribute("stroke","#FFD700");rect.setAttribute("stroke-width","3");}el.addEventListener("click",function h(){el.removeEventListener("click",h);el.style.cursor="";if(rect){rect.setAttribute("stroke","#ffffffa0");rect.setAttribute("stroke-width","0.8");}hideP();var s2=dc(GS);s2.players[s2.curIdx]=mg(s2.players[s2.curIdx],{pos:si,inTask:null,taskPos:-1});addL(s2,s2.players[s2.curIdx].name+" 🌀 teleports!");commitTurn(s2);advTurn(dc(GS));});})(i);}},100);return;}
-  if(card.type==="freeze"){var others=s.players.filter(function(p,i){return i!==s.curIdx&&p&&!p.done;});commitTurn(s);showP("❄️ Freeze Frame","info","Choose a player to freeze for 2 turns:",others.map(function(op){return{l:(op.isAI?"🤖 ":"")+op.name,c:"pp",fn:(function(opid){return function(){var s2=dc(GS);for(var i=0;i<s2.players.length;i++)if(s2.players[i]&&s2.players[i].id===opid){s2.players[i]=mg(s2.players[i],{frozen:2});break;}addL(s2,s2.players[s2.curIdx].name+" ❄️ froze "+op.name);commitTurn(s2);hideP();};})(op.id)};}));return;}
-  if(card.type==="robbery"){var others2=s.players.filter(function(p,i){return i!==s.curIdx&&p&&!p.done;});commitTurn(s);showP("💰 Highway Robbery","info","Steal ALL money from:",others2.map(function(op){return{l:(op.isAI?"🤖 ":"")+op.name+" ($"+op.money+")",c:"pp",fn:(function(opid){return function(){var s2=dc(GS),stolen=0;for(var i=0;i<s2.players.length;i++)if(s2.players[i]&&s2.players[i].id===opid){stolen=s2.players[i].money;s2.players[i]=mg(s2.players[i],{money:0});break;}s2.players[s2.curIdx]=mg(s2.players[s2.curIdx],{money:s2.players[s2.curIdx].money+stolen});addL(s2,s2.players[s2.curIdx].name+" 💰 robbed $"+stolen);commitTurn(s2);hideP();};})(op.id)};}));return;}
-}
-
-function debtR(){
-  if(!GS)return;var pl=GS.players[GS.curIdx];
-  if(!pl.completedTasks||!pl.completedTasks.length){showP("💸 Debt Relief","debt","No completed challenges to sacrifice.",[{l:"Close",c:"pn",fn:hideP}]);return;}
-  var lbls={boat_school:"🎓 Boat School",boat:"🛥️ Boat",fish:"🐟 Fish",rescue:"🆘 Rescues"};
-  var btns=pl.completedTasks.map(function(tk){return{l:lbls[tk]||tk,c:"pw",fn:(function(ttk){return function(){var s=dc(GS),p2=mg(s.players[s.curIdx],{money:0,completedTasks:s.players[s.curIdx].completedTasks.filter(function(x){return x!==ttk;})});if(ttk==="boat_school")p2=mg(p2,{graduated:false,stars:0});if(ttk==="fish")p2=mg(p2,{fish:0});if(ttk==="rescue")p2=mg(p2,{rescues:0});if(ttk==="boat")p2=mg(p2,{boat:null});s.players[s.curIdx]=p2;addL(s,p2.name+" used debt relief");commitTurn(s);hideP();};})(tk)};});
-  btns.push({l:"Cancel",c:"pn",fn:hideP});showP("💸 Debt Relief","debt","Sacrifice a challenge to reset balance to $0:",btns);
-}
-
-function inspP(i){
-  if(!GS)return;var pl=GS.players[i];if(!pl)return;
-  var showCards=isCardOwner(GS,i)||(!isOnlineMultiplayer&&!GS.players.some(function(p){return p&&p.isAI;}));
-  var tks=["boat_school","boat","fish","rescue"],lines="💰 $"+pl.money+(pl.money<0?" ⚠️ IN DEBT":"")+"\n\n";
-  for(var j=0;j<tks.length;j++){var tk=tks[j],done=(pl.completedTasks||[]).indexOf(tk)>=0,t=TASKS[tk];if(!t)continue;var status=done?(tk==="boat"?(pl.boat?(BOAT_EMOJIS[pl.boat.name]||"🛥️")+" "+pl.boat.name:"owned"):t.done||"done"):t.prog(pl);lines+=(done?"✅ ":"⬜ ")+t.label+": "+status+"\n";}
-  if(pl.heldCards&&pl.heldCards.length){
-    if(showCards)lines+="\n🃏 "+pl.heldCards.map(function(c){return c.icon+" "+c.label;}).join(", ");
-    else lines+="\n🃏 "+pl.heldCards.length+" Shipwreck card"+(pl.heldCards.length!==1?"s":"")+" available";
-  }
-  if(pl.frozen>0)lines+="\n❄️ Frozen: "+pl.frozen+" turn(s)";
-  showP((pl.isAI?"🤖 ":"")+pl.name,"info",lines,[{l:"Close",c:"pn",fn:hideP}]);
-}
-
-// ── TRADE ──
-function toggleTradePanel(){tradeOpen=!tradeOpen;renderAct(GS,GS.players[GS.curIdx]);}
-function buildTradePanel(s,cur){
-  var tp=document.getElementById("tradePanel");if(!tp)return;
-  var others=[];for(var i=0;i<s.players.length;i++)if(i!==s.curIdx&&s.players[i]&&!s.players[i].done)others.push({pl:s.players[i],idx:i});
-  if(!others.length){tp.innerHTML='<div style="font-size:11px;color:#aaa;padding:6px">No other active players.</div>';return;}
-  var h='<div style="background:#0d2137;border-radius:8px;padding:10px;margin-top:6px;border:1px solid #1a3a55"><div style="font-size:10px;color:#f5a623;font-weight:700;margin-bottom:8px">🤝 PROPOSE TRADE</div><select id="trTarget" style="width:100%;padding:4px;border-radius:5px;background:#071728;color:#fff;border:1px solid #1a3a55;font-size:11px;margin-bottom:8px">';
-  for(var i=0;i<others.length;i++)h+='<option value="'+others[i].idx+'">'+(others[i].pl.isAI?"🤖 ":"")+others[i].pl.name+'</option>';h+='</select>';
-  var gf=[{id:"tgMoney",lbl:"💰 Money",note:"$"+cur.money},{id:"tgFish",lbl:"🐟 Fish",note:cur.fish},{id:"tgRescues",lbl:"🆘 Rescues",note:cur.rescues},{id:"tgStars",lbl:"⭐ Stars",note:cur.stars}];
-  h+='<div style="font-size:10px;color:#4eff91;font-weight:700;margin-bottom:4px">YOU GIVE:</div>';
-  for(var i=0;i<gf.length;i++)h+='<div style="display:flex;align-items:center;gap:5px;margin-bottom:4px"><label style="font-size:11px;color:#aaa;width:70px">'+gf[i].lbl+'</label><input id="'+gf[i].id+'" type="number" min="0" value="0" style="width:50px;padding:2px 5px;border-radius:4px;background:#071728;border:1px solid #1a3a55;color:#fff;font-size:11px"/><span style="font-size:9px;color:#555">have '+gf[i].note+'</span></div>';
-  h+='<div style="display:flex;align-items:center;gap:5px;margin-bottom:6px"><label style="font-size:11px;color:#aaa;width:70px">🃏 Card</label><select id="tgCard" style="flex:1;padding:2px 4px;border-radius:4px;background:#071728;border:1px solid #1a3a55;color:#fff;font-size:10px"><option value="">None</option>';
-  if(cur.heldCards)for(var ci=0;ci<cur.heldCards.length;ci++){var c=cur.heldCards[ci];h+='<option value="'+ci+'">'+c.icon+' '+c.label+'</option>';}
-  h+='</select></div><div style="font-size:10px;color:#ff9999;font-weight:700;margin-bottom:4px">YOU WANT:</div>';
-  var wf=[{id:"trMoney",lbl:"💰 Money"},{id:"trFish",lbl:"🐟 Fish"},{id:"trRescues",lbl:"🆘 Rescues"},{id:"trStars",lbl:"⭐ Stars"}];
-  for(var i=0;i<wf.length;i++)h+='<div style="display:flex;align-items:center;gap:5px;margin-bottom:4px"><label style="font-size:11px;color:#aaa;width:70px">'+wf[i].lbl+'</label><input id="'+wf[i].id+'" type="number" min="0" value="0" style="width:50px;padding:2px 5px;border-radius:4px;background:#071728;border:1px solid #1a3a55;color:#fff;font-size:11px"/></div>';
-  h+='<div style="display:flex;gap:6px;margin-top:8px"><button id="btnSendTrade" style="flex:1;padding:6px;border-radius:6px;border:none;background:#1a7a3a;color:#fff;font-weight:600;font-size:11px;cursor:pointer">📤 Send</button><button id="btnCancelTrade" style="flex:1;padding:6px;border-radius:6px;border:none;background:#444;color:#fff;font-size:11px;cursor:pointer">✕ Cancel</button></div></div>';
-  tp.innerHTML=h;
-  document.getElementById("btnSendTrade").addEventListener("click",sendTrade);
-  document.getElementById("btnCancelTrade").addEventListener("click",function(){tradeOpen=false;renderAct(GS,GS.players[GS.curIdx]);});
-}
-function sendTrade(){if(!GS)return;var s=dc(GS),cur=s.players[s.curIdx];var toIdx=parseInt(document.getElementById("trTarget").value);var cardEl=document.getElementById("tgCard");var cardIdx=cardEl&&cardEl.value!==""?parseInt(cardEl.value):-1;var tp={fromIdx:s.curIdx,toIdx:toIdx,give:{money:parseInt(document.getElementById("tgMoney").value)||0,fish:parseInt(document.getElementById("tgFish").value)||0,rescues:parseInt(document.getElementById("tgRescues").value)||0,stars:parseInt(document.getElementById("tgStars").value)||0,cardIdx:cardIdx},want:{money:parseInt(document.getElementById("trMoney").value)||0,fish:parseInt(document.getElementById("trFish").value)||0,rescues:parseInt(document.getElementById("trRescues").value)||0,stars:parseInt(document.getElementById("trStars").value)||0},responded:false};tradeOpen=false;if(s.players[toIdx]&&s.players[toIdx].isAI){var net=(tp.give.money-tp.want.money)+(tp.give.fish-tp.want.fish)*2;if(net>=0||Math.random()<0.35){executeTrade(tp,s);addL(s,"🤖 AI accepts trade!");}else addL(s,"🤖 AI declines trade.");commitTurn(s);}else{s.pendingTrade=tp;addL(s,cur.name+" proposes a trade!");commitTurn(s);showTradeOffer(tp,s);}}
-function showTradeOffer(tp,s,isCounter){var from=s.players[tp.fromIdx],to=s.players[tp.toIdx],g=tp.give,w=tp.want,gs=[],ws=[];if(g.money>0)gs.push("$"+g.money);if(g.fish>0)gs.push(g.fish+" 🐟");if(g.rescues>0)gs.push(g.rescues+" 🆘");if(g.stars>0)gs.push(g.stars+" ⭐");if(g.cardIdx>=0&&from.heldCards&&from.heldCards[g.cardIdx])gs.push("1 Shipwreck card");if(w.money>0)ws.push("$"+w.money);if(w.fish>0)ws.push(w.fish+" 🐟");if(w.rescues>0)ws.push(w.rescues+" 🆘");if(w.stars>0)ws.push(w.stars+" ⭐");var body="Gives: "+(gs.join(", ")||"nothing")+"\nWants: "+(ws.join(", ")||"nothing")+"\n\n"+to.name+", accept?";var bl=[{l:"✅ Accept",c:"pp",fn:function(){var s2=dc(GS);executeTrade(tp,s2);s2.pendingTrade=null;addL(s2,to.name+" accepts! 🤝");commitTurn(s2);hideP();}},{l:"❌ Decline",c:"pn",fn:function(){var s2=dc(GS);s2.pendingTrade=null;addL(s2,to.name+" declines.");commitTurn(s2);hideP();}}];if(!isCounter)bl.push({l:"🔄 Counter",c:"pw",fn:function(){hideP();showCounterPanel(tp,s);}});showP((isCounter?"Counter from ":"Trade from ")+from.name,"info",body,bl);}
-function showCounterPanel(origTp,s){var from=s.players[origTp.fromIdx],to=s.players[origTp.toIdx];document.getElementById("phd").style.background="#1a5276";document.getElementById("phd").innerHTML='<div style="font-size:18px;font-weight:700;color:#fff">🔄 Counter to '+from.name+'</div>';document.getElementById("pbd").innerHTML='<div style="font-size:12px;color:#1565c0;font-weight:700;margin-bottom:6px">YOU GIVE:</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px"><span style="font-size:11px">💰<input id="ctgM" type="number" min="0" value="0" style="width:45px;margin:0 3px;border-radius:4px;border:1px solid #ccc;padding:2px 4px"/></span><span style="font-size:11px">🐟<input id="ctgF" type="number" min="0" value="0" style="width:45px;margin:0 3px;border-radius:4px;border:1px solid #ccc;padding:2px 4px"/></span><span style="font-size:11px">🆘<input id="ctgR" type="number" min="0" value="0" style="width:45px;margin:0 3px;border-radius:4px;border:1px solid #ccc;padding:2px 4px"/></span><span style="font-size:11px">⭐<input id="ctgS" type="number" min="0" value="0" style="width:45px;margin:0 3px;border-radius:4px;border:1px solid #ccc;padding:2px 4px"/></span></div><div style="font-size:12px;color:#c0392b;font-weight:700;margin-bottom:6px">YOU WANT:</div><div style="display:flex;gap:8px;flex-wrap:wrap"><span style="font-size:11px">💰<input id="ctrM" type="number" min="0" value="0" style="width:45px;margin:0 3px;border-radius:4px;border:1px solid #ccc;padding:2px 4px"/></span><span style="font-size:11px">🐟<input id="ctrF" type="number" min="0" value="0" style="width:45px;margin:0 3px;border-radius:4px;border:1px solid #ccc;padding:2px 4px"/></span><span style="font-size:11px">🆘<input id="ctrR" type="number" min="0" value="0" style="width:45px;margin:0 3px;border-radius:4px;border:1px solid #ccc;padding:2px 4px"/></span><span style="font-size:11px">⭐<input id="ctrS" type="number" min="0" value="0" style="width:45px;margin:0 3px;border-radius:4px;border:1px solid #ccc;padding:2px 4px"/></span></div>';var f=document.getElementById("pft");f.innerHTML="";var sb=document.createElement("button");sb.textContent="📤 Send Counter";sb.className="pp";sb.onclick=function(){var ctp={fromIdx:origTp.toIdx,toIdx:origTp.fromIdx,give:{money:parseInt(document.getElementById("ctgM").value)||0,fish:parseInt(document.getElementById("ctgF").value)||0,rescues:parseInt(document.getElementById("ctgR").value)||0,stars:parseInt(document.getElementById("ctgS").value)||0,cardIdx:-1},want:{money:parseInt(document.getElementById("ctrM").value)||0,fish:parseInt(document.getElementById("ctrF").value)||0,rescues:parseInt(document.getElementById("ctrR").value)||0,stars:parseInt(document.getElementById("ctrS").value)||0},responded:false};var s2=dc(GS);s2.pendingTrade=ctp;addL(s2,to.name+" counters!");commitTurn(s2);hideP();if(s2.players[ctp.toIdx]&&s2.players[ctp.toIdx].isAI){setTimeout(function(){var s3=dc(GS);if(Math.random()<0.5){executeTrade(ctp,s3);addL(s3,"🤖 AI accepts counter!");}else addL(s3,"🤖 AI declines.");commitTurn(s3);},700);}else showTradeOffer(ctp,s2,true);};var cb=document.createElement("button");cb.textContent="Cancel";cb.className="pn";cb.onclick=hideP;f.appendChild(sb);f.appendChild(cb);document.getElementById("po").classList.add("on");}
-function executeTrade(tp,s){var f=s.players[tp.fromIdx],t=s.players[tp.toIdx],g=tp.give,w=tp.want;if(g.cardIdx>=0&&f.heldCards&&f.heldCards[g.cardIdx]){var card=f.heldCards[g.cardIdx];t.heldCards=(t.heldCards||[]).concat([card]);f.heldCards=f.heldCards.filter(function(_,i){return i!==g.cardIdx;});}f=mg(f,{money:f.money-(g.money||0),fish:Math.max(0,f.fish-(g.fish||0)),rescues:Math.max(0,f.rescues-(g.rescues||0)),stars:Math.max(0,f.stars-(g.stars||0))});t=mg(t,{money:t.money+(g.money||0),fish:t.fish+(g.fish||0),rescues:t.rescues+(g.rescues||0),stars:t.stars+(g.stars||0)});t=mg(t,{money:t.money-(w.money||0),fish:Math.max(0,t.fish-(w.fish||0)),rescues:Math.max(0,t.rescues-(w.rescues||0)),stars:Math.max(0,t.stars-(w.stars||0))});f=mg(f,{money:f.money+(w.money||0),fish:f.fish+(w.fish||0),rescues:f.rescues+(w.rescues||0),stars:f.stars+(w.stars||0)});s.players[tp.fromIdx]=f;s.players[tp.toIdx]=t;addL(s,"🤝 Trade: "+f.name+" ↔ "+t.name);}
-
-// ── BOARD DRAWING ──
-var NS="http://www.w3.org/2000/svg";
-function mkEl(tag,attrs){var e=document.createElementNS(NS,tag);for(var k in attrs)e.setAttribute(k,attrs[k]);return e;}
-function mkTxt(str,attrs){var e=mkEl("text",attrs);e.textContent=str;return e;}
-function drawBoard(){
-  var svg=document.getElementById("bsvg");svg.setAttribute("width",BW);svg.setAttribute("height",BH);svg.innerHTML="";
-  var defs=mkEl("defs",{});var st=document.createElementNS(NS,"style");st.textContent="@keyframes wa{0%{transform:translateX(0)}100%{transform:translateX(-140px)}}@keyframes wb{0%{transform:translateX(0)}100%{transform:translateX(140px)}}@keyframes wc{0%{transform:translateX(-70px)}100%{transform:translateX(70px)}}";defs.appendChild(st);var cl=mkEl("clipPath",{id:"bc"});cl.appendChild(mkEl("rect",{width:BW,height:BH}));defs.appendChild(cl);svg.appendChild(defs);
-  svg.appendChild(mkEl("rect",{width:BW,height:BH,fill:"#5aaec8"}));
-  var wst=["wa","wb","wc"];for(var row=0;row<18;row++){var gg=mkEl("g",{style:"animation:"+wst[row%3]+" "+(2.5+row*0.3)+"s linear infinite","clip-path":"url(#bc)"});var wxs=[-280,-140,0,140,280,420,560,700,840,980,1120,1260,1400];for(var wi=0;wi<wxs.length;wi++){var wx=wxs[wi];gg.appendChild(mkEl("path",{d:"M"+wx+" "+(55+row*52)+" Q"+(wx+17)+" "+(45+row*52)+" "+(wx+35)+" "+(55+row*52)+" Q"+(wx+52)+" "+(65+row*52)+" "+(wx+70)+" "+(55+row*52),stroke:"#7ecbe0","stroke-width":2,fill:"none",opacity:0.5}));}svg.appendChild(gg);}
-  svg.appendChild(mkEl("rect",{x:OL-SW,y:OT-SW,width:OR-OL+SW*2,height:OB-OT+SW*2,rx:22,fill:"#d6b87a",opacity:0.9}));
-  svg.appendChild(mkEl("rect",{x:OL-SW/2,y:OT-SW/2,width:OR-OL+SW,height:OB-OT+SW,rx:16,fill:"#4a9ebb",opacity:0.9}));
-  svg.appendChild(mkTxt("Boat Ride 2.0",{x:(OL+OR)/2,y:(OT+OB)/2-14,"text-anchor":"middle","font-size":26,"font-weight":900,fill:"#fff",stroke:"#1a3a55","stroke-width":4,"paint-order":"stroke",opacity:0.45}));
-  svg.appendChild(mkTxt("Supreme Boat Captain Race",{x:(OL+OR)/2,y:(OT+OB)/2+20,"text-anchor":"middle","font-size":16,"font-weight":700,fill:"#fff",stroke:"#1a3a55","stroke-width":4,"paint-order":"stroke",opacity:0.45}));
-  drawJuts(svg);drawOval(svg);svg.appendChild(mkEl("g",{id:"tlayer"}));applyScale();
-}
-function jLP(k){if(k==="boat_school"){var b=oPos(5);return{x:b.x,y:b.y-3*SW-SW-10};}if(k==="boat"){var b=oPos(12);return{x:b.x-2*SW,y:b.y-SW/2-SW-10};}if(k==="fish"){var b=oPos(19);return{x:b.x,y:b.y+4*SW+SW+10};}if(k==="rescue"){var b=oPos(26);return{x:b.x,y:b.y+SW/2+3*SW+10};}if(k==="winner"){var b=oPos(33);return{x:b.x+2*SW,y:b.y-SW-10};}return null;}
-function drawJuts(svg){
-  var jcols={boat_school:"#a855f7",boat:"#fb923c",fish:"#34d399",rescue:"#60a5fa",winner:"#fbbf24"};
-  var jlbls={boat_school:"🎓 Boat School",boat:"🛥️ Boat Store",fish:"🐟 Catch a Fish",rescue:"🆘 Rescue!"};
-  var wjd=JC.winner;for(var i=0;i<wjd.pts.length-1;i++)svg.appendChild(mkEl("line",{x1:wjd.pts[i].x,y1:wjd.pts[i].y,x2:wjd.pts[i+1].x,y2:wjd.pts[i+1].y,stroke:"#c47d0e","stroke-width":SW+1,"stroke-opacity":0.15}));
-  var wlbls=["Dock 1","Lose Turn","Back 1","⭐ WIN"];
-  for(var i=0;i<wjd.pts.length;i++){var pt=wjd.pts[i],gj=mkEl("g",{});gj.appendChild(mkEl("rect",{x:pt.x-SW/2,y:pt.y-SH/2,width:SW,height:SH,rx:6,fill:i===3?"#f5a623":"#c47d0e",stroke:"#ffffffa0","stroke-width":0.8}));var pp2=wlbls[i].split(" ");gj.appendChild(mkTxt(pp2[0],{x:pt.x,y:pt.y-4,"text-anchor":"middle","dominant-baseline":"central","font-size":9,fill:"#fff","font-weight":"bold"}));if(pp2.length>1)gj.appendChild(mkTxt(pp2.slice(1).join(" "),{x:pt.x,y:pt.y+8,"text-anchor":"middle","dominant-baseline":"central","font-size":9,fill:"#fff"}));svg.appendChild(gj);}
-  var tkeys=Object.keys(TASKS);
-  for(var ki=0;ki<tkeys.length;ki++){
-    var key=tkeys[ki],t=TASKS[key],jd=JC[key];
-    for(var i=0;i<jd.pts.length-1;i++)svg.appendChild(mkEl("line",{x1:jd.pts[i].x,y1:jd.pts[i].y,x2:jd.pts[i+1].x,y2:jd.pts[i+1].y,stroke:t.color,"stroke-width":SW+1,"stroke-opacity":0.15}));
-    for(var i=0;i<jd.pts.length;i++){
-      var pt2=jd.pts[i],g2=mkEl("g",{});
-      if(key==="boat"){var boat=BOATS[i];g2.appendChild(mkEl("rect",{x:pt2.x-SW/2,y:pt2.y-SH/2,width:SW,height:SH,rx:6,fill:t.color,stroke:"#ffffffa0","stroke-width":0.8}));g2.appendChild(mkTxt(boat.icon,{x:pt2.x,y:pt2.y-6,"text-anchor":"middle","dominant-baseline":"central","font-size":14}));g2.appendChild(mkTxt("$"+boat.price,{x:pt2.x,y:pt2.y+10,"text-anchor":"middle","dominant-baseline":"central","font-size":9,fill:"#FFD700"}));}
-      else{var sp=t.spaces[i],rw=sp?sp.reward:null;g2.appendChild(mkEl("rect",{x:pt2.x-SW/2,y:pt2.y-SH/2,width:SW,height:SH,rx:6,fill:t.color,stroke:"#ffffffa0","stroke-width":0.8}));if(rw!==null&&rw!==undefined){var ic=key==="boat_school"?"⭐":key==="fish"?"🐟":"🆘";if(rw<0){g2.appendChild(mkTxt(String(rw),{x:pt2.x,y:pt2.y,"text-anchor":"middle","dominant-baseline":"central","font-size":13,"font-weight":"bold",fill:"#ff4444"}));}else if(rw===0){g2.appendChild(mkTxt("+0",{x:pt2.x,y:pt2.y,"text-anchor":"middle","dominant-baseline":"central","font-size":11,"font-weight":"bold",fill:"#FFD700"}));}else{var cols=rw<=2?rw:rw<=4?2:3,rows=Math.ceil(rw/cols),iconSize=rw<=2?14:rw<=4?11:9,spacingX=iconSize+2,spacingY=iconSize+2,totalH=(rows-1)*spacingY,count=0;for(var row2=0;row2<rows&&count<rw;row2++){var rowCols=Math.min(cols,rw-count),rowW=(rowCols-1)*spacingX;for(var col2=0;col2<rowCols;col2++){g2.appendChild(mkTxt(ic,{x:pt2.x-rowW/2+col2*spacingX,y:pt2.y-totalH/2+row2*spacingY,"text-anchor":"middle","dominant-baseline":"central","font-size":iconSize}));count++;}}}}}
-      svg.appendChild(g2);
-    }
-    if(jd.xp){var xg=mkEl("g",{});xg.appendChild(mkEl("rect",{x:jd.xp.x-SW/2,y:jd.xp.y-SH/2,width:SW,height:SH,rx:8,fill:sColor("entry_"+key),stroke:"#ffffffa0","stroke-width":0.8}));xg.appendChild(mkTxt(key==="boat_school"?"🎓":key==="boat"?"🛥️":key==="fish"?"🐟":"🆘",{x:jd.xp.x,y:jd.xp.y,"text-anchor":"middle","dominant-baseline":"central","font-size":18}));svg.appendChild(xg);}
-    var lp=jLP(key);if(lp){var lg=mkEl("g",{});lg.appendChild(mkEl("rect",{x:lp.x-60,y:lp.y-13,width:120,height:24,rx:6,fill:"rgba(7,23,40,0.92)",stroke:jcols[key]||"#fff","stroke-width":1.5}));lg.appendChild(mkTxt(jlbls[key]||key,{x:lp.x,y:lp.y,"text-anchor":"middle","dominant-baseline":"central","font-size":11,"font-weight":"bold",fill:jcols[key]||"#fff"}));svg.appendChild(lg);}
-  }
-  var wlp=jLP("winner");if(wlp){var wlg=mkEl("g",{});wlg.appendChild(mkEl("rect",{x:wlp.x-64,y:wlp.y-24,width:128,height:36,rx:6,fill:"rgba(7,23,40,0.92)",stroke:"#fbbf24","stroke-width":1.5}));wlg.appendChild(mkTxt("🏆 Supreme Boat",{x:wlp.x,y:wlp.y-8,"text-anchor":"middle","dominant-baseline":"central","font-size":10,"font-weight":"bold",fill:"#fbbf24"}));wlg.appendChild(mkTxt("Captain HQ",{x:wlp.x,y:wlp.y+8,"text-anchor":"middle","dominant-baseline":"central","font-size":10,"font-weight":"bold",fill:"#fbbf24"}));svg.appendChild(wlg);}
-}
-function drawOval(svg){
-  var exits={};Object.keys(TASKS).forEach(function(k){exits[TASKS[k].exitIdx]=true;});
-  for(var i=0;i<36;i++){
-    var pos=oPos(i),x=pos.x,y=pos.y,k=sKind(i),isEnt=k.indexOf("entry_")===0;
-    Object.keys(TASKS).forEach(function(tk){var t=TASKS[tk];if(i===t.entryIdx){var p=jPerp(t.entryIdx);x-=p.x*(t.colGap||SW)/2;y-=p.y*(t.colGap||SW)/2;}});
-    var fill=exits[i]?"#c8a96e":sColor(k);
-    var g=mkEl("g",{id:"sp"+i});
-    g.appendChild(mkEl("rect",{x:x-SW/2,y:y-SH/2,width:SW,height:SH,rx:(isEnt||k==="start")?8:5,fill:fill,stroke:k==="start"?"#7dff9a":"#ffffffa0","stroke-width":k==="start"?2.5:0.8}));
-    if(k==="start"){
-      // Bold green START label
-      g.appendChild(mkTxt("START",{x:x,y:y,"text-anchor":"middle","dominant-baseline":"central","font-size":9,fill:"#7dff9a","font-weight":"900"}));
-    } else if(k==="swim"){
-      g.appendChild(mkTxt("🏊",{x:x,y:y,"text-anchor":"middle","dominant-baseline":"central","font-size":18}));
-    } else if(k==="sink"){
-      g.appendChild(mkTxt("🌊",{x:x,y:y,"text-anchor":"middle","dominant-baseline":"central","font-size":18}));
-    } else if(k==="entry_winner"){
-      g.appendChild(mkTxt("⭐",{x:x,y:y,"text-anchor":"middle","dominant-baseline":"central","font-size":18}));
-    }
-    svg.appendChild(g);
-  }
-}
-function pXY(pl){if(pl.winPos>=0){var pts=JC.winner?JC.winner.pts:[];if(pts[pl.winPos])return pts[pl.winPos];}if(pl.inTask){var jd=JC[pl.inTask];if(jd){if(pl.taskPos>=0&&jd.pts[pl.taskPos])return jd.pts[pl.taskPos];return jd.ep||oPos(TASKS[pl.inTask].entryIdx);}}return oPos(pl.pos);}
-function updateTok(s){
-  var layer=document.getElementById("tlayer");if(!layer)return;layer.innerHTML="";
-  var groups={};for(var i=0;i<s.players.length;i++){var pl=s.players[i];if(!pl||pl.eliminated)continue;var xy=pXY(pl),k=Math.round(xy.x)+","+Math.round(xy.y);if(!groups[k])groups[k]=[];groups[k].push({pl:pl,pi:i});}
-  Object.keys(groups).forEach(function(gk){var grp=groups[gk],pts2=gk.split(","),bx=parseFloat(pts2[0]),by=parseFloat(pts2[1]);for(var oi=0;oi<grp.length;oi++){var pl=grp[oi].pl,pi=grp[oi].pi,act=pi===s.curIdx;var ox=grp.length>1?(oi-(grp.length-1)/2)*28:0,oy=grp.length>1?-oi*6:0;var gg=mkEl("g",{transform:"translate("+(bx+ox)+","+(by+oy)+")"});gg.innerHTML=tokenSVG(pl.tokenKey||"captain",pl.color,act);var ws2=pl.name.split(" ");for(var wi=0;wi<ws2.length;wi++)gg.appendChild(mkTxt(ws2[wi],{x:0,y:30+wi*10,"text-anchor":"middle","dominant-baseline":"central","font-size":8,fill:"#fff","font-weight":"bold",stroke:"#000","stroke-width":0.6,"paint-order":"stroke"}));layer.appendChild(gg);}});
-}
-
-// ── TRANSITION ──
-function showTrans(){
-  if(!GS||showTransActive)return;
-  var cur=GS.players[GS.curIdx];if(!cur)return;
-  // Defensive: check isAI strictly
-  var curIsAI=(cur.isAI===true);
-  showTransActive=true;
-  var mine=isMyTurnNow();
-  var isAIGame=GS.players.some(function(p){return p&&p.isAI===true;});
-  var nameLabel;
-  if(isOnlineMultiplayer){nameLabel=mine?"Your Turn!":cur.name+"'s Turn";}
-  else if(isAIGame){nameLabel=(mine&&!curIsAI)?"Your Turn!":cur.name+"'s Turn";}
-  else{nameLabel=cur.name+"'s Turn";}
-  document.getElementById("trsub").textContent=curIsAI?"🤖 AI TURN":"NEXT UP";
-  document.getElementById("trdot").style.background=cur.color;
-  document.getElementById("trdot").style.boxShadow="0 0 20px "+cur.color;
-  document.getElementById("trname").textContent=nameLabel;
-  document.getElementById("trstats").textContent="💰$"+cur.money+(cur.money<0?" ⚠️ IN DEBT":"")+" | "+(cur.completedTasks||[]).length+"/4";
-  document.getElementById("trBtn").style.display=(curIsAI||!mine)?"none":"block";
-  document.getElementById("tro").classList.add("on");
-  if(curIsAI){
-    var delay=aiSpeed==="fast"?300:1800;
-    setTimeout(function(){
-      showTransActive=false;
-      document.getElementById("tro").classList.remove("on");
-      if(GS)GS.phase="preturn";
-      renderAll();
-      setTimeout(function(){
-        if(GS&&GS.players[GS.curIdx]&&GS.players[GS.curIdx].isAI===true&&!aiRunning){
-          runAI();
-        }
-      },aiSpeed==="fast"?100:400);
-    },delay);
-  }
-}
-function disTrans(){
-  showTransActive=false;document.getElementById("tro").classList.remove("on");if(!GS)return;
-  GS.phase="preturn";if(isOnlineMultiplayer&&isMyTurnNow())writeToFirebase(GS);
-  renderAll();setTimeout(function(){centerOn(GS?GS.curIdx:0);},50);
-}
-
-// ── POPUP ──
-var ACOLS={swim:"#1565c0",sink:"#b71c1c",debt:"#c0392b",info:"#1a3a55",success:"#1a7a3a"};
-function showP(title,accent,body,btns,isSpectator){
-  document.getElementById("phd").style.background=ACOLS[accent]||"#1a3a55";
-  document.getElementById("phd").innerHTML='<div style="font-size:18px;font-weight:700;color:#fff">'+title+'</div>';
-  document.getElementById("pbd").textContent=body;
-  var f=document.getElementById("pft");f.innerHTML="";
-  if(isSpectator){var note=document.createElement("div");note.style.cssText="font-size:11px;color:#888;text-align:center;padding:4px 0";note.textContent="⏳ Waiting for "+(GS&&GS.players&&GS.players[GS.curIdx]?GS.players[GS.curIdx].name:"other player")+"...";f.appendChild(note);}
-  else{var isAITurn=GS&&GS.players[GS.curIdx]&&GS.players[GS.curIdx].isAI;if(isAITurn&&aiSpeed==="show"){var note2=document.createElement("div");note2.style.cssText="font-size:11px;color:#aaa;text-align:center;padding:4px 0";note2.textContent="⏳ Continuing in 2s...";f.appendChild(note2);document.getElementById("po").classList.add("on");var cb0=btns&&btns.length&&btns[0]&&btns[0].fn?btns[0].fn:null;setTimeout(function(){hideP();if(cb0)cb0();},2000);return;}(btns||[]).forEach(function(b){var btn=document.createElement("button");btn.textContent=b.l;btn.className=b.c||"pn";btn.onclick=function(){hideP();if(b.fn)b.fn();};f.appendChild(btn);});}
-  document.getElementById("po").classList.add("on");
-}
-function hideP(){document.getElementById("po").classList.remove("on");}
-function showWin(player){
-  document.getElementById("wname").textContent=player.name;
-  document.getElementById("wname").style.color=player.color;
-  document.getElementById("wo").classList.add("on");
-  // Clear online room record — game is over
-  if(isOnlineMultiplayer&&currentUser)clearOnlineRoom();
-  refreshResumeBtn();
-}
-
-// ── ZOOM ──
-var ZL=[0.4,0.55,0.7,0.85,1.0,1.2,1.5,1.8,2.0,2.2];
-function zoomIn(){var idx=ZL.indexOf(scale);if(idx<0)idx=8;scale=ZL[Math.min(idx+1,ZL.length-1)];applyScale();}
-function zoomOut(){var idx=ZL.indexOf(scale);if(idx<0)idx=8;scale=ZL[Math.max(idx-1,0)];applyScale();}
-function applyScale(){var w=document.getElementById("bwrap");w.style.transform="scale("+scale+")";w.style.width=BW+"px";w.style.height=BH+"px";w.style.minWidth=Math.ceil(BW*scale)+"px";w.style.minHeight=Math.ceil(BH*scale)+"px";document.getElementById("zlbl").textContent=Math.round(scale*100)+"%";}
-
-document.getElementById("btnLeave").addEventListener("click",leaveGame);
-document.getElementById("btnZI").addEventListener("click",zoomIn);
-document.getElementById("btnZO").addEventListener("click",zoomOut);
-document.getElementById("btnCtr").addEventListener("click",function(){centerOn(GS?GS.curIdx:0);});
-document.getElementById("btnWL").addEventListener("click",leaveGame);
-document.getElementById("trBtn").addEventListener("click",disTrans);
-document.getElementById("ji").addEventListener("keydown",function(e){if(e.key==="Enter")document.getElementById("btnGoJoin").click();});
-</script>
-</body>
-</html>
-+pl.money+(pl.money<0?" ⚠️":"")+" | "+(pl.completedTasks||[]).length+"/4"+(pl.frozen>0?" ❄️"+pl.frozen:"")+'</div>'
-      +'</div></div>';
-  }
+  var h="";for(var i=0;i<s.players.length;i++){var pl=s.players[i];if(!pl)continue;var act=i===s.curIdx;h+='<div class="prow'+(act?" act":"")+'" data-pi="'+i+'"><div style="width:9px;height:9px;border-radius:50%;background:'+pl.color+';flex-shrink:0"></div><div style="flex:1;min-width:0"><div style="font-size:11px;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(pl.isAI?"🤖 ":"")+pl.name+(pl.eliminated?" ❌":pl.done?" 🏆":act?" ▶":"")+'</div><div style="font-size:9px;color:'+(pl.money<0?"#ff9999":"#7ecbe0")+'">💰$'+pl.money+(pl.money<0?" ⚠️":"")+" | "+(pl.completedTasks||[]).length+"/4"+(pl.frozen>0?" ❄️"+pl.frozen:"")+'</div></div></div>';}
   document.getElementById("plist").innerHTML=h;
-  document.getElementById("plist").querySelectorAll("[data-pi]").forEach(function(row){
-    row.addEventListener("click",function(){inspP(parseInt(row.getAttribute("data-pi")));});
-  });
+  document.getElementById("plist").querySelectorAll("[data-pi]").forEach(function(row){row.addEventListener("click",function(){inspP(parseInt(row.getAttribute("data-pi")));});});
 }
 
 function renderCur(s,cur){
@@ -1702,30 +943,14 @@ function advTurn(s){
 
 // ── AI LOGIC ──
 function runAI(){
-  if(!GS)return;
-  if(aiRunning){console.log('runAI: already running, skip');return;}
-  var cur=GS.players[GS.curIdx];
-  if(!cur){console.log('runAI: no current player');return;}
-  if(!cur.isAI){console.log('runAI: current player is not AI:',cur.name,'isAI='+cur.isAI);return;}
-  aiRunning=true;
-  console.log('runAI: AI',cur.name,'taking turn');
+  if(!GS||aiRunning)return;var cur=GS.players[GS.curIdx];if(!cur||!cur.isAI)return;aiRunning=true;
   var s=dc(GS),pl=s.players[s.curIdx];
   // AI card buying: only if healthy balance and not too many cards
   if(!pl.boughtCardThisTurn&&pl.money>=25&&(pl.heldCards||[]).length<3&&Math.random()<0.6){
-    var deck=(s.swDeck||[]).slice();if(!deck.length)deck=mkDeck(SWDEFS);
-    var card=deck[0],uid2=Math.random().toString(36).slice(2);deck=deck.slice(1);s.swDeck=deck;
-    pl.heldCards=(pl.heldCards||[]).concat([mg(card,{uid:uid2})]);
-    pl.money-=10;pl.boughtCardThisTurn=true;
-    pl.cardsBoughtThisTurn=(pl.cardsBoughtThisTurn||[]).concat([uid2]);
-    if(card.type==="fasttrack")pl.fasttrack=true;
-    addL(s,"🤖 "+pl.name+" got a Shipwreck card");
+    var deck=(s.swDeck||[]).slice();if(!deck.length)deck=mkDeck(SWDEFS);var card=deck[0],uid2=Math.random().toString(36).slice(2);deck=deck.slice(1);s.swDeck=deck;
+    pl.heldCards=(pl.heldCards||[]).concat([mg(card,{uid:uid2})]);pl.money-=10;pl.boughtCardThisTurn=true;pl.cardsBoughtThisTurn=(pl.cardsBoughtThisTurn||[]).concat([uid2]);if(card.type==="fasttrack")pl.fasttrack=true;addL(s,"🤖 "+pl.name+" got a Shipwreck card");
   }
-  s.players[s.curIdx]=pl;
-  var r=Math.ceil(Math.random()*6);
-  showDie(r);
-  addL(s,"🤖 "+pl.name+" rolls "+r);
-  GS=s;renderAll();
-  processRoll(r,s);
+  s.players[s.curIdx]=pl;var r=Math.ceil(Math.random()*6);showDie(r);addL(s,"🤖 "+pl.name+" rolls "+r);GS=s;renderAll();processRoll(r,s);
 }
 
 // ── CARDS ──
@@ -1868,38 +1093,20 @@ function updateTok(s){
 
 // ── TRANSITION ──
 function showTrans(){
-  if(!GS||showTransActive)return;
-  var cur=GS.players[GS.curIdx];if(!cur)return;
-  // Defensive: check isAI strictly
-  var curIsAI=(cur.isAI===true);
-  showTransActive=true;
-  var mine=isMyTurnNow();
-  var isAIGame=GS.players.some(function(p){return p&&p.isAI===true;});
+  if(!GS||showTransActive)return;var cur=GS.players[GS.curIdx];if(!cur)return;
+  showTransActive=true;var mine=isMyTurnNow();
+  var isAIGame=GS.players.some(function(p){return p&&p.isAI;});
   var nameLabel;
   if(isOnlineMultiplayer){nameLabel=mine?"Your Turn!":cur.name+"'s Turn";}
-  else if(isAIGame){nameLabel=(mine&&!curIsAI)?"Your Turn!":cur.name+"'s Turn";}
+  else if(isAIGame){nameLabel=(mine&&!cur.isAI)?"Your Turn!":cur.name+"'s Turn";}
   else{nameLabel=cur.name+"'s Turn";}
-  document.getElementById("trsub").textContent=curIsAI?"🤖 AI TURN":"NEXT UP";
-  document.getElementById("trdot").style.background=cur.color;
-  document.getElementById("trdot").style.boxShadow="0 0 20px "+cur.color;
+  document.getElementById("trsub").textContent=cur.isAI?"🤖 AI TURN":"NEXT UP";
+  document.getElementById("trdot").style.background=cur.color;document.getElementById("trdot").style.boxShadow="0 0 20px "+cur.color;
   document.getElementById("trname").textContent=nameLabel;
   document.getElementById("trstats").textContent="💰$"+cur.money+(cur.money<0?" ⚠️ IN DEBT":"")+" | "+(cur.completedTasks||[]).length+"/4";
-  document.getElementById("trBtn").style.display=(curIsAI||!mine)?"none":"block";
+  document.getElementById("trBtn").style.display=(cur.isAI||!mine)?"none":"block";
   document.getElementById("tro").classList.add("on");
-  if(curIsAI){
-    var delay=aiSpeed==="fast"?300:1800;
-    setTimeout(function(){
-      showTransActive=false;
-      document.getElementById("tro").classList.remove("on");
-      if(GS)GS.phase="preturn";
-      renderAll();
-      setTimeout(function(){
-        if(GS&&GS.players[GS.curIdx]&&GS.players[GS.curIdx].isAI===true&&!aiRunning){
-          runAI();
-        }
-      },aiSpeed==="fast"?100:400);
-    },delay);
-  }
+  if(cur.isAI){var delay=aiSpeed==="fast"?300:1800;setTimeout(function(){showTransActive=false;document.getElementById("tro").classList.remove("on");if(GS)GS.phase="preturn";renderAll();setTimeout(function(){if(GS&&GS.players[GS.curIdx]&&GS.players[GS.curIdx].isAI&&!aiRunning)runAI();},aiSpeed==="fast"?100:400);},delay);}
 }
 function disTrans(){
   showTransActive=false;document.getElementById("tro").classList.remove("on");if(!GS)return;
@@ -1919,817 +1126,7 @@ function showP(title,accent,body,btns,isSpectator){
   document.getElementById("po").classList.add("on");
 }
 function hideP(){document.getElementById("po").classList.remove("on");}
-function showWin(player){
-  document.getElementById("wname").textContent=player.name;
-  document.getElementById("wname").style.color=player.color;
-  document.getElementById("wo").classList.add("on");
-  // Clear online room record — game is over
-  if(isOnlineMultiplayer&&currentUser)clearOnlineRoom();
-  refreshResumeBtn();
-}
-
-// ── ZOOM ──
-var ZL=[0.4,0.55,0.7,0.85,1.0,1.2,1.5,1.8,2.0,2.2];
-function zoomIn(){var idx=ZL.indexOf(scale);if(idx<0)idx=8;scale=ZL[Math.min(idx+1,ZL.length-1)];applyScale();}
-function zoomOut(){var idx=ZL.indexOf(scale);if(idx<0)idx=8;scale=ZL[Math.max(idx-1,0)];applyScale();}
-function applyScale(){var w=document.getElementById("bwrap");w.style.transform="scale("+scale+")";w.style.width=BW+"px";w.style.height=BH+"px";w.style.minWidth=Math.ceil(BW*scale)+"px";w.style.minHeight=Math.ceil(BH*scale)+"px";document.getElementById("zlbl").textContent=Math.round(scale*100)+"%";}
-
-document.getElementById("btnLeave").addEventListener("click",leaveGame);
-document.getElementById("btnZI").addEventListener("click",zoomIn);
-document.getElementById("btnZO").addEventListener("click",zoomOut);
-document.getElementById("btnCtr").addEventListener("click",function(){centerOn(GS?GS.curIdx:0);});
-document.getElementById("btnWL").addEventListener("click",leaveGame);
-document.getElementById("trBtn").addEventListener("click",disTrans);
-document.getElementById("ji").addEventListener("keydown",function(e){if(e.key==="Enter")document.getElementById("btnGoJoin").click();});
-</script>
-</body>
-</html>
-+cur.money+'</div>'
-      +'<div style="font-size:10px;line-height:1.8">'+prog+'</div>'
-      +'</div>';
-    return;
-  }
-  if(curIsAI){el.innerHTML='<div style="text-align:center;padding:12px;color:#7ecbe0;font-size:12px">🤖 AI is thinking...</div>';return;}
-  if(s.phase==="rolling"){el.innerHTML='<div style="text-align:center;padding:8px;color:#7ecbe0;font-size:12px">🎲 Rolling...</div>';return;}
-  el.innerHTML="";
-  if(cur.money<0){
-    var db2=document.createElement("button");db2.className="ab";
-    db2.style.cssText="background:#1a0a0a;border:2px solid #c0392b;color:#ff9999;font-size:11px";
-    db2.innerHTML="🆘 Eliminate Debt<div style='font-size:9px;font-weight:400;margin-top:1px'>Sacrifice challenge → reset to $0</div>";
-    db2.addEventListener("click",debtR);el.appendChild(db2);
-  }
-  var rb=document.createElement("button");rb.className="ab";
-  rb.style.background=(cur.doubleRollsLeft||0)>0?"#d68910":"#1a7a3a";
-  rb.innerHTML="🎲 Roll the Die!"+(((cur.doubleRollsLeft||0)>0)?" (+"+(cur.doubleRollsLeft||0)+")":"");
-  rb.addEventListener("click",doRoll);el.appendChild(rb);
-  var bb=document.createElement("button");bb.className="ab";
-  bb.style.background=cur.boughtCardThisTurn?"#333":"#6a1b9a";
-  bb.innerHTML="🃏 Buy Shipwreck Card ($10)"+(cur.boughtCardThisTurn?" ✓":"");
-  if(cur.boughtCardThisTurn)bb.disabled=true;
-  bb.addEventListener("click",buyCard);el.appendChild(bb);
-  var tb=document.createElement("button");tb.className="ab";tb.style.background="#1a5a8a";
-  tb.innerHTML="🤝 Propose a Trade";tb.addEventListener("click",toggleTradePanel);el.appendChild(tb);
-  var tp=document.createElement("div");tp.id="tradePanel";el.appendChild(tp);
-  if(tradeOpen)buildTradePanel(s,cur);
-}
-
-// ── DIE ──
-var DIE_DOTS={1:[[0,0]],2:[[-10,-10],[10,10]],3:[[-10,-10],[0,0],[10,10]],4:[[-10,-10],[10,-10],[-10,10],[10,10]],5:[[-10,-10],[10,-10],[0,0],[-10,10],[10,10]],6:[[-10,-10],[10,-10],[-10,0],[10,0],[-10,10],[10,10]]};
-function showDie(n){var el=document.getElementById("dieDisplay");if(!el)return;var dots=DIE_DOTS[n]||[];var svg='<svg width="52" height="52" viewBox="-28 -28 56 56"><rect x="-26" y="-26" width="52" height="52" rx="8" fill="#fff" stroke="#1a4a64" stroke-width="2"/>';for(var i=0;i<dots.length;i++)svg+='<circle cx="'+dots[i][0]+'" cy="'+dots[i][1]+'" r="4.5" fill="#1a4a64"/>';svg+='</svg>';el.innerHTML=svg;el.style.display='block';}
-function hideDie(){var el=document.getElementById("dieDisplay");if(el){el.innerHTML='';el.style.display='none';}}
-function posD(pl){if(pl.winPos>=0){var l=["Dock 1","Lose Turn","Back 1","⭐ WIN"];return"Winner's Dock: "+l[pl.winPos];}if(pl.inTask==="boat")return"🛥️ Boat Store: sp "+(pl.taskPos+1);if(pl.inTask)return(TASKS[pl.inTask]?TASKS[pl.inTask].label:pl.inTask)+": sp "+(pl.taskPos+1);return null;}
-function tLine(pl,tk){var done=(pl.completedTasks||[]).indexOf(tk)>=0;if(tk==="boat"){if(done)return{t:(pl.boat?BOAT_EMOJIS[pl.boat.name]||"🛥️":"🛥️")+" "+(pl.boat?pl.boat.name:"owned"),g:true};return{t:"⛵ No boat yet",g:false};}var t=TASKS[tk];if(!t)return{t:"",g:false};if(done)return{t:t.done||t.label,g:true};return{t:t.prog(pl),g:t.req(pl)};}
-
-// ── ANIMATION ──
-function animateSteps(playerIdx,steps,onDone){
-  if(!steps||!steps.length){onDone();return;}var i=0;
-  function next(){if(i>=steps.length){onDone();return;}var step=steps[i],isLast=(i===steps.length-1);i++;var pl=GS.players[playerIdx];if(!pl){onDone();return;}if(step.type==="oval")GS.players[playerIdx]=mg(pl,{pos:step.pos,inTask:null,taskPos:-1});else if(step.type==="task")GS.players[playerIdx]=mg(pl,{inTask:step.task,taskPos:step.taskPos});else if(step.type==="win")GS.players[playerIdx]=mg(pl,{winPos:step.winPos});updateTok(GS);centerOn(playerIdx);setTimeout(next,isLast?STEP_MS+LAND_PAUSE_MS:STEP_MS);}
-  next();
-}
-function centerOn(pi){if(!GS||!GS.players[pi])return;var xy=pXY(GS.players[pi]),bs=document.getElementById("bs");bs.scrollLeft=Math.max(0,xy.x*scale-bs.clientWidth/2);bs.scrollTop=Math.max(0,xy.y*scale-bs.clientHeight/2);}
-
-// ── GAME LOGIC ──
-function doRoll(){
-  if(!GS||!isMyTurnNow())return;var s=dc(GS),pl=s.players[s.curIdx];
-  if((pl.doubleRollsLeft||0)>0)pl.doubleRollsLeft--;
-  var r=Math.ceil(Math.random()*6);showDie(r);addL(s,pl.name+" 🎲 rolls "+r);s.players[s.curIdx]=pl;
-  if(isOnlineMultiplayer)writeToFirebase(s);else GS=s;renderAll();processRoll(r,s);
-}
-function processRoll(r,s){
-  var pl=s.players[s.curIdx];
-  if(pl.frozen>0){var nf=pl.frozen-1;s.players[s.curIdx]=mg(pl,{frozen:nf});addL(s,pl.name+" ❄️ frozen "+(nf>0?nf+" left.":"free!"));commitTurn(s);showP("❄️ Frozen!","info",pl.name+" is frozen!\n"+(nf>0?nf+" turn(s) left.":"Free next turn!"),[{l:"OK",c:"pn",fn:function(){advTurn(dc(GS));}}]);return;}
-  if(pl.skip>0){s.players[s.curIdx]=mg(pl,{skip:pl.skip-1});addL(s,pl.name+" skips turn.");commitTurn(s);advTurn(dc(GS));return;}
-  if(pl.winPos>=0){doWin(pl,s,r);return;}
-  if(pl.inTask==="boat"){doBoat(pl,s,r);return;}
-  if(pl.inTask){doTask(pl,s,r);return;}
-  doMove(pl,s,r);
-}
-function doMove(pl,s,r){
-  var path=[];for(var i=1;i<=r;i++)path.push((pl.pos+i)%36);
-  var fc=pl.completedTasks||[];
-  var jes=[{idx:TASKS.boat_school.entryIdx,key:"boat_school",need:fc.indexOf("boat_school")<0},{idx:TASKS.boat.entryIdx,key:"boat",need:fc.indexOf("boat")<0},{idx:TASKS.fish.entryIdx,key:"fish",need:fc.indexOf("fish")<0},{idx:TASKS.rescue.entryIdx,key:"rescue",need:fc.indexOf("rescue")<0},{idx:WIN_IDX,key:"winner",need:fc.length>=4}];
-  var ss=r,jh=null;
-  outer:for(var i=0;i<path.length;i++){for(var j=0;j<jes.length;j++){if(jes[j].need&&jes[j].idx===path[i]){ss=i+1;jh=jes[j];break outer;}}}
-  var extra=r-ss,steps=[];for(var i=0;i<ss;i++)steps.push({type:"oval",pos:path[i]});
-  var passed=false;for(var i=0;i<ss;i++)if(path[i]===0&&pl.pos!==0){passed=true;break;}
-  var finalPos=path[ss-1],u=mg(pl,{pos:finalPos});
-  if(passed){u=mg(u,{money:u.money+5});addL(s,"💰 "+pl.name+" passed START and collected $5!");}
-  s.players[s.curIdx]=u;commitTurn(s);
-  animateSteps(s.curIdx,steps,function(){
-    GS.players[GS.curIdx]=u;updateTok(GS);centerOn(GS.curIdx);
-    if(passed){
-      showP("💰 Passed START!","success","You passed START and collected $5!\nBalance: $"+u.money,[{l:"Nice!",c:"pp",fn:function(){if(jh){if(extra>0)enterJutX(u,dc(GS),jh.key,extra);else enterJut(u,dc(GS),jh.key);}else landOn(u,dc(GS));}}]);
-    } else {
-      if(jh){if(extra>0)enterJutX(u,dc(GS),jh.key,extra);else enterJut(u,dc(GS),jh.key);}else landOn(u,dc(GS));
-    }
-  });
-}
-function landOn(pl,s){
-  var k=sKind(pl.pos);
-  if(k==="swim"){var deck=(s.swimDeck||[]).slice();if(!deck.length)deck=mkSwim();var card=deck[0];deck=deck.slice(1);s.swimDeck=deck;var u=mg(pl,{});if(card.eff.money)u=mg(u,{money:u.money+card.eff.money});if(card.eff.skip)u=mg(u,{skip:(u.skip||0)+card.eff.skip});var mv=card.eff.move||0;s.players[s.curIdx]=u;addL(s,"🏊 SWIM: "+card.text);commitTurn(s);showP("🏊 Swim Card!","swim",card.text,[{l:"Woohoo!",c:"pp",fn:function(){if(mv!==0){var cur=dc(GS),curPl=cur.players[cur.curIdx];var swimSteps=[];var pos=curPl.pos;for(var i=0;i<Math.abs(mv);i++){pos=(pos+(mv>0?1:-1)+36)%36;swimSteps.push({type:"oval",pos:pos});}animateSteps(cur.curIdx,swimSteps,function(){var fp=((curPl.pos+mv)+3600)%36;var um=mg(curPl,{pos:fp});var s2=dc(GS);s2.players[s2.curIdx]=um;commitTurn(s2);landOn(um,dc(GS));});}else advTurn(dc(GS));}}]);return;}
-  if(k==="sink"){var deck2=(s.sinkDeck||[]).slice();if(!deck2.length)deck2=mkSink();var card2=deck2[0];deck2=deck2.slice(1);s.sinkDeck=deck2;var u2=mg(pl,{});if(card2.eff.money)u2=mg(u2,{money:u2.money+card2.eff.money});if(card2.eff.skip)u2=mg(u2,{skip:(u2.skip||0)+card2.eff.skip});var mv2=card2.eff.move||0;s.players[s.curIdx]=u2;addL(s,"🌊 SINK: "+card2.text);commitTurn(s);showP("🌊 Sink Card!","sink",card2.text,[{l:"Yikes!",c:"pn",fn:function(){if(mv2!==0){var cur=dc(GS),curPl=cur.players[cur.curIdx];var sinkSteps=[];var pos=curPl.pos;for(var i=0;i<Math.abs(mv2);i++){pos=(pos+(mv2>0?1:-1)+36)%36;sinkSteps.push({type:"oval",pos:pos});}animateSteps(cur.curIdx,sinkSteps,function(){var fp=((curPl.pos+mv2)+3600)%36;var um2=mg(curPl,{pos:fp});var s3=dc(GS);s3.players[s3.curIdx]=um2;commitTurn(s3);landOn(um2,dc(GS));});}else advTurn(dc(GS));}}]);return;}
-  advTurn(s);
-}
-function enterJut(pl,s,key){
-  // All juts work the same — no special bypass logic
-  if(key==="winner"){
-    if(pl.money<0){showP("💸 Wallet Too Low!","debt","Need $0+ to enter!\nCurrent balance: $"+pl.money,[{l:"Dang!",c:"pn",fn:function(){advTurn(dc(GS));}}]);return;}
-    s.players[s.curIdx]=mg(pl,{winPos:-1});addL(s,pl.name+" entered Winner's Dock!");commitTurn(s);showP("🏆 Winner's Dock!","info","All 4 challenges done! 🎉\nRoll to reach ⭐ WIN!",[{l:"Let's go!",c:"pp",fn:function(){advTurn(dc(GS));}}]);return;
-  }
-  if(key==="boat"&&!pl.graduated){
-    // Skip the boat store — not graduated
-    if(pl.isAI){addL(s,"🤖 AI skips Boat Store (not graduated)");commitTurn(s);advTurn(dc(GS));return;}
-    showP("🛥️ The Boat Store","info","You need to graduate from Boat School first!\n\nCome back after you've earned your stars.",[{l:"OK",c:"pn",fn:function(){advTurn(dc(GS));}}]);return;
-  }
-  s.players[s.curIdx]=mg(pl,{inTask:key,taskPos:-1});addL(s,pl.name+" enters "+(TASKS[key]?TASKS[key].label:key)+"!");commitTurn(s);advTurn(dc(GS));
-}
-function enterJutX(pl,s,key,extra){
-  if(key==="winner"){if(pl.money<0){showP("💸 Wallet Too Low!","debt","Need $0+ to enter!",[{l:"Dang!",c:"pn",fn:function(){advTurn(dc(GS));}}]);return;}s.players[s.curIdx]=mg(pl,{winPos:-1});commitTurn(s);doWin(s.players[s.curIdx],dc(GS),extra);return;}
-  if(key==="boat"&&!pl.graduated){
-    if(pl.isAI){addL(s,"🤖 AI skips Boat Store (not graduated)");commitTurn(s);var exitSteps=[];for(var i=1;i<=extra;i++)exitSteps.push({type:"oval",pos:(TASKS.boat.entryIdx+i)%36});animateSteps(s.curIdx,exitSteps,function(){var s2=dc(GS);s2.players[s2.curIdx]=mg(s2.players[s2.curIdx],{pos:(TASKS.boat.entryIdx+extra)%36});commitTurn(s2);landOn(s2.players[s2.curIdx],dc(GS));});return;}
-    showP("🛥️ The Boat Store","info","You need to graduate first!",[{l:"OK",c:"pn",fn:function(){advTurn(dc(GS));}}]);return;
-  }
-  s.players[s.curIdx]=mg(pl,{inTask:key,taskPos:-1});addL(s,pl.name+" enters "+(TASKS[key]?TASKS[key].label:key)+"!");commitTurn(s);doTask(s.players[s.curIdx],dc(GS),extra);
-}
-function doTask(pl,s,r){
-  var t=TASKS[pl.inTask],np=pl.taskPos+r;
-  if(np>=t.count){var stepsT=[];for(var i=pl.taskPos+1;i<t.count;i++)stepsT.push({type:"task",task:pl.inTask,taskPos:i});animateSteps(s.curIdx,stepsT,function(){var s2=dc(GS),pl2=s2.players[s2.curIdx];var rem=r-(t.count-1-pl.taskPos)-1;var u=mg(pl2,{inTask:null,taskPos:-1,pos:t.exitIdx});var comp=t.req(u)&&(u.completedTasks||[]).indexOf(t.key)<0;if(comp){u=mg(u,{completedTasks:(u.completedTasks||[]).concat([t.key])});if(t.key==="boat_school")u=mg(u,{graduated:true});addL(s2,"🎉 "+pl2.name+" completed "+t.label+"!");}s2.players[s2.curIdx]=u;commitTurn(s2);showP(comp?"✅ Done!":"Exited "+t.label,comp?"success":"info",comp?(u.completedTasks.length+"/4 done! 🎊"):t.prog(u),[{l:comp?"Yes! 🎉":"Continue",c:"pp",fn:function(){if(rem>0){var exitSteps=[];for(var i=1;i<=rem;i++)exitSteps.push({type:"oval",pos:(t.exitIdx+i)%36});animateSteps(GS.curIdx,exitSteps,function(){var s3=dc(GS);var fp3=(t.exitIdx+rem)%36;s3.players[s3.curIdx]=mg(s3.players[s3.curIdx],{pos:fp3});commitTurn(s3);landOn(s3.players[s3.curIdx],dc(GS));});}else advTurn(dc(GS));}}]);});return;}
-  var stepsT2=[];for(var i=pl.taskPos+1;i<=np;i++)stepsT2.push({type:"task",task:pl.inTask,taskPos:i});
-  animateSteps(s.curIdx,stepsT2,function(){var s2=dc(GS),pl2=s2.players[s2.curIdx];var u2=mg(pl2,{taskPos:np}),space=t.spaces[np];if(space)u2=space.eff(u2);s2.players[s2.curIdx]=u2;addL(s2,pl2.name+" sp"+(np+1)+": "+(space?space.desc:""));commitTurn(s2);showP(t.label,"info",space?(space.story+"\n\n"+space.desc):t.prog(u2),[{l:"Continue",c:"pp",fn:function(){advTurn(dc(GS));}}]);});
-}
-function doBoat(pl,s,r){
-  var np=pl.taskPos+r;
-  if(np>=BOATS.length){var s2=dc(GS);s2.players[s2.curIdx]=mg(s2.players[s2.curIdx],{inTask:null,taskPos:-1,pos:TASKS.boat.exitIdx});commitTurn(s2);advTurn(dc(GS));return;}
-  var stepsB=[];for(var i=pl.taskPos+1;i<=np;i++)stepsB.push({type:"task",task:"boat",taskPos:i});
-  animateSteps(s.curIdx,stepsB,function(){var s2=dc(GS),pl2=s2.players[s2.curIdx];var u=mg(pl2,{taskPos:np}),boat=BOATS[np];var sold=false;for(var i=0;i<s2.players.length;i++)if(i!==s2.curIdx&&s2.players[i]&&s2.players[i].boat&&s2.players[i].boat.name===boat.name){sold=true;break;}s2.players[s2.curIdx]=u;commitTurn(s2);if(sold){showP(boat.icon+" Sold Out","info","That boat was already purchased!",[{l:"Continue",c:"pp",fn:function(){advTurn(dc(GS));}}]);return;}
-  if(pl2.isAI){
-    // AI boat buying: only buy if they have enough money (don't go into debt for a boat)
-    if(u.money>=boat.price){var nc=(u.completedTasks||[]).concat(["boat"]);s2.players[s2.curIdx]=mg(u,{money:u.money-boat.price,boat:boat,inTask:null,taskPos:-1,pos:TASKS.boat.exitIdx,completedTasks:nc});addL(s2,"🤖 AI buys "+boat.icon+" "+boat.name);commitTurn(s2);advTurn(dc(GS));}
-    else{addL(s2,"🤖 AI passes on "+boat.icon+" "+boat.name+" (can't afford)");commitTurn(s2);advTurn(dc(GS));}
-    return;
-  }
-  showP(boat.icon+" "+boat.name+" — $"+boat.price,"info","Price: $"+boat.price+"\nYour balance: $"+u.money+(u.money<boat.price?"\n⚠️ This will put you in debt!":""),[{l:"Buy "+boat.icon+" $"+boat.price,c:"pp",fn:function(){var s3=dc(GS),pu=s3.players[s3.curIdx];var nc2=(pu.completedTasks||[]).filter(function(x){return x!=="boat";}).concat(["boat"]);s3.players[s3.curIdx]=mg(pu,{money:pu.money-boat.price,boat:boat,inTask:null,taskPos:-1,pos:TASKS.boat.exitIdx,completedTasks:nc2});addL(s3,pu.name+" buys "+boat.icon+" "+boat.name);commitTurn(s3);advTurn(dc(GS));}},{l:"Pass",c:"pn",fn:function(){advTurn(dc(GS));}}]);});
-}
-function doWin(pl,s,r){
-  var cp=pl.winPos<0?-1:pl.winPos,MAX=3,tg=cp+r;
-  if(!pl.fasttrack&&tg>MAX){showP("🎯 Overshot!","info","Need exactly "+(MAX-Math.max(cp,0))+" to reach ⭐ WIN.",[{l:"OK",c:"pn",fn:function(){advTurn(dc(GS));}}]);return;}
-  var nwp=Math.min(tg,MAX),stepsW=[];for(var i=cp+1;i<=nwp;i++)stepsW.push({type:"win",winPos:i});
-  animateSteps(s.curIdx,stepsW,function(){var s2=dc(GS),pl2=s2.players[s2.curIdx];var u=WDOCK[nwp].eff(mg(pl2,{winPos:nwp}));if(WDOCK[nwp].win){if(u.money<0){s2.players[s2.curIdx]=u;commitTurn(s2);showP("💸 Still in Debt!","debt","Cannot win with $"+u.money+"!",[{l:"Dang!",c:"pn",fn:function(){advTurn(dc(GS));}}]);return;}u=mg(u,{done:true});s2.players[s2.curIdx]=u;s2.winner=u;commitTurn(s2);if(!isOnlineMultiplayer&&currentUser)deleteSavedGame();showWin(u);return;}var wl=["⚓ Dock 1","😴 Lose Turn","↩️ Back 1"];addL(s2,pl2.name+": "+wl[nwp]);s2.players[s2.curIdx]=u;commitTurn(s2);showP("🏅 Winner's Dock","info",wl[nwp]+"!",[{l:"Continue",c:"pp",fn:function(){advTurn(dc(GS));}}]);});
-}
-function advTurn(s){
-  aiRunning=false;tradeOpen=false;var prevIdx=s.curIdx;
-  var np=[];for(var i=0;i<s.players.length;i++){var pl=s.players[i];if(!pl){np.push(pl);continue;}if(pl.done||pl.eliminated){np.push(pl);continue;}if(pl.money<=-1000){addL(s,pl.name+" eliminated! 💀");np.push(mg(pl,{eliminated:true,done:true}));}else np.push(pl);}
-  s.players=np;var cur2=np[prevIdx];if(cur2&&cur2.money<0&&!cur2.done&&!cur2.eliminated){var interest=Math.floor(cur2.money*0.05);np[prevIdx]=mg(cur2,{money:cur2.money+interest});addL(s,cur2.name+" 💸 debt interest: "+interest);}
-  var active=np.filter(function(p){return p&&!p.done;});
-  if(active.length<=1){var w=active[0]||np[0];var wi=np.indexOf(w);if(wi>=0)np[wi]=mg(w,{done:true});s.players=np;s.winner=w;commitTurn(s);if(!isOnlineMultiplayer&&currentUser)deleteSavedGame();showWin(w);return;}
-  var next=(s.curIdx+1)%np.length,its=0;while((!np[next]||np[next].done)&&its<np.length){next=(next+1)%np.length;its++;}
-  np[next]=mg(np[next],{boughtCardThisTurn:false,usedShipwreckThisTurn:false,cardsBoughtThisTurn:[],pendingTrade:null});
-  s.players=np;s.curIdx=next;s.phase="transition";s.pendingTrade=null;
-  commitTurn(s);hideDie();if(!isOnlineMultiplayer){saveGame(s);showTrans();}else notifyNextPlayer(s,prevIdx,next);
-}
-
-// ── AI LOGIC ──
-function runAI(){
-  if(!GS)return;
-  if(aiRunning){console.log('runAI: already running, skip');return;}
-  var cur=GS.players[GS.curIdx];
-  if(!cur){console.log('runAI: no current player');return;}
-  if(!cur.isAI){console.log('runAI: current player is not AI:',cur.name,'isAI='+cur.isAI);return;}
-  aiRunning=true;
-  console.log('runAI: AI',cur.name,'taking turn');
-  var s=dc(GS),pl=s.players[s.curIdx];
-  // AI card buying: only if healthy balance and not too many cards
-  if(!pl.boughtCardThisTurn&&pl.money>=25&&(pl.heldCards||[]).length<3&&Math.random()<0.6){
-    var deck=(s.swDeck||[]).slice();if(!deck.length)deck=mkDeck(SWDEFS);
-    var card=deck[0],uid2=Math.random().toString(36).slice(2);deck=deck.slice(1);s.swDeck=deck;
-    pl.heldCards=(pl.heldCards||[]).concat([mg(card,{uid:uid2})]);
-    pl.money-=10;pl.boughtCardThisTurn=true;
-    pl.cardsBoughtThisTurn=(pl.cardsBoughtThisTurn||[]).concat([uid2]);
-    if(card.type==="fasttrack")pl.fasttrack=true;
-    addL(s,"🤖 "+pl.name+" got a Shipwreck card");
-  }
-  s.players[s.curIdx]=pl;
-  var r=Math.ceil(Math.random()*6);
-  showDie(r);
-  addL(s,"🤖 "+pl.name+" rolls "+r);
-  GS=s;renderAll();
-  processRoll(r,s);
-}
-
-// ── CARDS ──
-function buyCard(){
-  if(!GS||!isMyTurnNow())return;var s=dc(GS),pl=s.players[s.curIdx];if(pl.boughtCardThisTurn)return;
-  var deck=(s.swDeck||[]).slice();if(!deck.length)deck=mkDeck(SWDEFS);var card=deck[0],uid2=Math.random().toString(36).slice(2);deck=deck.slice(1);s.swDeck=deck;
-  pl.heldCards=(pl.heldCards||[]).concat([mg(card,{uid:uid2})]);pl.money-=10;pl.boughtCardThisTurn=true;pl.cardsBoughtThisTurn=(pl.cardsBoughtThisTurn||[]).concat([uid2]);if(card.type==="fasttrack")pl.fasttrack=true;
-  s.players[s.curIdx]=pl;addL(s,pl.name+" 🃏 bought a Shipwreck card");commitTurn(s);
-  showP(card.icon+" "+card.label,"info",card.desc+(card.type==="fasttrack"?"\n🚀 Already active!":"\n⏳ Available next turn.\n\n🔒 Only you can see your cards!"),[{l:"Got it!",c:"pp",fn:hideP}]);
-}
-function openCard(idx){
-  if(!GS||!isMyTurnNow())return;var pl=GS.players[GS.curIdx];
-  if(pl.usedShipwreckThisTurn){showP("One Per Turn","info","You can only play 1 Shipwreck card per turn.",[{l:"OK",c:"pn",fn:hideP}]);return;}
-  var card=pl.heldCards[idx];if(!card)return;
-  if((pl.cardsBoughtThisTurn||[]).indexOf(card.uid)>=0){showP("⏳ Not Yet","info","This card is available next turn.",[{l:"OK",c:"pn",fn:hideP}]);return;}
-  if(card.type==="double"){execCard(card,idx);return;}
-  showP(card.icon+" "+card.label,"info",card.desc,[{l:"▶ Play Now",c:"pp",fn:function(){hideP();execCard(card,idx);}},{l:"Save for later",c:"pn",fn:hideP}]);
-}
-function execCard(card,idx){
-  var s=dc(GS),pl=s.players[s.curIdx];pl.heldCards=pl.heldCards.filter(function(_,i){return i!==idx;});pl.usedShipwreckThisTurn=true;s.players[s.curIdx]=pl;addL(s,pl.name+" plays a Shipwreck card!");
-  if(card.type==="double"){pl.doubleRollsLeft=(pl.doubleRollsLeft||0)+2;s.players[s.curIdx]=pl;commitTurn(s);showP("🎲 Double Time!","info","You get 2 bonus rolls this turn!",[{l:"Roll!",c:"pp",fn:hideP}]);return;}
-  if(card.type==="fasttrack"){pl.fasttrack=true;s.players[s.curIdx]=pl;commitTurn(s);showP("🚀 Fast Track","info","No exact roll needed to WIN!",[{l:"Awesome!",c:"pp",fn:hideP}]);return;}
-  if(card.type==="shortcut"){commitTurn(s);showP("⚡ Shortcut","info","Reduce which challenge?",[{l:"🐟 Fish: 10→6",c:"pp",fn:function(){var s2=dc(GS);s2.players[s2.curIdx].shortcut.fish=true;commitTurn(s2);hideP();}},{l:"🆘 Rescues: 2→1",c:"pp",fn:function(){var s2=dc(GS);s2.players[s2.curIdx].shortcut.rescues=true;commitTurn(s2);hideP();}},{l:"⭐ Stars: 3→2",c:"pp",fn:function(){var s2=dc(GS);s2.players[s2.curIdx].shortcut.stars=true;commitTurn(s2);hideP();}}]);return;}
-  if(card.type==="teleport"){commitTurn(s);showP("🌀 Teleportation","info","Click any space on the board to jump there!",[{l:"Cancel",c:"pn",fn:hideP}]);setTimeout(function(){for(var i=1;i<36;i++){if(sKind(i)==="entry_winner")continue;(function(si){var el=document.getElementById("sp"+si);if(!el)return;el.style.cursor="pointer";var rect=el.querySelector("rect");if(rect){rect.setAttribute("stroke","#FFD700");rect.setAttribute("stroke-width","3");}el.addEventListener("click",function h(){el.removeEventListener("click",h);el.style.cursor="";if(rect){rect.setAttribute("stroke","#ffffffa0");rect.setAttribute("stroke-width","0.8");}hideP();var s2=dc(GS);s2.players[s2.curIdx]=mg(s2.players[s2.curIdx],{pos:si,inTask:null,taskPos:-1});addL(s2,s2.players[s2.curIdx].name+" 🌀 teleports!");commitTurn(s2);advTurn(dc(GS));});})(i);}},100);return;}
-  if(card.type==="freeze"){var others=s.players.filter(function(p,i){return i!==s.curIdx&&p&&!p.done;});commitTurn(s);showP("❄️ Freeze Frame","info","Choose a player to freeze for 2 turns:",others.map(function(op){return{l:(op.isAI?"🤖 ":"")+op.name,c:"pp",fn:(function(opid){return function(){var s2=dc(GS);for(var i=0;i<s2.players.length;i++)if(s2.players[i]&&s2.players[i].id===opid){s2.players[i]=mg(s2.players[i],{frozen:2});break;}addL(s2,s2.players[s2.curIdx].name+" ❄️ froze "+op.name);commitTurn(s2);hideP();};})(op.id)};}));return;}
-  if(card.type==="robbery"){var others2=s.players.filter(function(p,i){return i!==s.curIdx&&p&&!p.done;});commitTurn(s);showP("💰 Highway Robbery","info","Steal ALL money from:",others2.map(function(op){return{l:(op.isAI?"🤖 ":"")+op.name+" ($"+op.money+")",c:"pp",fn:(function(opid){return function(){var s2=dc(GS),stolen=0;for(var i=0;i<s2.players.length;i++)if(s2.players[i]&&s2.players[i].id===opid){stolen=s2.players[i].money;s2.players[i]=mg(s2.players[i],{money:0});break;}s2.players[s2.curIdx]=mg(s2.players[s2.curIdx],{money:s2.players[s2.curIdx].money+stolen});addL(s2,s2.players[s2.curIdx].name+" 💰 robbed $"+stolen);commitTurn(s2);hideP();};})(op.id)};}));return;}
-}
-
-function debtR(){
-  if(!GS)return;var pl=GS.players[GS.curIdx];
-  if(!pl.completedTasks||!pl.completedTasks.length){showP("💸 Debt Relief","debt","No completed challenges to sacrifice.",[{l:"Close",c:"pn",fn:hideP}]);return;}
-  var lbls={boat_school:"🎓 Boat School",boat:"🛥️ Boat",fish:"🐟 Fish",rescue:"🆘 Rescues"};
-  var btns=pl.completedTasks.map(function(tk){return{l:lbls[tk]||tk,c:"pw",fn:(function(ttk){return function(){var s=dc(GS),p2=mg(s.players[s.curIdx],{money:0,completedTasks:s.players[s.curIdx].completedTasks.filter(function(x){return x!==ttk;})});if(ttk==="boat_school")p2=mg(p2,{graduated:false,stars:0});if(ttk==="fish")p2=mg(p2,{fish:0});if(ttk==="rescue")p2=mg(p2,{rescues:0});if(ttk==="boat")p2=mg(p2,{boat:null});s.players[s.curIdx]=p2;addL(s,p2.name+" used debt relief");commitTurn(s);hideP();};})(tk)};});
-  btns.push({l:"Cancel",c:"pn",fn:hideP});showP("💸 Debt Relief","debt","Sacrifice a challenge to reset balance to $0:",btns);
-}
-
-function inspP(i){
-  if(!GS)return;var pl=GS.players[i];if(!pl)return;
-  var showCards=isCardOwner(GS,i)||(!isOnlineMultiplayer&&!GS.players.some(function(p){return p&&p.isAI;}));
-  var tks=["boat_school","boat","fish","rescue"],lines="💰 $"+pl.money+(pl.money<0?" ⚠️ IN DEBT":"")+"\n\n";
-  for(var j=0;j<tks.length;j++){var tk=tks[j],done=(pl.completedTasks||[]).indexOf(tk)>=0,t=TASKS[tk];if(!t)continue;var status=done?(tk==="boat"?(pl.boat?(BOAT_EMOJIS[pl.boat.name]||"🛥️")+" "+pl.boat.name:"owned"):t.done||"done"):t.prog(pl);lines+=(done?"✅ ":"⬜ ")+t.label+": "+status+"\n";}
-  if(pl.heldCards&&pl.heldCards.length){
-    if(showCards)lines+="\n🃏 "+pl.heldCards.map(function(c){return c.icon+" "+c.label;}).join(", ");
-    else lines+="\n🃏 "+pl.heldCards.length+" Shipwreck card"+(pl.heldCards.length!==1?"s":"")+" available";
-  }
-  if(pl.frozen>0)lines+="\n❄️ Frozen: "+pl.frozen+" turn(s)";
-  showP((pl.isAI?"🤖 ":"")+pl.name,"info",lines,[{l:"Close",c:"pn",fn:hideP}]);
-}
-
-// ── TRADE ──
-function toggleTradePanel(){tradeOpen=!tradeOpen;renderAct(GS,GS.players[GS.curIdx]);}
-function buildTradePanel(s,cur){
-  var tp=document.getElementById("tradePanel");if(!tp)return;
-  var others=[];for(var i=0;i<s.players.length;i++)if(i!==s.curIdx&&s.players[i]&&!s.players[i].done)others.push({pl:s.players[i],idx:i});
-  if(!others.length){tp.innerHTML='<div style="font-size:11px;color:#aaa;padding:6px">No other active players.</div>';return;}
-  var h='<div style="background:#0d2137;border-radius:8px;padding:10px;margin-top:6px;border:1px solid #1a3a55"><div style="font-size:10px;color:#f5a623;font-weight:700;margin-bottom:8px">🤝 PROPOSE TRADE</div><select id="trTarget" style="width:100%;padding:4px;border-radius:5px;background:#071728;color:#fff;border:1px solid #1a3a55;font-size:11px;margin-bottom:8px">';
-  for(var i=0;i<others.length;i++)h+='<option value="'+others[i].idx+'">'+(others[i].pl.isAI?"🤖 ":"")+others[i].pl.name+'</option>';h+='</select>';
-  var gf=[{id:"tgMoney",lbl:"💰 Money",note:"$"+cur.money},{id:"tgFish",lbl:"🐟 Fish",note:cur.fish},{id:"tgRescues",lbl:"🆘 Rescues",note:cur.rescues},{id:"tgStars",lbl:"⭐ Stars",note:cur.stars}];
-  h+='<div style="font-size:10px;color:#4eff91;font-weight:700;margin-bottom:4px">YOU GIVE:</div>';
-  for(var i=0;i<gf.length;i++)h+='<div style="display:flex;align-items:center;gap:5px;margin-bottom:4px"><label style="font-size:11px;color:#aaa;width:70px">'+gf[i].lbl+'</label><input id="'+gf[i].id+'" type="number" min="0" value="0" style="width:50px;padding:2px 5px;border-radius:4px;background:#071728;border:1px solid #1a3a55;color:#fff;font-size:11px"/><span style="font-size:9px;color:#555">have '+gf[i].note+'</span></div>';
-  h+='<div style="display:flex;align-items:center;gap:5px;margin-bottom:6px"><label style="font-size:11px;color:#aaa;width:70px">🃏 Card</label><select id="tgCard" style="flex:1;padding:2px 4px;border-radius:4px;background:#071728;border:1px solid #1a3a55;color:#fff;font-size:10px"><option value="">None</option>';
-  if(cur.heldCards)for(var ci=0;ci<cur.heldCards.length;ci++){var c=cur.heldCards[ci];h+='<option value="'+ci+'">'+c.icon+' '+c.label+'</option>';}
-  h+='</select></div><div style="font-size:10px;color:#ff9999;font-weight:700;margin-bottom:4px">YOU WANT:</div>';
-  var wf=[{id:"trMoney",lbl:"💰 Money"},{id:"trFish",lbl:"🐟 Fish"},{id:"trRescues",lbl:"🆘 Rescues"},{id:"trStars",lbl:"⭐ Stars"}];
-  for(var i=0;i<wf.length;i++)h+='<div style="display:flex;align-items:center;gap:5px;margin-bottom:4px"><label style="font-size:11px;color:#aaa;width:70px">'+wf[i].lbl+'</label><input id="'+wf[i].id+'" type="number" min="0" value="0" style="width:50px;padding:2px 5px;border-radius:4px;background:#071728;border:1px solid #1a3a55;color:#fff;font-size:11px"/></div>';
-  h+='<div style="display:flex;gap:6px;margin-top:8px"><button id="btnSendTrade" style="flex:1;padding:6px;border-radius:6px;border:none;background:#1a7a3a;color:#fff;font-weight:600;font-size:11px;cursor:pointer">📤 Send</button><button id="btnCancelTrade" style="flex:1;padding:6px;border-radius:6px;border:none;background:#444;color:#fff;font-size:11px;cursor:pointer">✕ Cancel</button></div></div>';
-  tp.innerHTML=h;
-  document.getElementById("btnSendTrade").addEventListener("click",sendTrade);
-  document.getElementById("btnCancelTrade").addEventListener("click",function(){tradeOpen=false;renderAct(GS,GS.players[GS.curIdx]);});
-}
-function sendTrade(){if(!GS)return;var s=dc(GS),cur=s.players[s.curIdx];var toIdx=parseInt(document.getElementById("trTarget").value);var cardEl=document.getElementById("tgCard");var cardIdx=cardEl&&cardEl.value!==""?parseInt(cardEl.value):-1;var tp={fromIdx:s.curIdx,toIdx:toIdx,give:{money:parseInt(document.getElementById("tgMoney").value)||0,fish:parseInt(document.getElementById("tgFish").value)||0,rescues:parseInt(document.getElementById("tgRescues").value)||0,stars:parseInt(document.getElementById("tgStars").value)||0,cardIdx:cardIdx},want:{money:parseInt(document.getElementById("trMoney").value)||0,fish:parseInt(document.getElementById("trFish").value)||0,rescues:parseInt(document.getElementById("trRescues").value)||0,stars:parseInt(document.getElementById("trStars").value)||0},responded:false};tradeOpen=false;if(s.players[toIdx]&&s.players[toIdx].isAI){var net=(tp.give.money-tp.want.money)+(tp.give.fish-tp.want.fish)*2;if(net>=0||Math.random()<0.35){executeTrade(tp,s);addL(s,"🤖 AI accepts trade!");}else addL(s,"🤖 AI declines trade.");commitTurn(s);}else{s.pendingTrade=tp;addL(s,cur.name+" proposes a trade!");commitTurn(s);showTradeOffer(tp,s);}}
-function showTradeOffer(tp,s,isCounter){var from=s.players[tp.fromIdx],to=s.players[tp.toIdx],g=tp.give,w=tp.want,gs=[],ws=[];if(g.money>0)gs.push("$"+g.money);if(g.fish>0)gs.push(g.fish+" 🐟");if(g.rescues>0)gs.push(g.rescues+" 🆘");if(g.stars>0)gs.push(g.stars+" ⭐");if(g.cardIdx>=0&&from.heldCards&&from.heldCards[g.cardIdx])gs.push("1 Shipwreck card");if(w.money>0)ws.push("$"+w.money);if(w.fish>0)ws.push(w.fish+" 🐟");if(w.rescues>0)ws.push(w.rescues+" 🆘");if(w.stars>0)ws.push(w.stars+" ⭐");var body="Gives: "+(gs.join(", ")||"nothing")+"\nWants: "+(ws.join(", ")||"nothing")+"\n\n"+to.name+", accept?";var bl=[{l:"✅ Accept",c:"pp",fn:function(){var s2=dc(GS);executeTrade(tp,s2);s2.pendingTrade=null;addL(s2,to.name+" accepts! 🤝");commitTurn(s2);hideP();}},{l:"❌ Decline",c:"pn",fn:function(){var s2=dc(GS);s2.pendingTrade=null;addL(s2,to.name+" declines.");commitTurn(s2);hideP();}}];if(!isCounter)bl.push({l:"🔄 Counter",c:"pw",fn:function(){hideP();showCounterPanel(tp,s);}});showP((isCounter?"Counter from ":"Trade from ")+from.name,"info",body,bl);}
-function showCounterPanel(origTp,s){var from=s.players[origTp.fromIdx],to=s.players[origTp.toIdx];document.getElementById("phd").style.background="#1a5276";document.getElementById("phd").innerHTML='<div style="font-size:18px;font-weight:700;color:#fff">🔄 Counter to '+from.name+'</div>';document.getElementById("pbd").innerHTML='<div style="font-size:12px;color:#1565c0;font-weight:700;margin-bottom:6px">YOU GIVE:</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px"><span style="font-size:11px">💰<input id="ctgM" type="number" min="0" value="0" style="width:45px;margin:0 3px;border-radius:4px;border:1px solid #ccc;padding:2px 4px"/></span><span style="font-size:11px">🐟<input id="ctgF" type="number" min="0" value="0" style="width:45px;margin:0 3px;border-radius:4px;border:1px solid #ccc;padding:2px 4px"/></span><span style="font-size:11px">🆘<input id="ctgR" type="number" min="0" value="0" style="width:45px;margin:0 3px;border-radius:4px;border:1px solid #ccc;padding:2px 4px"/></span><span style="font-size:11px">⭐<input id="ctgS" type="number" min="0" value="0" style="width:45px;margin:0 3px;border-radius:4px;border:1px solid #ccc;padding:2px 4px"/></span></div><div style="font-size:12px;color:#c0392b;font-weight:700;margin-bottom:6px">YOU WANT:</div><div style="display:flex;gap:8px;flex-wrap:wrap"><span style="font-size:11px">💰<input id="ctrM" type="number" min="0" value="0" style="width:45px;margin:0 3px;border-radius:4px;border:1px solid #ccc;padding:2px 4px"/></span><span style="font-size:11px">🐟<input id="ctrF" type="number" min="0" value="0" style="width:45px;margin:0 3px;border-radius:4px;border:1px solid #ccc;padding:2px 4px"/></span><span style="font-size:11px">🆘<input id="ctrR" type="number" min="0" value="0" style="width:45px;margin:0 3px;border-radius:4px;border:1px solid #ccc;padding:2px 4px"/></span><span style="font-size:11px">⭐<input id="ctrS" type="number" min="0" value="0" style="width:45px;margin:0 3px;border-radius:4px;border:1px solid #ccc;padding:2px 4px"/></span></div>';var f=document.getElementById("pft");f.innerHTML="";var sb=document.createElement("button");sb.textContent="📤 Send Counter";sb.className="pp";sb.onclick=function(){var ctp={fromIdx:origTp.toIdx,toIdx:origTp.fromIdx,give:{money:parseInt(document.getElementById("ctgM").value)||0,fish:parseInt(document.getElementById("ctgF").value)||0,rescues:parseInt(document.getElementById("ctgR").value)||0,stars:parseInt(document.getElementById("ctgS").value)||0,cardIdx:-1},want:{money:parseInt(document.getElementById("ctrM").value)||0,fish:parseInt(document.getElementById("ctrF").value)||0,rescues:parseInt(document.getElementById("ctrR").value)||0,stars:parseInt(document.getElementById("ctrS").value)||0},responded:false};var s2=dc(GS);s2.pendingTrade=ctp;addL(s2,to.name+" counters!");commitTurn(s2);hideP();if(s2.players[ctp.toIdx]&&s2.players[ctp.toIdx].isAI){setTimeout(function(){var s3=dc(GS);if(Math.random()<0.5){executeTrade(ctp,s3);addL(s3,"🤖 AI accepts counter!");}else addL(s3,"🤖 AI declines.");commitTurn(s3);},700);}else showTradeOffer(ctp,s2,true);};var cb=document.createElement("button");cb.textContent="Cancel";cb.className="pn";cb.onclick=hideP;f.appendChild(sb);f.appendChild(cb);document.getElementById("po").classList.add("on");}
-function executeTrade(tp,s){var f=s.players[tp.fromIdx],t=s.players[tp.toIdx],g=tp.give,w=tp.want;if(g.cardIdx>=0&&f.heldCards&&f.heldCards[g.cardIdx]){var card=f.heldCards[g.cardIdx];t.heldCards=(t.heldCards||[]).concat([card]);f.heldCards=f.heldCards.filter(function(_,i){return i!==g.cardIdx;});}f=mg(f,{money:f.money-(g.money||0),fish:Math.max(0,f.fish-(g.fish||0)),rescues:Math.max(0,f.rescues-(g.rescues||0)),stars:Math.max(0,f.stars-(g.stars||0))});t=mg(t,{money:t.money+(g.money||0),fish:t.fish+(g.fish||0),rescues:t.rescues+(g.rescues||0),stars:t.stars+(g.stars||0)});t=mg(t,{money:t.money-(w.money||0),fish:Math.max(0,t.fish-(w.fish||0)),rescues:Math.max(0,t.rescues-(w.rescues||0)),stars:Math.max(0,t.stars-(w.stars||0))});f=mg(f,{money:f.money+(w.money||0),fish:f.fish+(w.fish||0),rescues:f.rescues+(w.rescues||0),stars:f.stars+(w.stars||0)});s.players[tp.fromIdx]=f;s.players[tp.toIdx]=t;addL(s,"🤝 Trade: "+f.name+" ↔ "+t.name);}
-
-// ── BOARD DRAWING ──
-var NS="http://www.w3.org/2000/svg";
-function mkEl(tag,attrs){var e=document.createElementNS(NS,tag);for(var k in attrs)e.setAttribute(k,attrs[k]);return e;}
-function mkTxt(str,attrs){var e=mkEl("text",attrs);e.textContent=str;return e;}
-function drawBoard(){
-  var svg=document.getElementById("bsvg");svg.setAttribute("width",BW);svg.setAttribute("height",BH);svg.innerHTML="";
-  var defs=mkEl("defs",{});var st=document.createElementNS(NS,"style");st.textContent="@keyframes wa{0%{transform:translateX(0)}100%{transform:translateX(-140px)}}@keyframes wb{0%{transform:translateX(0)}100%{transform:translateX(140px)}}@keyframes wc{0%{transform:translateX(-70px)}100%{transform:translateX(70px)}}";defs.appendChild(st);var cl=mkEl("clipPath",{id:"bc"});cl.appendChild(mkEl("rect",{width:BW,height:BH}));defs.appendChild(cl);svg.appendChild(defs);
-  svg.appendChild(mkEl("rect",{width:BW,height:BH,fill:"#5aaec8"}));
-  var wst=["wa","wb","wc"];for(var row=0;row<18;row++){var gg=mkEl("g",{style:"animation:"+wst[row%3]+" "+(2.5+row*0.3)+"s linear infinite","clip-path":"url(#bc)"});var wxs=[-280,-140,0,140,280,420,560,700,840,980,1120,1260,1400];for(var wi=0;wi<wxs.length;wi++){var wx=wxs[wi];gg.appendChild(mkEl("path",{d:"M"+wx+" "+(55+row*52)+" Q"+(wx+17)+" "+(45+row*52)+" "+(wx+35)+" "+(55+row*52)+" Q"+(wx+52)+" "+(65+row*52)+" "+(wx+70)+" "+(55+row*52),stroke:"#7ecbe0","stroke-width":2,fill:"none",opacity:0.5}));}svg.appendChild(gg);}
-  svg.appendChild(mkEl("rect",{x:OL-SW,y:OT-SW,width:OR-OL+SW*2,height:OB-OT+SW*2,rx:22,fill:"#d6b87a",opacity:0.9}));
-  svg.appendChild(mkEl("rect",{x:OL-SW/2,y:OT-SW/2,width:OR-OL+SW,height:OB-OT+SW,rx:16,fill:"#4a9ebb",opacity:0.9}));
-  svg.appendChild(mkTxt("Boat Ride 2.0",{x:(OL+OR)/2,y:(OT+OB)/2-14,"text-anchor":"middle","font-size":26,"font-weight":900,fill:"#fff",stroke:"#1a3a55","stroke-width":4,"paint-order":"stroke",opacity:0.45}));
-  svg.appendChild(mkTxt("Supreme Boat Captain Race",{x:(OL+OR)/2,y:(OT+OB)/2+20,"text-anchor":"middle","font-size":16,"font-weight":700,fill:"#fff",stroke:"#1a3a55","stroke-width":4,"paint-order":"stroke",opacity:0.45}));
-  drawJuts(svg);drawOval(svg);svg.appendChild(mkEl("g",{id:"tlayer"}));applyScale();
-}
-function jLP(k){if(k==="boat_school"){var b=oPos(5);return{x:b.x,y:b.y-3*SW-SW-10};}if(k==="boat"){var b=oPos(12);return{x:b.x-2*SW,y:b.y-SW/2-SW-10};}if(k==="fish"){var b=oPos(19);return{x:b.x,y:b.y+4*SW+SW+10};}if(k==="rescue"){var b=oPos(26);return{x:b.x,y:b.y+SW/2+3*SW+10};}if(k==="winner"){var b=oPos(33);return{x:b.x+2*SW,y:b.y-SW-10};}return null;}
-function drawJuts(svg){
-  var jcols={boat_school:"#a855f7",boat:"#fb923c",fish:"#34d399",rescue:"#60a5fa",winner:"#fbbf24"};
-  var jlbls={boat_school:"🎓 Boat School",boat:"🛥️ Boat Store",fish:"🐟 Catch a Fish",rescue:"🆘 Rescue!"};
-  var wjd=JC.winner;for(var i=0;i<wjd.pts.length-1;i++)svg.appendChild(mkEl("line",{x1:wjd.pts[i].x,y1:wjd.pts[i].y,x2:wjd.pts[i+1].x,y2:wjd.pts[i+1].y,stroke:"#c47d0e","stroke-width":SW+1,"stroke-opacity":0.15}));
-  var wlbls=["Dock 1","Lose Turn","Back 1","⭐ WIN"];
-  for(var i=0;i<wjd.pts.length;i++){var pt=wjd.pts[i],gj=mkEl("g",{});gj.appendChild(mkEl("rect",{x:pt.x-SW/2,y:pt.y-SH/2,width:SW,height:SH,rx:6,fill:i===3?"#f5a623":"#c47d0e",stroke:"#ffffffa0","stroke-width":0.8}));var pp2=wlbls[i].split(" ");gj.appendChild(mkTxt(pp2[0],{x:pt.x,y:pt.y-4,"text-anchor":"middle","dominant-baseline":"central","font-size":9,fill:"#fff","font-weight":"bold"}));if(pp2.length>1)gj.appendChild(mkTxt(pp2.slice(1).join(" "),{x:pt.x,y:pt.y+8,"text-anchor":"middle","dominant-baseline":"central","font-size":9,fill:"#fff"}));svg.appendChild(gj);}
-  var tkeys=Object.keys(TASKS);
-  for(var ki=0;ki<tkeys.length;ki++){
-    var key=tkeys[ki],t=TASKS[key],jd=JC[key];
-    for(var i=0;i<jd.pts.length-1;i++)svg.appendChild(mkEl("line",{x1:jd.pts[i].x,y1:jd.pts[i].y,x2:jd.pts[i+1].x,y2:jd.pts[i+1].y,stroke:t.color,"stroke-width":SW+1,"stroke-opacity":0.15}));
-    for(var i=0;i<jd.pts.length;i++){
-      var pt2=jd.pts[i],g2=mkEl("g",{});
-      if(key==="boat"){var boat=BOATS[i];g2.appendChild(mkEl("rect",{x:pt2.x-SW/2,y:pt2.y-SH/2,width:SW,height:SH,rx:6,fill:t.color,stroke:"#ffffffa0","stroke-width":0.8}));g2.appendChild(mkTxt(boat.icon,{x:pt2.x,y:pt2.y-6,"text-anchor":"middle","dominant-baseline":"central","font-size":14}));g2.appendChild(mkTxt("$"+boat.price,{x:pt2.x,y:pt2.y+10,"text-anchor":"middle","dominant-baseline":"central","font-size":9,fill:"#FFD700"}));}
-      else{var sp=t.spaces[i],rw=sp?sp.reward:null;g2.appendChild(mkEl("rect",{x:pt2.x-SW/2,y:pt2.y-SH/2,width:SW,height:SH,rx:6,fill:t.color,stroke:"#ffffffa0","stroke-width":0.8}));if(rw!==null&&rw!==undefined){var ic=key==="boat_school"?"⭐":key==="fish"?"🐟":"🆘";if(rw<0){g2.appendChild(mkTxt(String(rw),{x:pt2.x,y:pt2.y,"text-anchor":"middle","dominant-baseline":"central","font-size":13,"font-weight":"bold",fill:"#ff4444"}));}else if(rw===0){g2.appendChild(mkTxt("+0",{x:pt2.x,y:pt2.y,"text-anchor":"middle","dominant-baseline":"central","font-size":11,"font-weight":"bold",fill:"#FFD700"}));}else{var cols=rw<=2?rw:rw<=4?2:3,rows=Math.ceil(rw/cols),iconSize=rw<=2?14:rw<=4?11:9,spacingX=iconSize+2,spacingY=iconSize+2,totalH=(rows-1)*spacingY,count=0;for(var row2=0;row2<rows&&count<rw;row2++){var rowCols=Math.min(cols,rw-count),rowW=(rowCols-1)*spacingX;for(var col2=0;col2<rowCols;col2++){g2.appendChild(mkTxt(ic,{x:pt2.x-rowW/2+col2*spacingX,y:pt2.y-totalH/2+row2*spacingY,"text-anchor":"middle","dominant-baseline":"central","font-size":iconSize}));count++;}}}}}
-      svg.appendChild(g2);
-    }
-    if(jd.xp){var xg=mkEl("g",{});xg.appendChild(mkEl("rect",{x:jd.xp.x-SW/2,y:jd.xp.y-SH/2,width:SW,height:SH,rx:8,fill:sColor("entry_"+key),stroke:"#ffffffa0","stroke-width":0.8}));xg.appendChild(mkTxt(key==="boat_school"?"🎓":key==="boat"?"🛥️":key==="fish"?"🐟":"🆘",{x:jd.xp.x,y:jd.xp.y,"text-anchor":"middle","dominant-baseline":"central","font-size":18}));svg.appendChild(xg);}
-    var lp=jLP(key);if(lp){var lg=mkEl("g",{});lg.appendChild(mkEl("rect",{x:lp.x-60,y:lp.y-13,width:120,height:24,rx:6,fill:"rgba(7,23,40,0.92)",stroke:jcols[key]||"#fff","stroke-width":1.5}));lg.appendChild(mkTxt(jlbls[key]||key,{x:lp.x,y:lp.y,"text-anchor":"middle","dominant-baseline":"central","font-size":11,"font-weight":"bold",fill:jcols[key]||"#fff"}));svg.appendChild(lg);}
-  }
-  var wlp=jLP("winner");if(wlp){var wlg=mkEl("g",{});wlg.appendChild(mkEl("rect",{x:wlp.x-64,y:wlp.y-24,width:128,height:36,rx:6,fill:"rgba(7,23,40,0.92)",stroke:"#fbbf24","stroke-width":1.5}));wlg.appendChild(mkTxt("🏆 Supreme Boat",{x:wlp.x,y:wlp.y-8,"text-anchor":"middle","dominant-baseline":"central","font-size":10,"font-weight":"bold",fill:"#fbbf24"}));wlg.appendChild(mkTxt("Captain HQ",{x:wlp.x,y:wlp.y+8,"text-anchor":"middle","dominant-baseline":"central","font-size":10,"font-weight":"bold",fill:"#fbbf24"}));svg.appendChild(wlg);}
-}
-function drawOval(svg){
-  var exits={};Object.keys(TASKS).forEach(function(k){exits[TASKS[k].exitIdx]=true;});
-  for(var i=0;i<36;i++){
-    var pos=oPos(i),x=pos.x,y=pos.y,k=sKind(i),isEnt=k.indexOf("entry_")===0;
-    Object.keys(TASKS).forEach(function(tk){var t=TASKS[tk];if(i===t.entryIdx){var p=jPerp(t.entryIdx);x-=p.x*(t.colGap||SW)/2;y-=p.y*(t.colGap||SW)/2;}});
-    var fill=exits[i]?"#c8a96e":sColor(k);
-    var g=mkEl("g",{id:"sp"+i});
-    g.appendChild(mkEl("rect",{x:x-SW/2,y:y-SH/2,width:SW,height:SH,rx:(isEnt||k==="start")?8:5,fill:fill,stroke:k==="start"?"#7dff9a":"#ffffffa0","stroke-width":k==="start"?2.5:0.8}));
-    if(k==="start"){
-      // Bold green START label
-      g.appendChild(mkTxt("START",{x:x,y:y,"text-anchor":"middle","dominant-baseline":"central","font-size":9,fill:"#7dff9a","font-weight":"900"}));
-    } else if(k==="swim"){
-      g.appendChild(mkTxt("🏊",{x:x,y:y,"text-anchor":"middle","dominant-baseline":"central","font-size":18}));
-    } else if(k==="sink"){
-      g.appendChild(mkTxt("🌊",{x:x,y:y,"text-anchor":"middle","dominant-baseline":"central","font-size":18}));
-    } else if(k==="entry_winner"){
-      g.appendChild(mkTxt("⭐",{x:x,y:y,"text-anchor":"middle","dominant-baseline":"central","font-size":18}));
-    }
-    svg.appendChild(g);
-  }
-}
-function pXY(pl){if(pl.winPos>=0){var pts=JC.winner?JC.winner.pts:[];if(pts[pl.winPos])return pts[pl.winPos];}if(pl.inTask){var jd=JC[pl.inTask];if(jd){if(pl.taskPos>=0&&jd.pts[pl.taskPos])return jd.pts[pl.taskPos];return jd.ep||oPos(TASKS[pl.inTask].entryIdx);}}return oPos(pl.pos);}
-function updateTok(s){
-  var layer=document.getElementById("tlayer");if(!layer)return;layer.innerHTML="";
-  var groups={};for(var i=0;i<s.players.length;i++){var pl=s.players[i];if(!pl||pl.eliminated)continue;var xy=pXY(pl),k=Math.round(xy.x)+","+Math.round(xy.y);if(!groups[k])groups[k]=[];groups[k].push({pl:pl,pi:i});}
-  Object.keys(groups).forEach(function(gk){var grp=groups[gk],pts2=gk.split(","),bx=parseFloat(pts2[0]),by=parseFloat(pts2[1]);for(var oi=0;oi<grp.length;oi++){var pl=grp[oi].pl,pi=grp[oi].pi,act=pi===s.curIdx;var ox=grp.length>1?(oi-(grp.length-1)/2)*28:0,oy=grp.length>1?-oi*6:0;var gg=mkEl("g",{transform:"translate("+(bx+ox)+","+(by+oy)+")"});gg.innerHTML=tokenSVG(pl.tokenKey||"captain",pl.color,act);var ws2=pl.name.split(" ");for(var wi=0;wi<ws2.length;wi++)gg.appendChild(mkTxt(ws2[wi],{x:0,y:30+wi*10,"text-anchor":"middle","dominant-baseline":"central","font-size":8,fill:"#fff","font-weight":"bold",stroke:"#000","stroke-width":0.6,"paint-order":"stroke"}));layer.appendChild(gg);}});
-}
-
-// ── TRANSITION ──
-function showTrans(){
-  if(!GS||showTransActive)return;
-  var cur=GS.players[GS.curIdx];if(!cur)return;
-  // Defensive: check isAI strictly
-  var curIsAI=(cur.isAI===true);
-  showTransActive=true;
-  var mine=isMyTurnNow();
-  var isAIGame=GS.players.some(function(p){return p&&p.isAI===true;});
-  var nameLabel;
-  if(isOnlineMultiplayer){nameLabel=mine?"Your Turn!":cur.name+"'s Turn";}
-  else if(isAIGame){nameLabel=(mine&&!curIsAI)?"Your Turn!":cur.name+"'s Turn";}
-  else{nameLabel=cur.name+"'s Turn";}
-  document.getElementById("trsub").textContent=curIsAI?"🤖 AI TURN":"NEXT UP";
-  document.getElementById("trdot").style.background=cur.color;
-  document.getElementById("trdot").style.boxShadow="0 0 20px "+cur.color;
-  document.getElementById("trname").textContent=nameLabel;
-  document.getElementById("trstats").textContent="💰$"+cur.money+(cur.money<0?" ⚠️ IN DEBT":"")+" | "+(cur.completedTasks||[]).length+"/4";
-  document.getElementById("trBtn").style.display=(curIsAI||!mine)?"none":"block";
-  document.getElementById("tro").classList.add("on");
-  if(curIsAI){
-    var delay=aiSpeed==="fast"?300:1800;
-    setTimeout(function(){
-      showTransActive=false;
-      document.getElementById("tro").classList.remove("on");
-      if(GS)GS.phase="preturn";
-      renderAll();
-      setTimeout(function(){
-        if(GS&&GS.players[GS.curIdx]&&GS.players[GS.curIdx].isAI===true&&!aiRunning){
-          runAI();
-        }
-      },aiSpeed==="fast"?100:400);
-    },delay);
-  }
-}
-function disTrans(){
-  showTransActive=false;document.getElementById("tro").classList.remove("on");if(!GS)return;
-  GS.phase="preturn";if(isOnlineMultiplayer&&isMyTurnNow())writeToFirebase(GS);
-  renderAll();setTimeout(function(){centerOn(GS?GS.curIdx:0);},50);
-}
-
-// ── POPUP ──
-var ACOLS={swim:"#1565c0",sink:"#b71c1c",debt:"#c0392b",info:"#1a3a55",success:"#1a7a3a"};
-function showP(title,accent,body,btns,isSpectator){
-  document.getElementById("phd").style.background=ACOLS[accent]||"#1a3a55";
-  document.getElementById("phd").innerHTML='<div style="font-size:18px;font-weight:700;color:#fff">'+title+'</div>';
-  document.getElementById("pbd").textContent=body;
-  var f=document.getElementById("pft");f.innerHTML="";
-  if(isSpectator){var note=document.createElement("div");note.style.cssText="font-size:11px;color:#888;text-align:center;padding:4px 0";note.textContent="⏳ Waiting for "+(GS&&GS.players&&GS.players[GS.curIdx]?GS.players[GS.curIdx].name:"other player")+"...";f.appendChild(note);}
-  else{var isAITurn=GS&&GS.players[GS.curIdx]&&GS.players[GS.curIdx].isAI;if(isAITurn&&aiSpeed==="show"){var note2=document.createElement("div");note2.style.cssText="font-size:11px;color:#aaa;text-align:center;padding:4px 0";note2.textContent="⏳ Continuing in 2s...";f.appendChild(note2);document.getElementById("po").classList.add("on");var cb0=btns&&btns.length&&btns[0]&&btns[0].fn?btns[0].fn:null;setTimeout(function(){hideP();if(cb0)cb0();},2000);return;}(btns||[]).forEach(function(b){var btn=document.createElement("button");btn.textContent=b.l;btn.className=b.c||"pn";btn.onclick=function(){hideP();if(b.fn)b.fn();};f.appendChild(btn);});}
-  document.getElementById("po").classList.add("on");
-}
-function hideP(){document.getElementById("po").classList.remove("on");}
-function showWin(player){
-  document.getElementById("wname").textContent=player.name;
-  document.getElementById("wname").style.color=player.color;
-  document.getElementById("wo").classList.add("on");
-  // Clear online room record — game is over
-  if(isOnlineMultiplayer&&currentUser)clearOnlineRoom();
-  refreshResumeBtn();
-}
-
-// ── ZOOM ──
-var ZL=[0.4,0.55,0.7,0.85,1.0,1.2,1.5,1.8,2.0,2.2];
-function zoomIn(){var idx=ZL.indexOf(scale);if(idx<0)idx=8;scale=ZL[Math.min(idx+1,ZL.length-1)];applyScale();}
-function zoomOut(){var idx=ZL.indexOf(scale);if(idx<0)idx=8;scale=ZL[Math.max(idx-1,0)];applyScale();}
-function applyScale(){var w=document.getElementById("bwrap");w.style.transform="scale("+scale+")";w.style.width=BW+"px";w.style.height=BH+"px";w.style.minWidth=Math.ceil(BW*scale)+"px";w.style.minHeight=Math.ceil(BH*scale)+"px";document.getElementById("zlbl").textContent=Math.round(scale*100)+"%";}
-
-document.getElementById("btnLeave").addEventListener("click",leaveGame);
-document.getElementById("btnZI").addEventListener("click",zoomIn);
-document.getElementById("btnZO").addEventListener("click",zoomOut);
-document.getElementById("btnCtr").addEventListener("click",function(){centerOn(GS?GS.curIdx:0);});
-document.getElementById("btnWL").addEventListener("click",leaveGame);
-document.getElementById("trBtn").addEventListener("click",disTrans);
-document.getElementById("ji").addEventListener("keydown",function(e){if(e.key==="Enter")document.getElementById("btnGoJoin").click();});
-</script>
-</body>
-</html>
-+pl.money+(pl.money<0?" ⚠️":"")+" | "+(pl.completedTasks||[]).length+"/4"+(pl.frozen>0?" ❄️"+pl.frozen:"")+'</div>'
-      +'</div></div>';
-  }
-  document.getElementById("plist").innerHTML=h;
-  document.getElementById("plist").querySelectorAll("[data-pi]").forEach(function(row){
-    row.addEventListener("click",function(){inspP(parseInt(row.getAttribute("data-pi")));});
-  });
-}
-
-function renderCur(s,cur){
-  document.getElementById("ctn").textContent=(cur.isAI?"🤖 ":"")+cur.name;document.getElementById("ctn").style.color=cur.color;
-  var pd=posD(cur);document.getElementById("ctp").textContent=pd||"";document.getElementById("ctp").style.display=pd?"":"none";
-  var id=cur.money<0;document.getElementById("ctm").innerHTML="💰 $"+cur.money+(id?" ⚠️ IN DEBT":"");document.getElementById("ctm").style.color=id?"#ff6b6b":"#7dff9a";
-  var tks=["boat_school","boat","fish","rescue"],h="";for(var i=0;i<tks.length;i++){var r=tLine(cur,tks[i]);h+='<div style="color:'+(r.g?"#4eff91":"#8aaccc")+'">'+r.t+'</div>';}document.getElementById("ctt").innerHTML=h;
-  document.getElementById("ctb").textContent=(cur.doubleRollsLeft||0)>0?"🎲 "+(cur.doubleRollsLeft||0)+" bonus roll(s)!":"";
-  renderCards(s,cur);
-}
-
-function isCardOwner(s,playerIdx){
-  // Show card details only to the actual player on this device
-  if(!isOnlineMultiplayer&&!s.players.some(function(p){return p&&p.isAI;})){return true;} // local multiplayer — show all
-  if(!isOnlineMultiplayer)return(playerIdx===0); // vs AI — only show player 0's cards (the human)
-  // Online: show only if this player's uid matches ours
-  var pl=s.players[playerIdx];return !!(pl&&pl.uid&&currentUser&&pl.uid===currentUser.uid);
-}
-
-function renderCards(s,cur){
-  var el=document.getElementById("cds");if(!cur.heldCards){el.innerHTML="";return;}
-  var showDetails=isCardOwner(s,s.curIdx);
-  if(!cur.heldCards.length){el.innerHTML="";return;}
-  if(!showDetails){
-    // Just show count — include fasttrack in count but don't name it
-    el.innerHTML='<div class="sl">CARDS</div><div style="font-size:11px;color:#7ecbe0;padding:3px 6px;background:#1a3a55;border-radius:5px;margin-bottom:3px">🃏 '+cur.heldCards.length+' Shipwreck card'+(cur.heldCards.length!==1?'s':'')+' available</div>';
-    return;
-  }
-  var mine=isMyTurnNow();
-  var h='<div class="sl">CARDS'+(cur.usedShipwreckThisTurn?" (1 played)":"")+"</div>";
-  for(var i=0;i<cur.heldCards.length;i++){var c=cur.heldCards[i];if(c.type==="fasttrack"){h+='<div style="display:flex;align-items:center;gap:5px;padding:3px 7px;border-radius:5px;background:#0f3d1a;border:1.5px solid #2ecc71;color:#2ecc71;font-size:10px;margin-bottom:3px">'+c.icon+" "+c.label+'<span style="margin-left:auto;font-size:8px;background:#2ecc71;color:#0a1f0e;border-radius:3px;padding:1px 4px;font-weight:700">ACTIVE</span></div>';}else{var bn=(cur.cardsBoughtThisTurn||[]).indexOf(c.uid)>=0;var dis=cur.usedShipwreckThisTurn||bn||!mine;h+='<button class="cb2" data-cardidx="'+i+'"'+(dis?" disabled":"")+">"+c.icon+" "+c.label+(bn?" — available next turn":"")+"</button>";}}
-  el.innerHTML=h;
-  el.querySelectorAll("[data-cardidx]").forEach(function(btn){btn.addEventListener("click",function(){openCard(parseInt(btn.getAttribute("data-cardidx")));});});
-}
-
-function renderAct(s,cur){
-  var el=document.getElementById("aa"),mine=isMyTurnNow();
-  if(!mine){var pd=posD(cur)||("Space "+cur.pos);var prog=["boat_school","boat","fish","rescue"].map(function(tk){var r=tLine(cur,tk);return'<div style="color:'+(r.g?"#4eff91":"#8aaccc")+'">'+r.t+'</div>';}).join("");el.innerHTML='<div style="background:#0d2137;border-radius:8px;padding:10px;border:1px solid #1a3a55"><div style="font-size:11px;color:#f5a623;font-weight:700;margin-bottom:6px">👁 Watching '+cur.name+'\'s turn...</div><div style="font-size:10px;color:#7ecbe0;margin-bottom:4px">📍 '+pd+'</div><div style="font-size:10px;margin-bottom:4px">💰 $'+cur.money+'</div><div style="font-size:10px;line-height:1.8">'+prog+'</div></div>';return;}
-  if(cur.isAI){el.innerHTML='<div style="text-align:center;padding:12px;color:#7ecbe0;font-size:12px">🤖 AI is thinking...</div>';return;}
-  if(s.phase==="rolling"){el.innerHTML='<div style="text-align:center;padding:8px;color:#7ecbe0;font-size:12px">🎲 Rolling...</div>';return;}
-  el.innerHTML="";
-  if(cur.money<0){var db2=document.createElement("button");db2.className="ab";db2.style.cssText="background:#1a0a0a;border:2px solid #c0392b;color:#ff9999;font-size:11px";db2.innerHTML="🆘 Eliminate Debt<div style='font-size:9px;font-weight:400;margin-top:1px'>Sacrifice challenge → reset to $0</div>";db2.addEventListener("click",debtR);el.appendChild(db2);}
-  var rb=document.createElement("button");rb.className="ab";rb.style.background=(cur.doubleRollsLeft||0)>0?"#d68910":"#1a7a3a";rb.innerHTML="🎲 Roll the Die!"+(((cur.doubleRollsLeft||0)>0)?" (+"+(cur.doubleRollsLeft||0)+")":"");rb.addEventListener("click",doRoll);el.appendChild(rb);
-  var bb=document.createElement("button");bb.className="ab";bb.style.background=cur.boughtCardThisTurn?"#333":"#6a1b9a";bb.innerHTML="🃏 Buy Shipwreck Card ($10)"+(cur.boughtCardThisTurn?" ✓":"");if(cur.boughtCardThisTurn)bb.disabled=true;bb.addEventListener("click",buyCard);el.appendChild(bb);
-  var tb=document.createElement("button");tb.className="ab";tb.style.background="#1a5a8a";tb.innerHTML="🤝 Propose a Trade";tb.addEventListener("click",toggleTradePanel);el.appendChild(tb);
-  var tp=document.createElement("div");tp.id="tradePanel";el.appendChild(tp);
-  if(tradeOpen)buildTradePanel(s,cur);
-}
-
-// ── DIE ──
-var DIE_DOTS={1:[[0,0]],2:[[-10,-10],[10,10]],3:[[-10,-10],[0,0],[10,10]],4:[[-10,-10],[10,-10],[-10,10],[10,10]],5:[[-10,-10],[10,-10],[0,0],[-10,10],[10,10]],6:[[-10,-10],[10,-10],[-10,0],[10,0],[-10,10],[10,10]]};
-function showDie(n){var el=document.getElementById("dieDisplay");if(!el)return;var dots=DIE_DOTS[n]||[];var svg='<svg width="52" height="52" viewBox="-28 -28 56 56"><rect x="-26" y="-26" width="52" height="52" rx="8" fill="#fff" stroke="#1a4a64" stroke-width="2"/>';for(var i=0;i<dots.length;i++)svg+='<circle cx="'+dots[i][0]+'" cy="'+dots[i][1]+'" r="4.5" fill="#1a4a64"/>';svg+='</svg>';el.innerHTML=svg;el.style.display='block';}
-function hideDie(){var el=document.getElementById("dieDisplay");if(el){el.innerHTML='';el.style.display='none';}}
-function posD(pl){if(pl.winPos>=0){var l=["Dock 1","Lose Turn","Back 1","⭐ WIN"];return"Winner's Dock: "+l[pl.winPos];}if(pl.inTask==="boat")return"🛥️ Boat Store: sp "+(pl.taskPos+1);if(pl.inTask)return(TASKS[pl.inTask]?TASKS[pl.inTask].label:pl.inTask)+": sp "+(pl.taskPos+1);return null;}
-function tLine(pl,tk){var done=(pl.completedTasks||[]).indexOf(tk)>=0;if(tk==="boat"){if(done)return{t:(pl.boat?BOAT_EMOJIS[pl.boat.name]||"🛥️":"🛥️")+" "+(pl.boat?pl.boat.name:"owned"),g:true};return{t:"⛵ No boat yet",g:false};}var t=TASKS[tk];if(!t)return{t:"",g:false};if(done)return{t:t.done||t.label,g:true};return{t:t.prog(pl),g:t.req(pl)};}
-
-// ── ANIMATION ──
-function animateSteps(playerIdx,steps,onDone){
-  if(!steps||!steps.length){onDone();return;}var i=0;
-  function next(){if(i>=steps.length){onDone();return;}var step=steps[i],isLast=(i===steps.length-1);i++;var pl=GS.players[playerIdx];if(!pl){onDone();return;}if(step.type==="oval")GS.players[playerIdx]=mg(pl,{pos:step.pos,inTask:null,taskPos:-1});else if(step.type==="task")GS.players[playerIdx]=mg(pl,{inTask:step.task,taskPos:step.taskPos});else if(step.type==="win")GS.players[playerIdx]=mg(pl,{winPos:step.winPos});updateTok(GS);centerOn(playerIdx);setTimeout(next,isLast?STEP_MS+LAND_PAUSE_MS:STEP_MS);}
-  next();
-}
-function centerOn(pi){if(!GS||!GS.players[pi])return;var xy=pXY(GS.players[pi]),bs=document.getElementById("bs");bs.scrollLeft=Math.max(0,xy.x*scale-bs.clientWidth/2);bs.scrollTop=Math.max(0,xy.y*scale-bs.clientHeight/2);}
-
-// ── GAME LOGIC ──
-function doRoll(){
-  if(!GS||!isMyTurnNow())return;var s=dc(GS),pl=s.players[s.curIdx];
-  if((pl.doubleRollsLeft||0)>0)pl.doubleRollsLeft--;
-  var r=Math.ceil(Math.random()*6);showDie(r);addL(s,pl.name+" 🎲 rolls "+r);s.players[s.curIdx]=pl;
-  if(isOnlineMultiplayer)writeToFirebase(s);else GS=s;renderAll();processRoll(r,s);
-}
-function processRoll(r,s){
-  var pl=s.players[s.curIdx];
-  if(pl.frozen>0){var nf=pl.frozen-1;s.players[s.curIdx]=mg(pl,{frozen:nf});addL(s,pl.name+" ❄️ frozen "+(nf>0?nf+" left.":"free!"));commitTurn(s);showP("❄️ Frozen!","info",pl.name+" is frozen!\n"+(nf>0?nf+" turn(s) left.":"Free next turn!"),[{l:"OK",c:"pn",fn:function(){advTurn(dc(GS));}}]);return;}
-  if(pl.skip>0){s.players[s.curIdx]=mg(pl,{skip:pl.skip-1});addL(s,pl.name+" skips turn.");commitTurn(s);advTurn(dc(GS));return;}
-  if(pl.winPos>=0){doWin(pl,s,r);return;}
-  if(pl.inTask==="boat"){doBoat(pl,s,r);return;}
-  if(pl.inTask){doTask(pl,s,r);return;}
-  doMove(pl,s,r);
-}
-function doMove(pl,s,r){
-  var path=[];for(var i=1;i<=r;i++)path.push((pl.pos+i)%36);
-  var fc=pl.completedTasks||[];
-  var jes=[{idx:TASKS.boat_school.entryIdx,key:"boat_school",need:fc.indexOf("boat_school")<0},{idx:TASKS.boat.entryIdx,key:"boat",need:fc.indexOf("boat")<0},{idx:TASKS.fish.entryIdx,key:"fish",need:fc.indexOf("fish")<0},{idx:TASKS.rescue.entryIdx,key:"rescue",need:fc.indexOf("rescue")<0},{idx:WIN_IDX,key:"winner",need:fc.length>=4}];
-  var ss=r,jh=null;
-  outer:for(var i=0;i<path.length;i++){for(var j=0;j<jes.length;j++){if(jes[j].need&&jes[j].idx===path[i]){ss=i+1;jh=jes[j];break outer;}}}
-  var extra=r-ss,steps=[];for(var i=0;i<ss;i++)steps.push({type:"oval",pos:path[i]});
-  var passed=false;for(var i=0;i<ss;i++)if(path[i]===0&&pl.pos!==0){passed=true;break;}
-  var finalPos=path[ss-1],u=mg(pl,{pos:finalPos});
-  if(passed){u=mg(u,{money:u.money+5});addL(s,"💰 "+pl.name+" passed START and collected $5!");}
-  s.players[s.curIdx]=u;commitTurn(s);
-  animateSteps(s.curIdx,steps,function(){
-    GS.players[GS.curIdx]=u;updateTok(GS);centerOn(GS.curIdx);
-    if(passed){
-      showP("💰 Passed START!","success","You passed START and collected $5!\nBalance: $"+u.money,[{l:"Nice!",c:"pp",fn:function(){if(jh){if(extra>0)enterJutX(u,dc(GS),jh.key,extra);else enterJut(u,dc(GS),jh.key);}else landOn(u,dc(GS));}}]);
-    } else {
-      if(jh){if(extra>0)enterJutX(u,dc(GS),jh.key,extra);else enterJut(u,dc(GS),jh.key);}else landOn(u,dc(GS));
-    }
-  });
-}
-function landOn(pl,s){
-  var k=sKind(pl.pos);
-  if(k==="swim"){var deck=(s.swimDeck||[]).slice();if(!deck.length)deck=mkSwim();var card=deck[0];deck=deck.slice(1);s.swimDeck=deck;var u=mg(pl,{});if(card.eff.money)u=mg(u,{money:u.money+card.eff.money});if(card.eff.skip)u=mg(u,{skip:(u.skip||0)+card.eff.skip});var mv=card.eff.move||0;s.players[s.curIdx]=u;addL(s,"🏊 SWIM: "+card.text);commitTurn(s);showP("🏊 Swim Card!","swim",card.text,[{l:"Woohoo!",c:"pp",fn:function(){if(mv!==0){var cur=dc(GS),curPl=cur.players[cur.curIdx];var swimSteps=[];var pos=curPl.pos;for(var i=0;i<Math.abs(mv);i++){pos=(pos+(mv>0?1:-1)+36)%36;swimSteps.push({type:"oval",pos:pos});}animateSteps(cur.curIdx,swimSteps,function(){var fp=((curPl.pos+mv)+3600)%36;var um=mg(curPl,{pos:fp});var s2=dc(GS);s2.players[s2.curIdx]=um;commitTurn(s2);landOn(um,dc(GS));});}else advTurn(dc(GS));}}]);return;}
-  if(k==="sink"){var deck2=(s.sinkDeck||[]).slice();if(!deck2.length)deck2=mkSink();var card2=deck2[0];deck2=deck2.slice(1);s.sinkDeck=deck2;var u2=mg(pl,{});if(card2.eff.money)u2=mg(u2,{money:u2.money+card2.eff.money});if(card2.eff.skip)u2=mg(u2,{skip:(u2.skip||0)+card2.eff.skip});var mv2=card2.eff.move||0;s.players[s.curIdx]=u2;addL(s,"🌊 SINK: "+card2.text);commitTurn(s);showP("🌊 Sink Card!","sink",card2.text,[{l:"Yikes!",c:"pn",fn:function(){if(mv2!==0){var cur=dc(GS),curPl=cur.players[cur.curIdx];var sinkSteps=[];var pos=curPl.pos;for(var i=0;i<Math.abs(mv2);i++){pos=(pos+(mv2>0?1:-1)+36)%36;sinkSteps.push({type:"oval",pos:pos});}animateSteps(cur.curIdx,sinkSteps,function(){var fp=((curPl.pos+mv2)+3600)%36;var um2=mg(curPl,{pos:fp});var s3=dc(GS);s3.players[s3.curIdx]=um2;commitTurn(s3);landOn(um2,dc(GS));});}else advTurn(dc(GS));}}]);return;}
-  advTurn(s);
-}
-function enterJut(pl,s,key){
-  // All juts work the same — no special bypass logic
-  if(key==="winner"){
-    if(pl.money<0){showP("💸 Wallet Too Low!","debt","Need $0+ to enter!\nCurrent balance: $"+pl.money,[{l:"Dang!",c:"pn",fn:function(){advTurn(dc(GS));}}]);return;}
-    s.players[s.curIdx]=mg(pl,{winPos:-1});addL(s,pl.name+" entered Winner's Dock!");commitTurn(s);showP("🏆 Winner's Dock!","info","All 4 challenges done! 🎉\nRoll to reach ⭐ WIN!",[{l:"Let's go!",c:"pp",fn:function(){advTurn(dc(GS));}}]);return;
-  }
-  if(key==="boat"&&!pl.graduated){
-    // Skip the boat store — not graduated
-    if(pl.isAI){addL(s,"🤖 AI skips Boat Store (not graduated)");commitTurn(s);advTurn(dc(GS));return;}
-    showP("🛥️ The Boat Store","info","You need to graduate from Boat School first!\n\nCome back after you've earned your stars.",[{l:"OK",c:"pn",fn:function(){advTurn(dc(GS));}}]);return;
-  }
-  s.players[s.curIdx]=mg(pl,{inTask:key,taskPos:-1});addL(s,pl.name+" enters "+(TASKS[key]?TASKS[key].label:key)+"!");commitTurn(s);advTurn(dc(GS));
-}
-function enterJutX(pl,s,key,extra){
-  if(key==="winner"){if(pl.money<0){showP("💸 Wallet Too Low!","debt","Need $0+ to enter!",[{l:"Dang!",c:"pn",fn:function(){advTurn(dc(GS));}}]);return;}s.players[s.curIdx]=mg(pl,{winPos:-1});commitTurn(s);doWin(s.players[s.curIdx],dc(GS),extra);return;}
-  if(key==="boat"&&!pl.graduated){
-    if(pl.isAI){addL(s,"🤖 AI skips Boat Store (not graduated)");commitTurn(s);var exitSteps=[];for(var i=1;i<=extra;i++)exitSteps.push({type:"oval",pos:(TASKS.boat.entryIdx+i)%36});animateSteps(s.curIdx,exitSteps,function(){var s2=dc(GS);s2.players[s2.curIdx]=mg(s2.players[s2.curIdx],{pos:(TASKS.boat.entryIdx+extra)%36});commitTurn(s2);landOn(s2.players[s2.curIdx],dc(GS));});return;}
-    showP("🛥️ The Boat Store","info","You need to graduate first!",[{l:"OK",c:"pn",fn:function(){advTurn(dc(GS));}}]);return;
-  }
-  s.players[s.curIdx]=mg(pl,{inTask:key,taskPos:-1});addL(s,pl.name+" enters "+(TASKS[key]?TASKS[key].label:key)+"!");commitTurn(s);doTask(s.players[s.curIdx],dc(GS),extra);
-}
-function doTask(pl,s,r){
-  var t=TASKS[pl.inTask],np=pl.taskPos+r;
-  if(np>=t.count){var stepsT=[];for(var i=pl.taskPos+1;i<t.count;i++)stepsT.push({type:"task",task:pl.inTask,taskPos:i});animateSteps(s.curIdx,stepsT,function(){var s2=dc(GS),pl2=s2.players[s2.curIdx];var rem=r-(t.count-1-pl.taskPos)-1;var u=mg(pl2,{inTask:null,taskPos:-1,pos:t.exitIdx});var comp=t.req(u)&&(u.completedTasks||[]).indexOf(t.key)<0;if(comp){u=mg(u,{completedTasks:(u.completedTasks||[]).concat([t.key])});if(t.key==="boat_school")u=mg(u,{graduated:true});addL(s2,"🎉 "+pl2.name+" completed "+t.label+"!");}s2.players[s2.curIdx]=u;commitTurn(s2);showP(comp?"✅ Done!":"Exited "+t.label,comp?"success":"info",comp?(u.completedTasks.length+"/4 done! 🎊"):t.prog(u),[{l:comp?"Yes! 🎉":"Continue",c:"pp",fn:function(){if(rem>0){var exitSteps=[];for(var i=1;i<=rem;i++)exitSteps.push({type:"oval",pos:(t.exitIdx+i)%36});animateSteps(GS.curIdx,exitSteps,function(){var s3=dc(GS);var fp3=(t.exitIdx+rem)%36;s3.players[s3.curIdx]=mg(s3.players[s3.curIdx],{pos:fp3});commitTurn(s3);landOn(s3.players[s3.curIdx],dc(GS));});}else advTurn(dc(GS));}}]);});return;}
-  var stepsT2=[];for(var i=pl.taskPos+1;i<=np;i++)stepsT2.push({type:"task",task:pl.inTask,taskPos:i});
-  animateSteps(s.curIdx,stepsT2,function(){var s2=dc(GS),pl2=s2.players[s2.curIdx];var u2=mg(pl2,{taskPos:np}),space=t.spaces[np];if(space)u2=space.eff(u2);s2.players[s2.curIdx]=u2;addL(s2,pl2.name+" sp"+(np+1)+": "+(space?space.desc:""));commitTurn(s2);showP(t.label,"info",space?(space.story+"\n\n"+space.desc):t.prog(u2),[{l:"Continue",c:"pp",fn:function(){advTurn(dc(GS));}}]);});
-}
-function doBoat(pl,s,r){
-  var np=pl.taskPos+r;
-  if(np>=BOATS.length){var s2=dc(GS);s2.players[s2.curIdx]=mg(s2.players[s2.curIdx],{inTask:null,taskPos:-1,pos:TASKS.boat.exitIdx});commitTurn(s2);advTurn(dc(GS));return;}
-  var stepsB=[];for(var i=pl.taskPos+1;i<=np;i++)stepsB.push({type:"task",task:"boat",taskPos:i});
-  animateSteps(s.curIdx,stepsB,function(){var s2=dc(GS),pl2=s2.players[s2.curIdx];var u=mg(pl2,{taskPos:np}),boat=BOATS[np];var sold=false;for(var i=0;i<s2.players.length;i++)if(i!==s2.curIdx&&s2.players[i]&&s2.players[i].boat&&s2.players[i].boat.name===boat.name){sold=true;break;}s2.players[s2.curIdx]=u;commitTurn(s2);if(sold){showP(boat.icon+" Sold Out","info","That boat was already purchased!",[{l:"Continue",c:"pp",fn:function(){advTurn(dc(GS));}}]);return;}
-  if(pl2.isAI){
-    // AI boat buying: only buy if they have enough money (don't go into debt for a boat)
-    if(u.money>=boat.price){var nc=(u.completedTasks||[]).concat(["boat"]);s2.players[s2.curIdx]=mg(u,{money:u.money-boat.price,boat:boat,inTask:null,taskPos:-1,pos:TASKS.boat.exitIdx,completedTasks:nc});addL(s2,"🤖 AI buys "+boat.icon+" "+boat.name);commitTurn(s2);advTurn(dc(GS));}
-    else{addL(s2,"🤖 AI passes on "+boat.icon+" "+boat.name+" (can't afford)");commitTurn(s2);advTurn(dc(GS));}
-    return;
-  }
-  showP(boat.icon+" "+boat.name+" — $"+boat.price,"info","Price: $"+boat.price+"\nYour balance: $"+u.money+(u.money<boat.price?"\n⚠️ This will put you in debt!":""),[{l:"Buy "+boat.icon+" $"+boat.price,c:"pp",fn:function(){var s3=dc(GS),pu=s3.players[s3.curIdx];var nc2=(pu.completedTasks||[]).filter(function(x){return x!=="boat";}).concat(["boat"]);s3.players[s3.curIdx]=mg(pu,{money:pu.money-boat.price,boat:boat,inTask:null,taskPos:-1,pos:TASKS.boat.exitIdx,completedTasks:nc2});addL(s3,pu.name+" buys "+boat.icon+" "+boat.name);commitTurn(s3);advTurn(dc(GS));}},{l:"Pass",c:"pn",fn:function(){advTurn(dc(GS));}}]);});
-}
-function doWin(pl,s,r){
-  var cp=pl.winPos<0?-1:pl.winPos,MAX=3,tg=cp+r;
-  if(!pl.fasttrack&&tg>MAX){showP("🎯 Overshot!","info","Need exactly "+(MAX-Math.max(cp,0))+" to reach ⭐ WIN.",[{l:"OK",c:"pn",fn:function(){advTurn(dc(GS));}}]);return;}
-  var nwp=Math.min(tg,MAX),stepsW=[];for(var i=cp+1;i<=nwp;i++)stepsW.push({type:"win",winPos:i});
-  animateSteps(s.curIdx,stepsW,function(){var s2=dc(GS),pl2=s2.players[s2.curIdx];var u=WDOCK[nwp].eff(mg(pl2,{winPos:nwp}));if(WDOCK[nwp].win){if(u.money<0){s2.players[s2.curIdx]=u;commitTurn(s2);showP("💸 Still in Debt!","debt","Cannot win with $"+u.money+"!",[{l:"Dang!",c:"pn",fn:function(){advTurn(dc(GS));}}]);return;}u=mg(u,{done:true});s2.players[s2.curIdx]=u;s2.winner=u;commitTurn(s2);if(!isOnlineMultiplayer&&currentUser)deleteSavedGame();showWin(u);return;}var wl=["⚓ Dock 1","😴 Lose Turn","↩️ Back 1"];addL(s2,pl2.name+": "+wl[nwp]);s2.players[s2.curIdx]=u;commitTurn(s2);showP("🏅 Winner's Dock","info",wl[nwp]+"!",[{l:"Continue",c:"pp",fn:function(){advTurn(dc(GS));}}]);});
-}
-function advTurn(s){
-  aiRunning=false;tradeOpen=false;var prevIdx=s.curIdx;
-  var np=[];for(var i=0;i<s.players.length;i++){var pl=s.players[i];if(!pl){np.push(pl);continue;}if(pl.done||pl.eliminated){np.push(pl);continue;}if(pl.money<=-1000){addL(s,pl.name+" eliminated! 💀");np.push(mg(pl,{eliminated:true,done:true}));}else np.push(pl);}
-  s.players=np;var cur2=np[prevIdx];if(cur2&&cur2.money<0&&!cur2.done&&!cur2.eliminated){var interest=Math.floor(cur2.money*0.05);np[prevIdx]=mg(cur2,{money:cur2.money+interest});addL(s,cur2.name+" 💸 debt interest: "+interest);}
-  var active=np.filter(function(p){return p&&!p.done;});
-  if(active.length<=1){var w=active[0]||np[0];var wi=np.indexOf(w);if(wi>=0)np[wi]=mg(w,{done:true});s.players=np;s.winner=w;commitTurn(s);if(!isOnlineMultiplayer&&currentUser)deleteSavedGame();showWin(w);return;}
-  var next=(s.curIdx+1)%np.length,its=0;while((!np[next]||np[next].done)&&its<np.length){next=(next+1)%np.length;its++;}
-  np[next]=mg(np[next],{boughtCardThisTurn:false,usedShipwreckThisTurn:false,cardsBoughtThisTurn:[],pendingTrade:null});
-  s.players=np;s.curIdx=next;s.phase="transition";s.pendingTrade=null;
-  commitTurn(s);hideDie();if(!isOnlineMultiplayer){saveGame(s);showTrans();}else notifyNextPlayer(s,prevIdx,next);
-}
-
-// ── AI LOGIC ──
-function runAI(){
-  if(!GS)return;
-  if(aiRunning){console.log('runAI: already running, skip');return;}
-  var cur=GS.players[GS.curIdx];
-  if(!cur){console.log('runAI: no current player');return;}
-  if(!cur.isAI){console.log('runAI: current player is not AI:',cur.name,'isAI='+cur.isAI);return;}
-  aiRunning=true;
-  console.log('runAI: AI',cur.name,'taking turn');
-  var s=dc(GS),pl=s.players[s.curIdx];
-  // AI card buying: only if healthy balance and not too many cards
-  if(!pl.boughtCardThisTurn&&pl.money>=25&&(pl.heldCards||[]).length<3&&Math.random()<0.6){
-    var deck=(s.swDeck||[]).slice();if(!deck.length)deck=mkDeck(SWDEFS);
-    var card=deck[0],uid2=Math.random().toString(36).slice(2);deck=deck.slice(1);s.swDeck=deck;
-    pl.heldCards=(pl.heldCards||[]).concat([mg(card,{uid:uid2})]);
-    pl.money-=10;pl.boughtCardThisTurn=true;
-    pl.cardsBoughtThisTurn=(pl.cardsBoughtThisTurn||[]).concat([uid2]);
-    if(card.type==="fasttrack")pl.fasttrack=true;
-    addL(s,"🤖 "+pl.name+" got a Shipwreck card");
-  }
-  s.players[s.curIdx]=pl;
-  var r=Math.ceil(Math.random()*6);
-  showDie(r);
-  addL(s,"🤖 "+pl.name+" rolls "+r);
-  GS=s;renderAll();
-  processRoll(r,s);
-}
-
-// ── CARDS ──
-function buyCard(){
-  if(!GS||!isMyTurnNow())return;var s=dc(GS),pl=s.players[s.curIdx];if(pl.boughtCardThisTurn)return;
-  var deck=(s.swDeck||[]).slice();if(!deck.length)deck=mkDeck(SWDEFS);var card=deck[0],uid2=Math.random().toString(36).slice(2);deck=deck.slice(1);s.swDeck=deck;
-  pl.heldCards=(pl.heldCards||[]).concat([mg(card,{uid:uid2})]);pl.money-=10;pl.boughtCardThisTurn=true;pl.cardsBoughtThisTurn=(pl.cardsBoughtThisTurn||[]).concat([uid2]);if(card.type==="fasttrack")pl.fasttrack=true;
-  s.players[s.curIdx]=pl;addL(s,pl.name+" 🃏 bought a Shipwreck card");commitTurn(s);
-  showP(card.icon+" "+card.label,"info",card.desc+(card.type==="fasttrack"?"\n🚀 Already active!":"\n⏳ Available next turn.\n\n🔒 Only you can see your cards!"),[{l:"Got it!",c:"pp",fn:hideP}]);
-}
-function openCard(idx){
-  if(!GS||!isMyTurnNow())return;var pl=GS.players[GS.curIdx];
-  if(pl.usedShipwreckThisTurn){showP("One Per Turn","info","You can only play 1 Shipwreck card per turn.",[{l:"OK",c:"pn",fn:hideP}]);return;}
-  var card=pl.heldCards[idx];if(!card)return;
-  if((pl.cardsBoughtThisTurn||[]).indexOf(card.uid)>=0){showP("⏳ Not Yet","info","This card is available next turn.",[{l:"OK",c:"pn",fn:hideP}]);return;}
-  if(card.type==="double"){execCard(card,idx);return;}
-  showP(card.icon+" "+card.label,"info",card.desc,[{l:"▶ Play Now",c:"pp",fn:function(){hideP();execCard(card,idx);}},{l:"Save for later",c:"pn",fn:hideP}]);
-}
-function execCard(card,idx){
-  var s=dc(GS),pl=s.players[s.curIdx];pl.heldCards=pl.heldCards.filter(function(_,i){return i!==idx;});pl.usedShipwreckThisTurn=true;s.players[s.curIdx]=pl;addL(s,pl.name+" plays a Shipwreck card!");
-  if(card.type==="double"){pl.doubleRollsLeft=(pl.doubleRollsLeft||0)+2;s.players[s.curIdx]=pl;commitTurn(s);showP("🎲 Double Time!","info","You get 2 bonus rolls this turn!",[{l:"Roll!",c:"pp",fn:hideP}]);return;}
-  if(card.type==="fasttrack"){pl.fasttrack=true;s.players[s.curIdx]=pl;commitTurn(s);showP("🚀 Fast Track","info","No exact roll needed to WIN!",[{l:"Awesome!",c:"pp",fn:hideP}]);return;}
-  if(card.type==="shortcut"){commitTurn(s);showP("⚡ Shortcut","info","Reduce which challenge?",[{l:"🐟 Fish: 10→6",c:"pp",fn:function(){var s2=dc(GS);s2.players[s2.curIdx].shortcut.fish=true;commitTurn(s2);hideP();}},{l:"🆘 Rescues: 2→1",c:"pp",fn:function(){var s2=dc(GS);s2.players[s2.curIdx].shortcut.rescues=true;commitTurn(s2);hideP();}},{l:"⭐ Stars: 3→2",c:"pp",fn:function(){var s2=dc(GS);s2.players[s2.curIdx].shortcut.stars=true;commitTurn(s2);hideP();}}]);return;}
-  if(card.type==="teleport"){commitTurn(s);showP("🌀 Teleportation","info","Click any space on the board to jump there!",[{l:"Cancel",c:"pn",fn:hideP}]);setTimeout(function(){for(var i=1;i<36;i++){if(sKind(i)==="entry_winner")continue;(function(si){var el=document.getElementById("sp"+si);if(!el)return;el.style.cursor="pointer";var rect=el.querySelector("rect");if(rect){rect.setAttribute("stroke","#FFD700");rect.setAttribute("stroke-width","3");}el.addEventListener("click",function h(){el.removeEventListener("click",h);el.style.cursor="";if(rect){rect.setAttribute("stroke","#ffffffa0");rect.setAttribute("stroke-width","0.8");}hideP();var s2=dc(GS);s2.players[s2.curIdx]=mg(s2.players[s2.curIdx],{pos:si,inTask:null,taskPos:-1});addL(s2,s2.players[s2.curIdx].name+" 🌀 teleports!");commitTurn(s2);advTurn(dc(GS));});})(i);}},100);return;}
-  if(card.type==="freeze"){var others=s.players.filter(function(p,i){return i!==s.curIdx&&p&&!p.done;});commitTurn(s);showP("❄️ Freeze Frame","info","Choose a player to freeze for 2 turns:",others.map(function(op){return{l:(op.isAI?"🤖 ":"")+op.name,c:"pp",fn:(function(opid){return function(){var s2=dc(GS);for(var i=0;i<s2.players.length;i++)if(s2.players[i]&&s2.players[i].id===opid){s2.players[i]=mg(s2.players[i],{frozen:2});break;}addL(s2,s2.players[s2.curIdx].name+" ❄️ froze "+op.name);commitTurn(s2);hideP();};})(op.id)};}));return;}
-  if(card.type==="robbery"){var others2=s.players.filter(function(p,i){return i!==s.curIdx&&p&&!p.done;});commitTurn(s);showP("💰 Highway Robbery","info","Steal ALL money from:",others2.map(function(op){return{l:(op.isAI?"🤖 ":"")+op.name+" ($"+op.money+")",c:"pp",fn:(function(opid){return function(){var s2=dc(GS),stolen=0;for(var i=0;i<s2.players.length;i++)if(s2.players[i]&&s2.players[i].id===opid){stolen=s2.players[i].money;s2.players[i]=mg(s2.players[i],{money:0});break;}s2.players[s2.curIdx]=mg(s2.players[s2.curIdx],{money:s2.players[s2.curIdx].money+stolen});addL(s2,s2.players[s2.curIdx].name+" 💰 robbed $"+stolen);commitTurn(s2);hideP();};})(op.id)};}));return;}
-}
-
-function debtR(){
-  if(!GS)return;var pl=GS.players[GS.curIdx];
-  if(!pl.completedTasks||!pl.completedTasks.length){showP("💸 Debt Relief","debt","No completed challenges to sacrifice.",[{l:"Close",c:"pn",fn:hideP}]);return;}
-  var lbls={boat_school:"🎓 Boat School",boat:"🛥️ Boat",fish:"🐟 Fish",rescue:"🆘 Rescues"};
-  var btns=pl.completedTasks.map(function(tk){return{l:lbls[tk]||tk,c:"pw",fn:(function(ttk){return function(){var s=dc(GS),p2=mg(s.players[s.curIdx],{money:0,completedTasks:s.players[s.curIdx].completedTasks.filter(function(x){return x!==ttk;})});if(ttk==="boat_school")p2=mg(p2,{graduated:false,stars:0});if(ttk==="fish")p2=mg(p2,{fish:0});if(ttk==="rescue")p2=mg(p2,{rescues:0});if(ttk==="boat")p2=mg(p2,{boat:null});s.players[s.curIdx]=p2;addL(s,p2.name+" used debt relief");commitTurn(s);hideP();};})(tk)};});
-  btns.push({l:"Cancel",c:"pn",fn:hideP});showP("💸 Debt Relief","debt","Sacrifice a challenge to reset balance to $0:",btns);
-}
-
-function inspP(i){
-  if(!GS)return;var pl=GS.players[i];if(!pl)return;
-  var showCards=isCardOwner(GS,i)||(!isOnlineMultiplayer&&!GS.players.some(function(p){return p&&p.isAI;}));
-  var tks=["boat_school","boat","fish","rescue"],lines="💰 $"+pl.money+(pl.money<0?" ⚠️ IN DEBT":"")+"\n\n";
-  for(var j=0;j<tks.length;j++){var tk=tks[j],done=(pl.completedTasks||[]).indexOf(tk)>=0,t=TASKS[tk];if(!t)continue;var status=done?(tk==="boat"?(pl.boat?(BOAT_EMOJIS[pl.boat.name]||"🛥️")+" "+pl.boat.name:"owned"):t.done||"done"):t.prog(pl);lines+=(done?"✅ ":"⬜ ")+t.label+": "+status+"\n";}
-  if(pl.heldCards&&pl.heldCards.length){
-    if(showCards)lines+="\n🃏 "+pl.heldCards.map(function(c){return c.icon+" "+c.label;}).join(", ");
-    else lines+="\n🃏 "+pl.heldCards.length+" Shipwreck card"+(pl.heldCards.length!==1?"s":"")+" available";
-  }
-  if(pl.frozen>0)lines+="\n❄️ Frozen: "+pl.frozen+" turn(s)";
-  showP((pl.isAI?"🤖 ":"")+pl.name,"info",lines,[{l:"Close",c:"pn",fn:hideP}]);
-}
-
-// ── TRADE ──
-function toggleTradePanel(){tradeOpen=!tradeOpen;renderAct(GS,GS.players[GS.curIdx]);}
-function buildTradePanel(s,cur){
-  var tp=document.getElementById("tradePanel");if(!tp)return;
-  var others=[];for(var i=0;i<s.players.length;i++)if(i!==s.curIdx&&s.players[i]&&!s.players[i].done)others.push({pl:s.players[i],idx:i});
-  if(!others.length){tp.innerHTML='<div style="font-size:11px;color:#aaa;padding:6px">No other active players.</div>';return;}
-  var h='<div style="background:#0d2137;border-radius:8px;padding:10px;margin-top:6px;border:1px solid #1a3a55"><div style="font-size:10px;color:#f5a623;font-weight:700;margin-bottom:8px">🤝 PROPOSE TRADE</div><select id="trTarget" style="width:100%;padding:4px;border-radius:5px;background:#071728;color:#fff;border:1px solid #1a3a55;font-size:11px;margin-bottom:8px">';
-  for(var i=0;i<others.length;i++)h+='<option value="'+others[i].idx+'">'+(others[i].pl.isAI?"🤖 ":"")+others[i].pl.name+'</option>';h+='</select>';
-  var gf=[{id:"tgMoney",lbl:"💰 Money",note:"$"+cur.money},{id:"tgFish",lbl:"🐟 Fish",note:cur.fish},{id:"tgRescues",lbl:"🆘 Rescues",note:cur.rescues},{id:"tgStars",lbl:"⭐ Stars",note:cur.stars}];
-  h+='<div style="font-size:10px;color:#4eff91;font-weight:700;margin-bottom:4px">YOU GIVE:</div>';
-  for(var i=0;i<gf.length;i++)h+='<div style="display:flex;align-items:center;gap:5px;margin-bottom:4px"><label style="font-size:11px;color:#aaa;width:70px">'+gf[i].lbl+'</label><input id="'+gf[i].id+'" type="number" min="0" value="0" style="width:50px;padding:2px 5px;border-radius:4px;background:#071728;border:1px solid #1a3a55;color:#fff;font-size:11px"/><span style="font-size:9px;color:#555">have '+gf[i].note+'</span></div>';
-  h+='<div style="display:flex;align-items:center;gap:5px;margin-bottom:6px"><label style="font-size:11px;color:#aaa;width:70px">🃏 Card</label><select id="tgCard" style="flex:1;padding:2px 4px;border-radius:4px;background:#071728;border:1px solid #1a3a55;color:#fff;font-size:10px"><option value="">None</option>';
-  if(cur.heldCards)for(var ci=0;ci<cur.heldCards.length;ci++){var c=cur.heldCards[ci];h+='<option value="'+ci+'">'+c.icon+' '+c.label+'</option>';}
-  h+='</select></div><div style="font-size:10px;color:#ff9999;font-weight:700;margin-bottom:4px">YOU WANT:</div>';
-  var wf=[{id:"trMoney",lbl:"💰 Money"},{id:"trFish",lbl:"🐟 Fish"},{id:"trRescues",lbl:"🆘 Rescues"},{id:"trStars",lbl:"⭐ Stars"}];
-  for(var i=0;i<wf.length;i++)h+='<div style="display:flex;align-items:center;gap:5px;margin-bottom:4px"><label style="font-size:11px;color:#aaa;width:70px">'+wf[i].lbl+'</label><input id="'+wf[i].id+'" type="number" min="0" value="0" style="width:50px;padding:2px 5px;border-radius:4px;background:#071728;border:1px solid #1a3a55;color:#fff;font-size:11px"/></div>';
-  h+='<div style="display:flex;gap:6px;margin-top:8px"><button id="btnSendTrade" style="flex:1;padding:6px;border-radius:6px;border:none;background:#1a7a3a;color:#fff;font-weight:600;font-size:11px;cursor:pointer">📤 Send</button><button id="btnCancelTrade" style="flex:1;padding:6px;border-radius:6px;border:none;background:#444;color:#fff;font-size:11px;cursor:pointer">✕ Cancel</button></div></div>';
-  tp.innerHTML=h;
-  document.getElementById("btnSendTrade").addEventListener("click",sendTrade);
-  document.getElementById("btnCancelTrade").addEventListener("click",function(){tradeOpen=false;renderAct(GS,GS.players[GS.curIdx]);});
-}
-function sendTrade(){if(!GS)return;var s=dc(GS),cur=s.players[s.curIdx];var toIdx=parseInt(document.getElementById("trTarget").value);var cardEl=document.getElementById("tgCard");var cardIdx=cardEl&&cardEl.value!==""?parseInt(cardEl.value):-1;var tp={fromIdx:s.curIdx,toIdx:toIdx,give:{money:parseInt(document.getElementById("tgMoney").value)||0,fish:parseInt(document.getElementById("tgFish").value)||0,rescues:parseInt(document.getElementById("tgRescues").value)||0,stars:parseInt(document.getElementById("tgStars").value)||0,cardIdx:cardIdx},want:{money:parseInt(document.getElementById("trMoney").value)||0,fish:parseInt(document.getElementById("trFish").value)||0,rescues:parseInt(document.getElementById("trRescues").value)||0,stars:parseInt(document.getElementById("trStars").value)||0},responded:false};tradeOpen=false;if(s.players[toIdx]&&s.players[toIdx].isAI){var net=(tp.give.money-tp.want.money)+(tp.give.fish-tp.want.fish)*2;if(net>=0||Math.random()<0.35){executeTrade(tp,s);addL(s,"🤖 AI accepts trade!");}else addL(s,"🤖 AI declines trade.");commitTurn(s);}else{s.pendingTrade=tp;addL(s,cur.name+" proposes a trade!");commitTurn(s);showTradeOffer(tp,s);}}
-function showTradeOffer(tp,s,isCounter){var from=s.players[tp.fromIdx],to=s.players[tp.toIdx],g=tp.give,w=tp.want,gs=[],ws=[];if(g.money>0)gs.push("$"+g.money);if(g.fish>0)gs.push(g.fish+" 🐟");if(g.rescues>0)gs.push(g.rescues+" 🆘");if(g.stars>0)gs.push(g.stars+" ⭐");if(g.cardIdx>=0&&from.heldCards&&from.heldCards[g.cardIdx])gs.push("1 Shipwreck card");if(w.money>0)ws.push("$"+w.money);if(w.fish>0)ws.push(w.fish+" 🐟");if(w.rescues>0)ws.push(w.rescues+" 🆘");if(w.stars>0)ws.push(w.stars+" ⭐");var body="Gives: "+(gs.join(", ")||"nothing")+"\nWants: "+(ws.join(", ")||"nothing")+"\n\n"+to.name+", accept?";var bl=[{l:"✅ Accept",c:"pp",fn:function(){var s2=dc(GS);executeTrade(tp,s2);s2.pendingTrade=null;addL(s2,to.name+" accepts! 🤝");commitTurn(s2);hideP();}},{l:"❌ Decline",c:"pn",fn:function(){var s2=dc(GS);s2.pendingTrade=null;addL(s2,to.name+" declines.");commitTurn(s2);hideP();}}];if(!isCounter)bl.push({l:"🔄 Counter",c:"pw",fn:function(){hideP();showCounterPanel(tp,s);}});showP((isCounter?"Counter from ":"Trade from ")+from.name,"info",body,bl);}
-function showCounterPanel(origTp,s){var from=s.players[origTp.fromIdx],to=s.players[origTp.toIdx];document.getElementById("phd").style.background="#1a5276";document.getElementById("phd").innerHTML='<div style="font-size:18px;font-weight:700;color:#fff">🔄 Counter to '+from.name+'</div>';document.getElementById("pbd").innerHTML='<div style="font-size:12px;color:#1565c0;font-weight:700;margin-bottom:6px">YOU GIVE:</div><div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px"><span style="font-size:11px">💰<input id="ctgM" type="number" min="0" value="0" style="width:45px;margin:0 3px;border-radius:4px;border:1px solid #ccc;padding:2px 4px"/></span><span style="font-size:11px">🐟<input id="ctgF" type="number" min="0" value="0" style="width:45px;margin:0 3px;border-radius:4px;border:1px solid #ccc;padding:2px 4px"/></span><span style="font-size:11px">🆘<input id="ctgR" type="number" min="0" value="0" style="width:45px;margin:0 3px;border-radius:4px;border:1px solid #ccc;padding:2px 4px"/></span><span style="font-size:11px">⭐<input id="ctgS" type="number" min="0" value="0" style="width:45px;margin:0 3px;border-radius:4px;border:1px solid #ccc;padding:2px 4px"/></span></div><div style="font-size:12px;color:#c0392b;font-weight:700;margin-bottom:6px">YOU WANT:</div><div style="display:flex;gap:8px;flex-wrap:wrap"><span style="font-size:11px">💰<input id="ctrM" type="number" min="0" value="0" style="width:45px;margin:0 3px;border-radius:4px;border:1px solid #ccc;padding:2px 4px"/></span><span style="font-size:11px">🐟<input id="ctrF" type="number" min="0" value="0" style="width:45px;margin:0 3px;border-radius:4px;border:1px solid #ccc;padding:2px 4px"/></span><span style="font-size:11px">🆘<input id="ctrR" type="number" min="0" value="0" style="width:45px;margin:0 3px;border-radius:4px;border:1px solid #ccc;padding:2px 4px"/></span><span style="font-size:11px">⭐<input id="ctrS" type="number" min="0" value="0" style="width:45px;margin:0 3px;border-radius:4px;border:1px solid #ccc;padding:2px 4px"/></span></div>';var f=document.getElementById("pft");f.innerHTML="";var sb=document.createElement("button");sb.textContent="📤 Send Counter";sb.className="pp";sb.onclick=function(){var ctp={fromIdx:origTp.toIdx,toIdx:origTp.fromIdx,give:{money:parseInt(document.getElementById("ctgM").value)||0,fish:parseInt(document.getElementById("ctgF").value)||0,rescues:parseInt(document.getElementById("ctgR").value)||0,stars:parseInt(document.getElementById("ctgS").value)||0,cardIdx:-1},want:{money:parseInt(document.getElementById("ctrM").value)||0,fish:parseInt(document.getElementById("ctrF").value)||0,rescues:parseInt(document.getElementById("ctrR").value)||0,stars:parseInt(document.getElementById("ctrS").value)||0},responded:false};var s2=dc(GS);s2.pendingTrade=ctp;addL(s2,to.name+" counters!");commitTurn(s2);hideP();if(s2.players[ctp.toIdx]&&s2.players[ctp.toIdx].isAI){setTimeout(function(){var s3=dc(GS);if(Math.random()<0.5){executeTrade(ctp,s3);addL(s3,"🤖 AI accepts counter!");}else addL(s3,"🤖 AI declines.");commitTurn(s3);},700);}else showTradeOffer(ctp,s2,true);};var cb=document.createElement("button");cb.textContent="Cancel";cb.className="pn";cb.onclick=hideP;f.appendChild(sb);f.appendChild(cb);document.getElementById("po").classList.add("on");}
-function executeTrade(tp,s){var f=s.players[tp.fromIdx],t=s.players[tp.toIdx],g=tp.give,w=tp.want;if(g.cardIdx>=0&&f.heldCards&&f.heldCards[g.cardIdx]){var card=f.heldCards[g.cardIdx];t.heldCards=(t.heldCards||[]).concat([card]);f.heldCards=f.heldCards.filter(function(_,i){return i!==g.cardIdx;});}f=mg(f,{money:f.money-(g.money||0),fish:Math.max(0,f.fish-(g.fish||0)),rescues:Math.max(0,f.rescues-(g.rescues||0)),stars:Math.max(0,f.stars-(g.stars||0))});t=mg(t,{money:t.money+(g.money||0),fish:t.fish+(g.fish||0),rescues:t.rescues+(g.rescues||0),stars:t.stars+(g.stars||0)});t=mg(t,{money:t.money-(w.money||0),fish:Math.max(0,t.fish-(w.fish||0)),rescues:Math.max(0,t.rescues-(w.rescues||0)),stars:Math.max(0,t.stars-(w.stars||0))});f=mg(f,{money:f.money+(w.money||0),fish:f.fish+(w.fish||0),rescues:f.rescues+(w.rescues||0),stars:f.stars+(w.stars||0)});s.players[tp.fromIdx]=f;s.players[tp.toIdx]=t;addL(s,"🤝 Trade: "+f.name+" ↔ "+t.name);}
-
-// ── BOARD DRAWING ──
-var NS="http://www.w3.org/2000/svg";
-function mkEl(tag,attrs){var e=document.createElementNS(NS,tag);for(var k in attrs)e.setAttribute(k,attrs[k]);return e;}
-function mkTxt(str,attrs){var e=mkEl("text",attrs);e.textContent=str;return e;}
-function drawBoard(){
-  var svg=document.getElementById("bsvg");svg.setAttribute("width",BW);svg.setAttribute("height",BH);svg.innerHTML="";
-  var defs=mkEl("defs",{});var st=document.createElementNS(NS,"style");st.textContent="@keyframes wa{0%{transform:translateX(0)}100%{transform:translateX(-140px)}}@keyframes wb{0%{transform:translateX(0)}100%{transform:translateX(140px)}}@keyframes wc{0%{transform:translateX(-70px)}100%{transform:translateX(70px)}}";defs.appendChild(st);var cl=mkEl("clipPath",{id:"bc"});cl.appendChild(mkEl("rect",{width:BW,height:BH}));defs.appendChild(cl);svg.appendChild(defs);
-  svg.appendChild(mkEl("rect",{width:BW,height:BH,fill:"#5aaec8"}));
-  var wst=["wa","wb","wc"];for(var row=0;row<18;row++){var gg=mkEl("g",{style:"animation:"+wst[row%3]+" "+(2.5+row*0.3)+"s linear infinite","clip-path":"url(#bc)"});var wxs=[-280,-140,0,140,280,420,560,700,840,980,1120,1260,1400];for(var wi=0;wi<wxs.length;wi++){var wx=wxs[wi];gg.appendChild(mkEl("path",{d:"M"+wx+" "+(55+row*52)+" Q"+(wx+17)+" "+(45+row*52)+" "+(wx+35)+" "+(55+row*52)+" Q"+(wx+52)+" "+(65+row*52)+" "+(wx+70)+" "+(55+row*52),stroke:"#7ecbe0","stroke-width":2,fill:"none",opacity:0.5}));}svg.appendChild(gg);}
-  svg.appendChild(mkEl("rect",{x:OL-SW,y:OT-SW,width:OR-OL+SW*2,height:OB-OT+SW*2,rx:22,fill:"#d6b87a",opacity:0.9}));
-  svg.appendChild(mkEl("rect",{x:OL-SW/2,y:OT-SW/2,width:OR-OL+SW,height:OB-OT+SW,rx:16,fill:"#4a9ebb",opacity:0.9}));
-  svg.appendChild(mkTxt("Boat Ride 2.0",{x:(OL+OR)/2,y:(OT+OB)/2-14,"text-anchor":"middle","font-size":26,"font-weight":900,fill:"#fff",stroke:"#1a3a55","stroke-width":4,"paint-order":"stroke",opacity:0.45}));
-  svg.appendChild(mkTxt("Supreme Boat Captain Race",{x:(OL+OR)/2,y:(OT+OB)/2+20,"text-anchor":"middle","font-size":16,"font-weight":700,fill:"#fff",stroke:"#1a3a55","stroke-width":4,"paint-order":"stroke",opacity:0.45}));
-  drawJuts(svg);drawOval(svg);svg.appendChild(mkEl("g",{id:"tlayer"}));applyScale();
-}
-function jLP(k){if(k==="boat_school"){var b=oPos(5);return{x:b.x,y:b.y-3*SW-SW-10};}if(k==="boat"){var b=oPos(12);return{x:b.x-2*SW,y:b.y-SW/2-SW-10};}if(k==="fish"){var b=oPos(19);return{x:b.x,y:b.y+4*SW+SW+10};}if(k==="rescue"){var b=oPos(26);return{x:b.x,y:b.y+SW/2+3*SW+10};}if(k==="winner"){var b=oPos(33);return{x:b.x+2*SW,y:b.y-SW-10};}return null;}
-function drawJuts(svg){
-  var jcols={boat_school:"#a855f7",boat:"#fb923c",fish:"#34d399",rescue:"#60a5fa",winner:"#fbbf24"};
-  var jlbls={boat_school:"🎓 Boat School",boat:"🛥️ Boat Store",fish:"🐟 Catch a Fish",rescue:"🆘 Rescue!"};
-  var wjd=JC.winner;for(var i=0;i<wjd.pts.length-1;i++)svg.appendChild(mkEl("line",{x1:wjd.pts[i].x,y1:wjd.pts[i].y,x2:wjd.pts[i+1].x,y2:wjd.pts[i+1].y,stroke:"#c47d0e","stroke-width":SW+1,"stroke-opacity":0.15}));
-  var wlbls=["Dock 1","Lose Turn","Back 1","⭐ WIN"];
-  for(var i=0;i<wjd.pts.length;i++){var pt=wjd.pts[i],gj=mkEl("g",{});gj.appendChild(mkEl("rect",{x:pt.x-SW/2,y:pt.y-SH/2,width:SW,height:SH,rx:6,fill:i===3?"#f5a623":"#c47d0e",stroke:"#ffffffa0","stroke-width":0.8}));var pp2=wlbls[i].split(" ");gj.appendChild(mkTxt(pp2[0],{x:pt.x,y:pt.y-4,"text-anchor":"middle","dominant-baseline":"central","font-size":9,fill:"#fff","font-weight":"bold"}));if(pp2.length>1)gj.appendChild(mkTxt(pp2.slice(1).join(" "),{x:pt.x,y:pt.y+8,"text-anchor":"middle","dominant-baseline":"central","font-size":9,fill:"#fff"}));svg.appendChild(gj);}
-  var tkeys=Object.keys(TASKS);
-  for(var ki=0;ki<tkeys.length;ki++){
-    var key=tkeys[ki],t=TASKS[key],jd=JC[key];
-    for(var i=0;i<jd.pts.length-1;i++)svg.appendChild(mkEl("line",{x1:jd.pts[i].x,y1:jd.pts[i].y,x2:jd.pts[i+1].x,y2:jd.pts[i+1].y,stroke:t.color,"stroke-width":SW+1,"stroke-opacity":0.15}));
-    for(var i=0;i<jd.pts.length;i++){
-      var pt2=jd.pts[i],g2=mkEl("g",{});
-      if(key==="boat"){var boat=BOATS[i];g2.appendChild(mkEl("rect",{x:pt2.x-SW/2,y:pt2.y-SH/2,width:SW,height:SH,rx:6,fill:t.color,stroke:"#ffffffa0","stroke-width":0.8}));g2.appendChild(mkTxt(boat.icon,{x:pt2.x,y:pt2.y-6,"text-anchor":"middle","dominant-baseline":"central","font-size":14}));g2.appendChild(mkTxt("$"+boat.price,{x:pt2.x,y:pt2.y+10,"text-anchor":"middle","dominant-baseline":"central","font-size":9,fill:"#FFD700"}));}
-      else{var sp=t.spaces[i],rw=sp?sp.reward:null;g2.appendChild(mkEl("rect",{x:pt2.x-SW/2,y:pt2.y-SH/2,width:SW,height:SH,rx:6,fill:t.color,stroke:"#ffffffa0","stroke-width":0.8}));if(rw!==null&&rw!==undefined){var ic=key==="boat_school"?"⭐":key==="fish"?"🐟":"🆘";if(rw<0){g2.appendChild(mkTxt(String(rw),{x:pt2.x,y:pt2.y,"text-anchor":"middle","dominant-baseline":"central","font-size":13,"font-weight":"bold",fill:"#ff4444"}));}else if(rw===0){g2.appendChild(mkTxt("+0",{x:pt2.x,y:pt2.y,"text-anchor":"middle","dominant-baseline":"central","font-size":11,"font-weight":"bold",fill:"#FFD700"}));}else{var cols=rw<=2?rw:rw<=4?2:3,rows=Math.ceil(rw/cols),iconSize=rw<=2?14:rw<=4?11:9,spacingX=iconSize+2,spacingY=iconSize+2,totalH=(rows-1)*spacingY,count=0;for(var row2=0;row2<rows&&count<rw;row2++){var rowCols=Math.min(cols,rw-count),rowW=(rowCols-1)*spacingX;for(var col2=0;col2<rowCols;col2++){g2.appendChild(mkTxt(ic,{x:pt2.x-rowW/2+col2*spacingX,y:pt2.y-totalH/2+row2*spacingY,"text-anchor":"middle","dominant-baseline":"central","font-size":iconSize}));count++;}}}}}
-      svg.appendChild(g2);
-    }
-    if(jd.xp){var xg=mkEl("g",{});xg.appendChild(mkEl("rect",{x:jd.xp.x-SW/2,y:jd.xp.y-SH/2,width:SW,height:SH,rx:8,fill:sColor("entry_"+key),stroke:"#ffffffa0","stroke-width":0.8}));xg.appendChild(mkTxt(key==="boat_school"?"🎓":key==="boat"?"🛥️":key==="fish"?"🐟":"🆘",{x:jd.xp.x,y:jd.xp.y,"text-anchor":"middle","dominant-baseline":"central","font-size":18}));svg.appendChild(xg);}
-    var lp=jLP(key);if(lp){var lg=mkEl("g",{});lg.appendChild(mkEl("rect",{x:lp.x-60,y:lp.y-13,width:120,height:24,rx:6,fill:"rgba(7,23,40,0.92)",stroke:jcols[key]||"#fff","stroke-width":1.5}));lg.appendChild(mkTxt(jlbls[key]||key,{x:lp.x,y:lp.y,"text-anchor":"middle","dominant-baseline":"central","font-size":11,"font-weight":"bold",fill:jcols[key]||"#fff"}));svg.appendChild(lg);}
-  }
-  var wlp=jLP("winner");if(wlp){var wlg=mkEl("g",{});wlg.appendChild(mkEl("rect",{x:wlp.x-64,y:wlp.y-24,width:128,height:36,rx:6,fill:"rgba(7,23,40,0.92)",stroke:"#fbbf24","stroke-width":1.5}));wlg.appendChild(mkTxt("🏆 Supreme Boat",{x:wlp.x,y:wlp.y-8,"text-anchor":"middle","dominant-baseline":"central","font-size":10,"font-weight":"bold",fill:"#fbbf24"}));wlg.appendChild(mkTxt("Captain HQ",{x:wlp.x,y:wlp.y+8,"text-anchor":"middle","dominant-baseline":"central","font-size":10,"font-weight":"bold",fill:"#fbbf24"}));svg.appendChild(wlg);}
-}
-function drawOval(svg){
-  var exits={};Object.keys(TASKS).forEach(function(k){exits[TASKS[k].exitIdx]=true;});
-  for(var i=0;i<36;i++){
-    var pos=oPos(i),x=pos.x,y=pos.y,k=sKind(i),isEnt=k.indexOf("entry_")===0;
-    Object.keys(TASKS).forEach(function(tk){var t=TASKS[tk];if(i===t.entryIdx){var p=jPerp(t.entryIdx);x-=p.x*(t.colGap||SW)/2;y-=p.y*(t.colGap||SW)/2;}});
-    var fill=exits[i]?"#c8a96e":sColor(k);
-    var g=mkEl("g",{id:"sp"+i});
-    g.appendChild(mkEl("rect",{x:x-SW/2,y:y-SH/2,width:SW,height:SH,rx:(isEnt||k==="start")?8:5,fill:fill,stroke:k==="start"?"#7dff9a":"#ffffffa0","stroke-width":k==="start"?2.5:0.8}));
-    if(k==="start"){
-      // Bold green START label
-      g.appendChild(mkTxt("START",{x:x,y:y,"text-anchor":"middle","dominant-baseline":"central","font-size":9,fill:"#7dff9a","font-weight":"900"}));
-    } else if(k==="swim"){
-      g.appendChild(mkTxt("🏊",{x:x,y:y,"text-anchor":"middle","dominant-baseline":"central","font-size":18}));
-    } else if(k==="sink"){
-      g.appendChild(mkTxt("🌊",{x:x,y:y,"text-anchor":"middle","dominant-baseline":"central","font-size":18}));
-    } else if(k==="entry_winner"){
-      g.appendChild(mkTxt("⭐",{x:x,y:y,"text-anchor":"middle","dominant-baseline":"central","font-size":18}));
-    }
-    svg.appendChild(g);
-  }
-}
-function pXY(pl){if(pl.winPos>=0){var pts=JC.winner?JC.winner.pts:[];if(pts[pl.winPos])return pts[pl.winPos];}if(pl.inTask){var jd=JC[pl.inTask];if(jd){if(pl.taskPos>=0&&jd.pts[pl.taskPos])return jd.pts[pl.taskPos];return jd.ep||oPos(TASKS[pl.inTask].entryIdx);}}return oPos(pl.pos);}
-function updateTok(s){
-  var layer=document.getElementById("tlayer");if(!layer)return;layer.innerHTML="";
-  var groups={};for(var i=0;i<s.players.length;i++){var pl=s.players[i];if(!pl||pl.eliminated)continue;var xy=pXY(pl),k=Math.round(xy.x)+","+Math.round(xy.y);if(!groups[k])groups[k]=[];groups[k].push({pl:pl,pi:i});}
-  Object.keys(groups).forEach(function(gk){var grp=groups[gk],pts2=gk.split(","),bx=parseFloat(pts2[0]),by=parseFloat(pts2[1]);for(var oi=0;oi<grp.length;oi++){var pl=grp[oi].pl,pi=grp[oi].pi,act=pi===s.curIdx;var ox=grp.length>1?(oi-(grp.length-1)/2)*28:0,oy=grp.length>1?-oi*6:0;var gg=mkEl("g",{transform:"translate("+(bx+ox)+","+(by+oy)+")"});gg.innerHTML=tokenSVG(pl.tokenKey||"captain",pl.color,act);var ws2=pl.name.split(" ");for(var wi=0;wi<ws2.length;wi++)gg.appendChild(mkTxt(ws2[wi],{x:0,y:30+wi*10,"text-anchor":"middle","dominant-baseline":"central","font-size":8,fill:"#fff","font-weight":"bold",stroke:"#000","stroke-width":0.6,"paint-order":"stroke"}));layer.appendChild(gg);}});
-}
-
-// ── TRANSITION ──
-function showTrans(){
-  if(!GS||showTransActive)return;
-  var cur=GS.players[GS.curIdx];if(!cur)return;
-  // Defensive: check isAI strictly
-  var curIsAI=(cur.isAI===true);
-  showTransActive=true;
-  var mine=isMyTurnNow();
-  var isAIGame=GS.players.some(function(p){return p&&p.isAI===true;});
-  var nameLabel;
-  if(isOnlineMultiplayer){nameLabel=mine?"Your Turn!":cur.name+"'s Turn";}
-  else if(isAIGame){nameLabel=(mine&&!curIsAI)?"Your Turn!":cur.name+"'s Turn";}
-  else{nameLabel=cur.name+"'s Turn";}
-  document.getElementById("trsub").textContent=curIsAI?"🤖 AI TURN":"NEXT UP";
-  document.getElementById("trdot").style.background=cur.color;
-  document.getElementById("trdot").style.boxShadow="0 0 20px "+cur.color;
-  document.getElementById("trname").textContent=nameLabel;
-  document.getElementById("trstats").textContent="💰$"+cur.money+(cur.money<0?" ⚠️ IN DEBT":"")+" | "+(cur.completedTasks||[]).length+"/4";
-  document.getElementById("trBtn").style.display=(curIsAI||!mine)?"none":"block";
-  document.getElementById("tro").classList.add("on");
-  if(curIsAI){
-    var delay=aiSpeed==="fast"?300:1800;
-    setTimeout(function(){
-      showTransActive=false;
-      document.getElementById("tro").classList.remove("on");
-      if(GS)GS.phase="preturn";
-      renderAll();
-      setTimeout(function(){
-        if(GS&&GS.players[GS.curIdx]&&GS.players[GS.curIdx].isAI===true&&!aiRunning){
-          runAI();
-        }
-      },aiSpeed==="fast"?100:400);
-    },delay);
-  }
-}
-function disTrans(){
-  showTransActive=false;document.getElementById("tro").classList.remove("on");if(!GS)return;
-  GS.phase="preturn";if(isOnlineMultiplayer&&isMyTurnNow())writeToFirebase(GS);
-  renderAll();setTimeout(function(){centerOn(GS?GS.curIdx:0);},50);
-}
-
-// ── POPUP ──
-var ACOLS={swim:"#1565c0",sink:"#b71c1c",debt:"#c0392b",info:"#1a3a55",success:"#1a7a3a"};
-function showP(title,accent,body,btns,isSpectator){
-  document.getElementById("phd").style.background=ACOLS[accent]||"#1a3a55";
-  document.getElementById("phd").innerHTML='<div style="font-size:18px;font-weight:700;color:#fff">'+title+'</div>';
-  document.getElementById("pbd").textContent=body;
-  var f=document.getElementById("pft");f.innerHTML="";
-  if(isSpectator){var note=document.createElement("div");note.style.cssText="font-size:11px;color:#888;text-align:center;padding:4px 0";note.textContent="⏳ Waiting for "+(GS&&GS.players&&GS.players[GS.curIdx]?GS.players[GS.curIdx].name:"other player")+"...";f.appendChild(note);}
-  else{var isAITurn=GS&&GS.players[GS.curIdx]&&GS.players[GS.curIdx].isAI;if(isAITurn&&aiSpeed==="show"){var note2=document.createElement("div");note2.style.cssText="font-size:11px;color:#aaa;text-align:center;padding:4px 0";note2.textContent="⏳ Continuing in 2s...";f.appendChild(note2);document.getElementById("po").classList.add("on");var cb0=btns&&btns.length&&btns[0]&&btns[0].fn?btns[0].fn:null;setTimeout(function(){hideP();if(cb0)cb0();},2000);return;}(btns||[]).forEach(function(b){var btn=document.createElement("button");btn.textContent=b.l;btn.className=b.c||"pn";btn.onclick=function(){hideP();if(b.fn)b.fn();};f.appendChild(btn);});}
-  document.getElementById("po").classList.add("on");
-}
-function hideP(){document.getElementById("po").classList.remove("on");}
-function showWin(player){
-  document.getElementById("wname").textContent=player.name;
-  document.getElementById("wname").style.color=player.color;
-  document.getElementById("wo").classList.add("on");
-  // Clear online room record — game is over
-  if(isOnlineMultiplayer&&currentUser)clearOnlineRoom();
-  refreshResumeBtn();
-}
+function showWin(player){document.getElementById("wname").textContent=player.name;document.getElementById("wname").style.color=player.color;document.getElementById("wo").classList.add("on");refreshResumeBtn();}
 
 // ── ZOOM ──
 var ZL=[0.4,0.55,0.7,0.85,1.0,1.2,1.5,1.8,2.0,2.2];

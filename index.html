@@ -206,6 +206,13 @@ hr.div{border:none;border-top:1px solid #1a3a55;margin:16px 0}
       <div class="cnt-btn sel" data-sz="2">2</div><div class="cnt-btn" data-sz="3">3</div><div class="cnt-btn" data-sz="4">4</div><div class="cnt-btn" data-sz="5">5</div><div class="cnt-btn" data-sz="6">6</div>
     </div>
     <button class="btn btn-green" id="btnGoCreate">Create Room</button>
+    <!-- Room code shown here after creation, before token selection -->
+    <div id="createRoomCodeSection" style="display:none;margin-top:8px;text-align:center;background:#071728;border:1px solid #1a3a55;border-radius:10px;padding:12px">
+      <p style="font-size:12px;color:#7ecbe0;margin-bottom:4px">Share this code with friends:</p>
+      <div class="room-code" id="onlineCreateCode">----</div>
+      <p style="font-size:11px;color:#4a7a9b;margin-top:4px">Players can join while you choose your token</p>
+      <button class="btn btn-blue" id="btnGoCreateToken" style="margin-top:10px;padding:10px">Choose Your Token →</button>
+    </div>
     <hr class="div"/>
     <div style="font-weight:700;color:#7ecbe0;font-size:13px;margin-bottom:10px">🚀 JOIN A ROOM</div>
     <input class="inp inp-code" id="ji" maxlength="4" placeholder="ENTER CODE"/>
@@ -402,11 +409,26 @@ function sendTurnEmail(toEmail,toName,fromName,roomCode){
 // ── SAVE SYSTEM ──
 function saveSlotKey(id){return currentUser?'savedGames/'+currentUser.uid+'/'+id:null;}
 function saveGame(s){
-  if(!currentUser||!_db||isOnlineMultiplayer||!s||s.winner)return;
+  if(!currentUser||!_db||isOnlineMultiplayer||!s)return;
+  if(s.winner)return; // don't save finished games
   var slotId=s._saveSlot||('slot_'+Date.now());s._saveSlot=slotId;
   var opps=(s.players||[]).filter(function(p,i){return i!==0&&p;});
-  var meta={slotId:slotId,savedAt:Date.now(),gameType:opps.some(function(p){return p&&p.isAI;})?'vs AI':'Local Multiplayer',opponents:opps.map(function(p){return(p&&p.isAI?'🤖 ':'')+( p?p.name:'');}).join(', '),currentTurn:(s.players[s.curIdx]?s.players[s.curIdx].name:'?'),completedCount:s.players[0]?(s.players[0].completedTasks||[]).length:0};
-  dbSet(saveSlotKey(slotId),{state:cleanForFB(s),meta:meta}).catch(function(e){console.warn('Save:',e);});
+  var meta={
+    slotId:slotId,savedAt:Date.now(),
+    gameType:opps.some(function(p){return p&&p.isAI;})?'vs AI':'Local Multiplayer',
+    opponents:opps.map(function(p){return(p&&p.isAI?'🤖 ':'')+( p?p.name:'');}).join(', '),
+    currentTurn:(s.players[s.curIdx]?s.players[s.curIdx].name:'?'),
+    completedCount:s.players[0]?(s.players[0].completedTasks||[]).length:0
+  };
+  dbSet(saveSlotKey(slotId),{state:cleanForFB(s),meta:meta})
+    .then(function(){refreshResumeBtn();})
+    .catch(function(e){console.warn('Save error:',e);});
+}
+
+function commitTurn(s){
+  GS=s;renderAll();
+  if(isOnlineMultiplayer)writeToFirebase(s);
+  else if(currentUser)saveGame(s); // save on every local/AI turn commit
 }
 function getAllSaves(){
   if(!currentUser||!_db)return Promise.resolve({});
@@ -414,24 +436,64 @@ function getAllSaves(){
 }
 function deleteSaveSlot(id){if(!currentUser||!_db)return Promise.resolve();return dbSet(saveSlotKey(id),null).catch(function(){});}
 function deleteSavedGame(){if(!GS||!GS._saveSlot)return;deleteSaveSlot(GS._saveSlot);}
+// ── ONLINE ROOM SAVE/RESUME ──
+function saveOnlineRoom(code,slot){
+  if(!currentUser||!_db||!code)return;
+  dbSet('onlineRooms/'+currentUser.uid,{code:code,mySlot:slot,savedAt:Date.now()}).catch(function(e){console.warn('Online room save:',e);});
+}
+function clearOnlineRoom(){
+  if(!currentUser||!_db)return;
+  dbSet('onlineRooms/'+currentUser.uid,null).catch(function(){});
+}
+function getOnlineRoom(){
+  if(!currentUser||!_db)return Promise.resolve(null);
+  return dbGet('onlineRooms/'+currentUser.uid).catch(function(){return null;});
+}
+
 function refreshResumeBtn(){
   var btn=document.getElementById('btnResume'),sub=document.getElementById('btnResumeSub');if(!btn||!sub)return;
   if(!currentUser){btn.classList.add('btn-disabled');sub.textContent=isGuest?'Not available for guests':'Sign in to resume';return;}
   sub.textContent='Loading...';
-  getAllSaves().then(function(saves){var slots=Object.values(saves).filter(function(s){return s&&s.meta;});if(slots.length>0){btn.classList.remove('btn-disabled');sub.textContent=slots.length+' game'+(slots.length!==1?'s':'')+' available';}else{btn.classList.add('btn-disabled');sub.textContent='No saved games';}}).catch(function(){btn.classList.add('btn-disabled');sub.textContent='Could not load';});
+  Promise.all([getAllSaves(),getOnlineRoom()]).then(function(results){
+    var saves=results[0]||{},onlineRoom=results[1];
+    var slots=Object.values(saves).filter(function(s){return s&&s.meta;});
+    var total=slots.length+(onlineRoom?1:0);
+    if(total>0){btn.classList.remove('btn-disabled');sub.textContent=total+' game'+(total!==1?'s':'')+' available';}
+    else{btn.classList.add('btn-disabled');sub.textContent='No saved games';}
+  }).catch(function(){btn.classList.add('btn-disabled');sub.textContent='Could not load';});
 }
 document.getElementById('btnResume').addEventListener('click',function(){if(this.classList.contains('btn-disabled'))return;openResumePicker();});
 function openResumePicker(){
   if(!currentUser)return;
-  getAllSaves().then(function(saves){
+  Promise.all([getAllSaves(),getOnlineRoom()]).then(function(results){
+    var saves=results[0]||{},onlineRoom=results[1];
     var slots=Object.values(saves).filter(function(s){return s&&s.meta&&s.state;});
-    if(!slots.length){refreshResumeBtn();return;}
-    if(slots.length===1){loadSaveSlot(slots[0]);return;}
     slots.sort(function(a,b){return b.meta.savedAt-a.meta.savedAt;});
+    var hasOnline=!!(onlineRoom&&onlineRoom.code);
+    var total=slots.length+(hasOnline?1:0);
+    if(total===0){refreshResumeBtn();return;}
+    // If only one item total, jump straight to it
+    if(total===1){
+      if(hasOnline)tryRejoinOnline(onlineRoom);
+      else loadSaveSlot(slots[0]);
+      return;
+    }
+    // Show picker
     document.getElementById('phd').style.background='#1a3a55';
     document.getElementById('phd').innerHTML='<div style="font-size:18px;font-weight:700;color:#fff">▶ Resume Which Game?</div>';
     document.getElementById('pbd').innerHTML='<div style="font-size:13px;color:#555;margin-bottom:4px">Select a saved game:</div>';
     var ft=document.getElementById('pft');ft.innerHTML='';
+    // Online room entry at top if exists
+    if(hasOnline){
+      var d=new Date(onlineRoom.savedAt),ts=d.toLocaleDateString()+' '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+      var wrap=document.createElement('div');wrap.style.cssText='width:100%;margin-bottom:8px';
+      var b=document.createElement('button');b.style.cssText='display:block;width:100%;padding:10px 14px;border-radius:9px;border:2px solid #2471a3;background:#071728;color:#fff;font-size:12px;cursor:pointer;text-align:left;margin-bottom:3px';
+      b.innerHTML='<div style="font-weight:700;color:#7ecbe0">🌐 Online Multiplayer</div><div>Room code: <b style="color:#FFD700">'+onlineRoom.code+'</b></div><div style="color:#4eff91">Will attempt to rejoin</div><div style="color:#4a7a9b;font-size:10px">Left at: '+ts+'</div>';
+      b.onclick=function(){hideP();tryRejoinOnline(onlineRoom);};
+      var del=document.createElement('button');del.textContent='🗑 Remove';del.style.cssText='font-size:11px;padding:4px 10px;background:#c0392b;color:#fff;border:none;border-radius:5px;cursor:pointer';
+      del.onclick=function(e){e.stopPropagation();clearOnlineRoom();hideP();refreshResumeBtn();};
+      wrap.appendChild(b);wrap.appendChild(del);ft.appendChild(wrap);
+    }
     slots.forEach(function(slot){
       var m=slot.meta,d=new Date(m.savedAt),ts=d.toLocaleDateString()+' '+d.toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
       var wrap=document.createElement('div');wrap.style.cssText='width:100%;margin-bottom:8px';
@@ -444,6 +506,36 @@ function openResumePicker(){
     });
     var cancel=document.createElement('button');cancel.textContent='Cancel';cancel.className='pn';cancel.onclick=hideP;ft.appendChild(cancel);
     document.getElementById('po').classList.add('on');
+  });
+}
+
+function tryRejoinOnline(onlineRoom){
+  var code=onlineRoom.code,slot=onlineRoom.mySlot;
+  if(!code){clearOnlineRoom();refreshResumeBtn();return;}
+  // Check if room still exists and has a spot for this player
+  dbGet("rooms/"+code).then(function(v){
+    if(!v||v.winner){
+      // Room gone or game over
+      clearOnlineRoom();refreshResumeBtn();
+      showP("Room Unavailable","info","Room "+code+" no longer exists or the game has ended.",[{l:"OK",c:"pn",fn:hideP}]);
+      return;
+    }
+    // Check if our uid is still in the room
+    var foundSlot=-1;
+    if(v.players){
+      for(var i=0;i<(v.roomSize||6);i++){
+        var p=v.players[i];if(p&&p.uid&&p.uid===currentUser.uid){foundSlot=i;break;}
+      }
+    }
+    if(foundSlot<0){
+      // Our slot may have been taken by AI — try original slot
+      foundSlot=slot||0;
+    }
+    rCode=code;myId=foundSlot;isOnlineMultiplayer=true;
+    enterGame(code);
+  }).catch(function(e){
+    clearOnlineRoom();
+    showP("Rejoin Failed","info","Could not connect to room "+code+".\n"+e.message,[{l:"OK",c:"pn",fn:hideP}]);
   });
 }
 function loadSaveSlot(slot){
@@ -574,12 +666,18 @@ document.getElementById("btnOnlineBack").addEventListener("click",function(){sho
 document.getElementById("btnAIBack").addEventListener("click",function(){showScreen("scHome");});
 document.getElementById("btnLocalBack").addEventListener("click",function(){showScreen("scHome");});
 document.getElementById("btnOnlineTokenBack").addEventListener("click",function(){
-  // Reset waiting lobby state
   document.getElementById("waitingLobby").style.display="none";
   document.getElementById("btnJoinGame").style.display="none";
   document.getElementById("btnConfirmCreate").style.display="block";
   if(rUnsub){rUnsub();rUnsub=null;}
+  if(rCode&&!onlineJoining){
+    // Delete the pre-created room if creator backs out before confirming token
+    dbSet("rooms/"+rCode,null).catch(function(){});
+  }
   rCode=null;isOnlineMultiplayer=false;
+  // Reset create section on online screen
+  document.getElementById("createRoomCodeSection").style.display="none";
+  document.getElementById("btnGoCreate").style.display="block";
   showScreen("scOnline");
 });
 document.getElementById("btnAITokenBack").addEventListener("click",function(){showScreen("scAI");});
@@ -593,10 +691,26 @@ function resetOnlineTokenScreen(isJoining){
 
 document.getElementById("btnGoCreate").addEventListener("click",function(){
   if(!currentUser){alert("Sign in required.");return;}
+  var name=document.getElementById("onlineName").value.trim()||currentUser.displayName||"Player 1";
+  if(!name){alert("Please enter your name.");return;}
+  // Generate room code and show it immediately on this screen
+  var code=String(Math.floor(1000+Math.random()*9000));
+  rCode=code;myId=0;isOnlineMultiplayer=true;
+  document.getElementById("onlineCreateCode").textContent=code;
+  document.getElementById("createRoomCodeSection").style.display="block";
+  document.getElementById("btnGoCreate").style.display="none";
+  // Pre-create room in Firebase so others can see the code exists
+  var tempState={players:[null],curIdx:0,phase:"waiting",log:[],roomSize:selRoomSize,swimDeck:mkSwim(),sinkDeck:mkSink(),swDeck:mkDeck(SWDEFS),winner:null,takenTokens:[],roomName:name};
+  var tempPlayers=[];for(var i=0;i<selRoomSize;i++)tempPlayers.push(null);
+  tempState.players=tempPlayers;
+  dbSet("rooms/"+code,tempState).catch(function(e){console.warn("Pre-create room:",e);});
+});
+
+document.getElementById("btnGoCreateToken").addEventListener("click",function(){
   onlineJoining=false;takenTokens=[];selOnlineTok=null;
   document.getElementById("onlineTokTitle").textContent="Choose Your Token";
-  document.getElementById("onlineTokSub").textContent="Pick a token before creating your room";
-  document.getElementById("onlineTokNote").textContent="";
+  document.getElementById("onlineTokSub").textContent="Pick a token before entering the game";
+  document.getElementById("onlineTokNote").textContent="Room code: "+rCode;
   resetOnlineTokenScreen(false);
   buildTokenGrid("onlineTokenGrid",null,"#2471a3",function(k){selOnlineTok=k;},[]);
   showScreen("scOnlineToken");
@@ -634,9 +748,9 @@ document.getElementById("btnJoinGame").addEventListener("click",function(){
 });
 
 function doCreateRoom(){
+  // rCode already set by btnGoCreate; update with player info and token
   var name=document.getElementById("onlineName").value.trim()||currentUser.displayName||"Player 1";
-  var code=String(Math.floor(1000+Math.random()*9000));
-  rCode=code;myId=0;isOnlineMultiplayer=true;
+  var code=rCode;
   var players=[];for(var i=0;i<selRoomSize;i++)players.push(null);
   players[0]=mkP(0,name,PC[0],false,null,selOnlineTok,currentUser.uid);
   var s={players:players,curIdx:0,phase:"waiting",log:[],roomSize:selRoomSize,swimDeck:mkSwim(),sinkDeck:mkSink(),swDeck:mkDeck(SWDEFS),winner:null,takenTokens:[selOnlineTok]};
@@ -716,14 +830,52 @@ document.getElementById("btnLocalTokNext").addEventListener("click",function(){i
 function enterGame(code){
   if(rUnsub){rUnsub();rUnsub=null;}
   showScreen(null);document.getElementById("waveBg").style.display="none";document.getElementById("game").classList.add("on");document.getElementById("rpill").textContent="ROOM "+code;
-  JC=buildJC();drawBoard();if(currentUser)dbSet("rooms/"+code+"/presence/"+myId,true);
+  JC=buildJC();drawBoard();
+  if(currentUser){
+    dbSet("rooms/"+code+"/presence/"+myId,true);
+    saveOnlineRoom(code,myId); // persist room code for rejoin
+  }
   var shownTransFor=-1;
+  var lastLogLen=0;
+  var lastPhase="";
+  var lastCurIdx=-1;
   rUnsub=dbOn("rooms/"+code,function(v){
     if(!v)return;
     if(currentUser&&v.players){for(var i=0;i<(v.roomSize||6);i++){var p=v.players[i];if(p&&p.uid&&p.uid===currentUser.uid){myId=i;break;}}}
-    var curPl=v.players&&v.players[v.curIdx];var nowMyTurn=!!(curPl&&curPl.uid&&currentUser&&curPl.uid===currentUser.uid);
-    if(!nowMyTurn&&document.getElementById("po").classList.contains("on"))hideP();
+    var curPl=v.players&&v.players[v.curIdx];
+    var nowMyTurn=!!(curPl&&curPl.uid&&currentUser&&curPl.uid===currentUser.uid);
+
+    // When it becomes MY turn, dismiss any spectator popup
+    if(nowMyTurn&&document.getElementById("po").classList.contains("on")){
+      hideP();lastSpectatorEvent="";
+    }
+
+    var prevGS=GS;
     GS=v;renderAll();
+
+    // Show spectator popups for non-active players
+    if(!nowMyTurn&&v.phase==="preturn"||!nowMyTurn&&v.phase==="transition"){
+      var logArr=Array.isArray(v.log)?v.log:Object.values(v.log||{});
+      var curLogLen=logArr.length;
+      if(curLogLen>lastLogLen&&logArr.length>0){
+        // New log entry — show it as spectator popup
+        var latestEntry=logArr[0];
+        // Don't show card details — filter out shipwreck card content
+        var isCardMsg=latestEntry.indexOf("Shipwreck card")>=0||latestEntry.indexOf("plays a Shipwreck")>=0;
+        var isRollMsg=latestEntry.indexOf("rolls")>=0;
+        var isPassMsg=latestEntry.indexOf("passed START")>=0;
+        var isTaskMsg=latestEntry.indexOf("completed")>=0||latestEntry.indexOf("enters")>=0||latestEntry.indexOf("SWIM")>=0||latestEntry.indexOf("SINK")>=0||latestEntry.indexOf("sp")>=0;
+        var playerName=curPl?curPl.name:"";
+        if(isRollMsg){
+          var rollNum=latestEntry.match(/rolls (\d)/);showSpectatorPopup("🎲 "+playerName+" rolled",(rollNum?"Rolled a "+rollNum[1]+"!":"Rolling..."));}
+        else if(isPassMsg){showSpectatorPopup("💰 Passed START!",playerName+" passed START and collected $5!");}
+        else if(isCardMsg&&latestEntry.indexOf("bought")>=0){showSpectatorPopup("🃏 Shipwreck Card",playerName+" bought a Shipwreck card.");}
+        else if(isCardMsg&&latestEntry.indexOf("plays")>=0){showSpectatorPopup("🃏 Shipwreck Card Played!",playerName+" played a Shipwreck card!");}
+        else if(isTaskMsg){showSpectatorPopup("📍 "+playerName,latestEntry.replace(/🤖 /g,"").replace(/🎲/g,"").replace(/💰/g,"").replace(/🎉/g,""));}
+      }
+      lastLogLen=curLogLen;
+    }
+
     if(nowMyTurn&&v.phase==="transition"&&shownTransFor!==v.curIdx){shownTransFor=v.curIdx;showTransActive=false;showTrans();}
     if(v.pendingTrade&&v.pendingTrade.toIdx===myId&&!v.pendingTrade.responded)showTradeOffer(v.pendingTrade,v);
   });
@@ -738,8 +890,11 @@ function startGame(players,spd){
 
 function leaveGame(){
   if(GS&&!isOnlineMultiplayer&&currentUser)saveGame(GS);
+  if(isOnlineMultiplayer&&currentUser){
+    // Keep online room saved so player can rejoin — don't clear it on leave
+    if(rCode)dbSet("rooms/"+rCode+"/presence/"+myId,false);
+  }
   aiRunning=false;showTransActive=false;tradeOpen=false;
-  if(rCode&&currentUser)dbSet("rooms/"+rCode+"/presence/"+myId,false);
   if(rUnsub){rUnsub();rUnsub=null;}
   GS=null;isOnlineMultiplayer=false;rCode=null;
   document.getElementById("game").classList.remove("on");document.getElementById("wo").classList.remove("on");document.getElementById("tro").classList.remove("on");
@@ -750,7 +905,6 @@ function leaveGame(){
 
 function isMyTurnNow(){if(!isOnlineMultiplayer)return true;if(!GS||!currentUser)return false;var cur=GS.players&&GS.players[GS.curIdx];return !!(cur&&cur.uid&&cur.uid===currentUser.uid);}
 function writeToFirebase(s){if(isOnlineMultiplayer&&rCode)dbSet("rooms/"+rCode,cleanForFB(s)).catch(function(e){console.error(e);});}
-function commitTurn(s){GS=s;renderAll();if(isOnlineMultiplayer)writeToFirebase(s);}
 
 function notifyNextPlayer(s,prevIdx,nextIdx){
   if(!isOnlineMultiplayer||!rCode)return;var nextPl=s.players[nextIdx];if(!nextPl||nextPl.isAI||!nextPl.uid||(nextPl.uid===(currentUser?currentUser.uid:null)))return;
@@ -1126,7 +1280,14 @@ function showP(title,accent,body,btns,isSpectator){
   document.getElementById("po").classList.add("on");
 }
 function hideP(){document.getElementById("po").classList.remove("on");}
-function showWin(player){document.getElementById("wname").textContent=player.name;document.getElementById("wname").style.color=player.color;document.getElementById("wo").classList.add("on");refreshResumeBtn();}
+function showWin(player){
+  document.getElementById("wname").textContent=player.name;
+  document.getElementById("wname").style.color=player.color;
+  document.getElementById("wo").classList.add("on");
+  // Clear online room record — game is over
+  if(isOnlineMultiplayer&&currentUser)clearOnlineRoom();
+  refreshResumeBtn();
+}
 
 // ── ZOOM ──
 var ZL=[0.4,0.55,0.7,0.85,1.0,1.2,1.5,1.8,2.0,2.2];
